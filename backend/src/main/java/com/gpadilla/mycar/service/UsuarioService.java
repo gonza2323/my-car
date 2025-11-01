@@ -5,11 +5,13 @@ import com.gpadilla.mycar.dtos.usuario.UsuarioDetailDto;
 import com.gpadilla.mycar.dtos.usuario.UsuarioSummaryDto;
 import com.gpadilla.mycar.dtos.usuario.UsuarioUpdateDto;
 import com.gpadilla.mycar.entity.Usuario;
+import com.gpadilla.mycar.enums.UserRole;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.UsuarioMapper;
 import com.gpadilla.mycar.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UsuarioService extends BaseService<
@@ -37,7 +39,7 @@ public class UsuarioService extends BaseService<
 
     @Override
     protected void validateCreate(UsuarioCreateDto dto) {
-        validarNombreEsUnico(dto.getEmail(), null);
+        validarEmailUnico(dto.getEmail(), null);
 
         if (!dto.getPassword().equals(dto.getPasswordConfirmacion()))
             throw new BusinessException("Las contraseñas no coinciden");
@@ -45,15 +47,30 @@ public class UsuarioService extends BaseService<
 
     @Override
     protected void validateUpdate(UsuarioUpdateDto dto) {
-        validarNombreEsUnico(dto.getEmail(), dto.getId());
+        validarEmailUnico(dto.getEmail(), dto.getId());
     }
 
-    private void validarNombreEsUnico(String nombre, Long excludeId) {
+    public void validarEmailUnico(String nombre, Long excludeId) {
         boolean exists = (excludeId == null)
                 ? repository.existsByEmailAndEliminadoFalse(nombre)
                 : repository.existsByEmailAndIdNotAndEliminadoFalse(nombre, excludeId);
 
         if (exists)
             throw new BusinessException("El email de usuario ya está en uso");
+    }
+
+    @Transactional
+    public Usuario registerUserFromAuth0(String providerId, String email) {
+        validarEmailUnico(email, null);
+        
+        Usuario usuario = Usuario.builder()
+                .email(email)
+                .password(null)
+                .providerId(providerId)
+                .rol(UserRole.CLIENTE)
+                .hasCompletedProfile(false).build();
+
+        repository.save(usuario);
+        return usuario;
     }
 }

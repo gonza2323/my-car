@@ -6,25 +6,43 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Builder
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails, OidcUser {
 
     @Getter
     private final Long id;
     private final String email;
     private final String password;
     private final UserRole rol;
+    private final OidcUser oidcUser;
 
     public CustomUserDetails(Long id, String email, String password, UserRole rol) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.rol = rol;
+        this.oidcUser = null;
     }
+
+    public CustomUserDetails(Long id, String email, String password, UserRole rol, OidcUser oidcUser) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.rol = rol;
+        this.oidcUser = oidcUser;
+    }
+
+
+    // Métodos de UserDetails
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -59,5 +77,33 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+
+    // Métodos de OidcUserInfo
+
+    @Override
+    public Map<String, Object> getClaims() {
+        return oidcUser != null ? oidcUser.getClaims() : Collections.emptyMap();
+    }
+
+    @Override
+    public OidcUserInfo getUserInfo() {
+        return oidcUser != null ? oidcUser.getUserInfo() : null;
+    }
+
+    @Override
+    public OidcIdToken getIdToken() {
+        return oidcUser != null ? oidcUser.getIdToken() : null;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return oidcUser != null ? oidcUser.getAttributes() : Collections.emptyMap();
+    }
+
+    @Override
+    public String getName() {
+        return oidcUser != null ? oidcUser.getName() : null;
     }
 }

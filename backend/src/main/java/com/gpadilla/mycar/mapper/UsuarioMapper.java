@@ -16,12 +16,16 @@ public interface UsuarioMapper extends BaseMapper<Usuario, UsuarioDetailDto, Usu
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "eliminado", ignore = true)
     @Mapping(target = "password", ignore = true)
+    @Mapping(target = "providerId", ignore = true)
+    @Mapping(target = "rol", ignore = true)
     Usuario toEntity(UsuarioCreateDto Dto);
 
     @Override
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "eliminado", ignore = true)
     @Mapping(target = "password", ignore = true)
+    @Mapping(target = "providerId", ignore = true)
+    @Mapping(target = "rol", ignore = true)
     void updateEntity(UsuarioUpdateDto dto, @MappingTarget Usuario usuario);
 
     @Override

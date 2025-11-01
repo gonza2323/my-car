@@ -1,16 +1,18 @@
 package com.gpadilla.mycar.service;
 
+import com.gpadilla.mycar.auth.CustomUserDetails;
 import com.gpadilla.mycar.dtos.auth.LoginRequest;
+import com.gpadilla.mycar.entity.Usuario;
+import com.gpadilla.mycar.error.BusinessException;
+import com.gpadilla.mycar.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,30 +20,42 @@ public class AuthService {
 
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
-    public Long buscarIdUsuarioActual() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    @Transactional
+    public Usuario loginOrSignupWithProvider(String providerId, String email, boolean emailVerified) {
 
-        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        // Buscamos usuario por OAuth2Id, si existe inicia sesión
+        Usuario usuario = usuarioRepository.findByProviderIdAndEliminadoFalse(providerId)
+                .orElse(null);
+        if (usuario != null)
+            return usuario;
+
+
+        // Intentamos registrar al usuario
+        
+        // Aseguramos que el mail exista
+        if (email == null || email.isBlank()) {
+            throw new OAuth2AuthenticationException(new OAuth2Error("email_not_provided"),
+                    "Email not provided");
+        }
+        
+        // Aseguramos que el mail esté verificado
+        if (!emailVerified) {
+            throw new OAuth2AuthenticationException(new OAuth2Error("email_not_verified"),
+                    "Email is not verified");
         }
 
-        Object principal = authentication.getPrincipal();
-        if (!(principal instanceof Jwt jwt)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        }
-
-        Long userId;
+        // Intentamos el registro
         try {
-            userId = Long.parseLong(jwt.getSubject());
-        } catch (NumberFormatException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            return usuario = usuarioService.registerUserFromAuth0(providerId, email);
+        } catch (BusinessException ex) {
+            throw new OAuth2AuthenticationException(new OAuth2Error("email_taken"), "Email is already in use");
         }
-
-        return userId;
     }
 
-    public String authenticateAndGetToken(LoginRequest loginRequest) {
+    public String authWithEmailAndPasswordAndGetToken(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
@@ -49,6 +63,6 @@ public class AuthService {
                 )
         );
 
-        return jwtService.generateToken(authentication);
+        return jwtService.generateToken((CustomUserDetails) authentication.getPrincipal());
     }
 }

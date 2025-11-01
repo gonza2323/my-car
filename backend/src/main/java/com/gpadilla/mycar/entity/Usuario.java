@@ -5,14 +5,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Usuario extends BaseEntity<Long> {
@@ -26,4 +25,9 @@ public class Usuario extends BaseEntity<Long> {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole rol;
+
+    private String providerId;
+
+    @Column(nullable = false)
+    private Boolean hasCompletedProfile;
 }

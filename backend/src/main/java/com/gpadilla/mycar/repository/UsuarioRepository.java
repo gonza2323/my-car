@@ -10,4 +10,6 @@ public interface UsuarioRepository extends BaseRepository<Usuario, Long> {
     boolean existsByEmailAndIdNotAndEliminadoFalse(String name, Long id);
 
     Optional<Usuario> findByEmailAndEliminadoFalse(String nombre);
+
+    Optional<Usuario> findByProviderIdAndEliminadoFalse(String providerId);
 }
