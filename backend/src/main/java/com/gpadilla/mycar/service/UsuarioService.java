@@ -70,7 +70,6 @@ public class UsuarioService extends BaseService<
                 .rol(UserRole.CLIENTE)
                 .hasCompletedProfile(false).build();
 
-        repository.save(usuario);
-        return usuario;
+        return repository.save(usuario);
     }
 }

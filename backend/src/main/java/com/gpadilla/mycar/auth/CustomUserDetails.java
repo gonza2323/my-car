@@ -16,28 +16,29 @@ import java.util.List;
 import java.util.Map;
 
 @Builder
-public class CustomUserDetails implements UserDetails, OidcUser {
+public class CustomUserDetails implements UserDetails, OidcUser, CurrentUser {
 
     @Getter
     private final Long id;
     private final String email;
     private final String password;
-    private final UserRole rol;
+    @Getter
+    private final Collection<UserRole> roles;
     private final OidcUser oidcUser;
 
-    public CustomUserDetails(Long id, String email, String password, UserRole rol) {
+    public CustomUserDetails(Long id, String email, String password, Collection<UserRole> roles) {
         this.id = id;
         this.email = email;
         this.password = password;
-        this.rol = rol;
+        this.roles = roles;
         this.oidcUser = null;
     }
 
-    public CustomUserDetails(Long id, String email, String password, UserRole rol, OidcUser oidcUser) {
+    public CustomUserDetails(Long id, String email, String password, Collection<UserRole> roles, OidcUser oidcUser) {
         this.id = id;
         this.email = email;
         this.password = password;
-        this.rol = rol;
+        this.roles = roles;
         this.oidcUser = oidcUser;
     }
 
@@ -46,7 +47,7 @@ public class CustomUserDetails implements UserDetails, OidcUser {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + rol));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + roles));
     }
 
     @Override

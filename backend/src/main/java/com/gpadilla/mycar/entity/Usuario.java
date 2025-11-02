@@ -19,7 +19,6 @@ public class Usuario extends BaseEntity<Long> {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)

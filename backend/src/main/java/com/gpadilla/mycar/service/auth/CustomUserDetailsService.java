@@ -1,4 +1,4 @@
-package com.gpadilla.mycar.service;
+package com.gpadilla.mycar.service.auth;
 
 import com.gpadilla.mycar.auth.CustomUserDetails;
 import com.gpadilla.mycar.entity.Usuario;
@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,6 +28,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Usuario no encontrado");
 
         Usuario usuario = usuarioOpt.get();
-        return new CustomUserDetails(usuario.getId(), usuario.getEmail(), usuario.getPassword(), usuario.getRol());
+        return new CustomUserDetails(usuario.getId(), usuario.getEmail(), usuario.getPassword(), List.of(usuario.getRol()));
     }
 }

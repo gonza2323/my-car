@@ -11,7 +11,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.List;
 
 @Component
 public class JwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
@@ -28,20 +27,20 @@ public class JwtAuthenticationConverter implements Converter<Jwt, AbstractAuthen
         Collection<GrantedAuthority> authorities = authoritiesConverter.convert(jwt);
 
         Long id = Long.valueOf(jwt.getSubject());
-        List<String> roles = jwt.getClaimAsStringList("roles");
+        Collection<String> rolesStrings = jwt.getClaimAsStringList("roles");
 
-        if (roles == null || roles.isEmpty()) {
+        if (rolesStrings == null || rolesStrings.isEmpty()) {
             throw new JwtException("Missing or empty roles claim");
         }
 
-        UserRole role;
+        Collection<UserRole> roles;
         try {
-            role = UserRole.valueOf(roles.getFirst());
+            roles = rolesStrings.stream().map(UserRole::valueOf).toList();
         } catch (IllegalArgumentException e) {
-            throw new JwtException("Invalid role in token: " + roles.getFirst());
+            throw new JwtException("Invalid role in token: " + rolesStrings);
         }
 
-        CustomUserDetails userDetails = new CustomUserDetails(id, null, null, role);
+        CustomUserDetails userDetails = new CustomUserDetails(id, null, null, roles);
 
         return new UsernamePasswordAuthenticationToken(userDetails, jwt, authorities);
     }

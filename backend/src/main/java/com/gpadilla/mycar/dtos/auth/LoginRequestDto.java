@@ -1,5 +1,7 @@
 package com.gpadilla.mycar.dtos.auth;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +13,13 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
+public class LoginRequestDto {
+
+    @Email(message = "Ingrese un email válido")
     private String email;
+
+    @NotNull(message = "Ingrese su contraseña")
     private String password;
-    private Boolean rememberMe;
+
+    private boolean rememberMe = false;
 }

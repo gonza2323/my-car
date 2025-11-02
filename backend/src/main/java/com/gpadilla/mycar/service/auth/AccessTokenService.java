@@ -1,6 +1,6 @@
-package com.gpadilla.mycar.service;
+package com.gpadilla.mycar.service.auth;
 
-import com.gpadilla.mycar.auth.CustomUserDetails;
+import com.gpadilla.mycar.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -9,24 +9,17 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
-public class JwtService {
+public class AccessTokenService {
 
     private final JwtEncoder encoder;
 
-    public String generateToken(CustomUserDetails customUserDetails) {
+    public String createToken(Long userId, Collection<UserRole> roles) {
         Instant now = Instant.now();
         long expiry = 10 * 60; // 10 minutos
-
-        List<String> roles = customUserDetails.getAuthorities().stream()
-                .filter(auth -> auth.getAuthority().startsWith("ROLE_"))
-                .map(auth -> auth.getAuthority().substring(5))
-                .toList();
-
-        Long userId = customUserDetails.getId();
 
         JwsHeader jwsHeader = JwsHeader.with(() -> "HS256").build();
 

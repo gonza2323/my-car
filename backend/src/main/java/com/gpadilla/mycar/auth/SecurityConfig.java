@@ -1,10 +1,11 @@
 package com.gpadilla.mycar.auth;
 
-import com.gpadilla.mycar.service.CustomOidcUserService;
+import com.gpadilla.mycar.config.AppProperties;
+import com.gpadilla.mycar.service.auth.CustomOidcUserService;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -31,14 +32,10 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final String jwtSecret;
-
-    public SecurityConfig(
-            @Value("${jwt.secret}") String jwtSecret) {
-        this.jwtSecret = jwtSecret;
-    }
+    private final AppProperties properties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -74,15 +71,16 @@ public class SecurityConfig {
 
     @Bean
     public JwtEncoder jwtEncoder() {
-        System.out.println(jwtSecret);
-        SecretKey key = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256");
+        String secret = properties.auth().accessToken().secret();
+        SecretKey key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
         JWKSource<SecurityContext> immutableSecret = new ImmutableSecret<SecurityContext>(key);
         return new NimbusJwtEncoder(immutableSecret);
     }
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        SecretKey originalKey = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256");
+        String secret = properties.auth().accessToken().secret();
+        SecretKey originalKey = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(originalKey).build();
         return jwtDecoder;
     }

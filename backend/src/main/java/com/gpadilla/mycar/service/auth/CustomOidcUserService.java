@@ -1,4 +1,4 @@
-package com.gpadilla.mycar.service;
+package com.gpadilla.mycar.service.auth;
 
 import com.gpadilla.mycar.auth.CustomUserDetails;
 import com.gpadilla.mycar.entity.Usuario;
@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,6 @@ public class CustomOidcUserService implements OAuth2UserService<OidcUserRequest,
 
         Usuario usuario = authService.loginOrSignupWithProvider(providerId, email, emailVerified);
 
-        return new CustomUserDetails(usuario.getId(), usuario.getEmail(), usuario.getPassword(), usuario.getRol(), oidcUser);
+        return new CustomUserDetails(usuario.getId(), usuario.getEmail(), usuario.getPassword(), List.of(usuario.getRol()), oidcUser);
     }
 }

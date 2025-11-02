@@ -1,10 +1,12 @@
-package com.gpadilla.mycar.service;
+package com.gpadilla.mycar.service.auth;
 
-import com.gpadilla.mycar.auth.CustomUserDetails;
-import com.gpadilla.mycar.dtos.auth.LoginRequest;
+import com.gpadilla.mycar.auth.CurrentUser;
+import com.gpadilla.mycar.dtos.auth.LoginRequestDto;
 import com.gpadilla.mycar.entity.Usuario;
+import com.gpadilla.mycar.enums.UserRole;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.repository.UsuarioRepository;
+import com.gpadilla.mycar.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,11 +16,14 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final JwtService jwtService;
+    private final AccessTokenService accessTokenService;
     private final AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
@@ -55,7 +60,7 @@ public class AuthService {
         }
     }
 
-    public String authWithEmailAndPasswordAndGetToken(LoginRequest loginRequest) {
+    public CurrentUser getAuthenticatedUser(LoginRequestDto loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
@@ -63,6 +68,12 @@ public class AuthService {
                 )
         );
 
-        return jwtService.generateToken((CustomUserDetails) authentication.getPrincipal());
+        return (CurrentUser) authentication.getPrincipal();
+    }
+
+    @Transactional(readOnly = true)
+    public Collection<UserRole> getUserRoles(Long userId) {
+        Usuario user = usuarioService.find(userId);
+        return List.of(user.getRol());
     }
 }
