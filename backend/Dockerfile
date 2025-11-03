@@ -8,8 +8,6 @@ RUN useradd -u ${APP_UID} -ms /bin/bash mycar
 # Switch to non-root user
 USER mycar
 
-WORKDIR /app
-
 # Copy the JAR built by CI/CD
 COPY mycar.jar app.jar
 
