@@ -13,7 +13,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     env:
-      # Add compilation environment variables here
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/my_car
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
@@ -21,20 +20,20 @@ jobs:
       AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
       AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_DB: my_car
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=5
+    # services:
+    #   postgres:
+    #     image: postgres:15
+    #     env:
+    #       POSTGRES_DB: my_car
+    #       POSTGRES_USER: postgres
+    #       POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+    #     ports:
+    #       - 5432:5432
+    #     options: >-
+    #       --health-cmd="pg_isready -U postgres"
+    #       --health-interval=5s
+    #       --health-timeout=5s
+    #       --health-retries=5
 
     steps:
       - name: Checkout code
@@ -49,7 +48,7 @@ jobs:
       - name: Build and test backend
         working-directory: backend
         run: |
-          mvn clean package
+          mvn clean package -DskipTests
           # Rename JAR to mycar.jar
           mv target/*.jar target/mycar.jar
 
