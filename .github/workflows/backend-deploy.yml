@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Add compilation environment variables here
-      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/my_car
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/my_car
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
       AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
@@ -30,6 +30,11 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
         ports:
           - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
       - name: Checkout code
