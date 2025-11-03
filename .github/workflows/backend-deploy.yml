@@ -1,0 +1,88 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches:
+      - deploy
+    paths:
+      - 'backend/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      # Add compilation environment variables here
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/my_car
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+      AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+      AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+      AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: my_car
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
+      - name: Build and test backend
+        working-directory: backend
+        run: |
+          mvn clean package
+          # Rename JAR to mycar.jar
+          mv target/*.jar target/mycar.jar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: mycar-backend-jar
+          path: backend/target/mycar.jar
+
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: mycar-backend-jar
+          path: ./backend/target
+
+      - name: Copy JAR to server
+        uses: appleboy/scp-action@v0.1.5
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: mycar
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: ./backend/target/mycar.jar
+          target: /home/mycar/mycar.jar
+
+      - name: Deploy with Docker Compose
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: mycar
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+            cd /home/mycar/backend
+            docker-compose down
+            docker-compose up -d --build
