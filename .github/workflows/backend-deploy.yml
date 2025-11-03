@@ -70,7 +70,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: mycar-backend-jar
-          path: backend/target
+          path: ./
 
       - name: Copy JAR to server
         uses: appleboy/scp-action@v0.1.5
@@ -78,8 +78,8 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: mycar
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: backend/target/mycar.jar
-          target: /home/mycar/      
+          source: ./mycar.jar
+          target: /home/mycar/
 
       - name: Deploy with Docker Compose
         uses: appleboy/ssh-action@v0.1.7
@@ -89,6 +89,6 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             set -e
-            cd /home/mycar/backend
+            cd /home/mycar/
             docker-compose down
             docker-compose up -d --build
