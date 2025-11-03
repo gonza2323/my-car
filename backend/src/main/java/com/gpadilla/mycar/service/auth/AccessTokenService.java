@@ -1,5 +1,7 @@
 package com.gpadilla.mycar.service.auth;
 
+import com.gpadilla.mycar.config.AppProperties;
+import com.gpadilla.mycar.dtos.auth.AccessTokenDto;
 import com.gpadilla.mycar.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -16,21 +18,28 @@ import java.util.Collection;
 public class AccessTokenService {
 
     private final JwtEncoder encoder;
+    private final AppProperties config;
 
-    public String createToken(Long userId, Collection<UserRole> roles) {
+    public AccessTokenDto createToken(Long userId, Collection<UserRole> roles) {
+        AppProperties.Auth.AccessToken tokenConfig = config.auth().accessToken();
         Instant now = Instant.now();
-        long expiry = 10 * 60; // 10 minutos
+        Instant expiryDate = now.plusSeconds(60 * tokenConfig.durationMinutes());
 
         JwsHeader jwsHeader = JwsHeader.with(() -> "HS256").build();
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(now)
-                .expiresAt(now.plusSeconds(expiry))
+                .expiresAt(expiryDate)
                 .subject(userId.toString())
                 .claim("roles", roles)
                 .build();
 
-        return this.encoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+        String encodedToken = this.encoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+
+        return AccessTokenDto.builder()
+                .value(encodedToken)
+                .expiryDate(expiryDate)
+                .build();
     }
 }

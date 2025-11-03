@@ -6,26 +6,26 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record AppProperties(
     Auth auth,
     String baseUrl,
-    String frontendUrl,
-    String domain
+    String frontendUrl
 ) {
     public record Auth(RefreshToken refreshToken, AccessToken accessToken) {
+
         public record RefreshToken(Cookie cookie,
-            long days
+            long defaultDurationMinutes,
+            long rememberMeDurationDays
         ) {
             public record Cookie(
                 String name,
-                String path,
-                boolean httpOnly,
-                boolean secure,
-                String sameSite
+                String domain,
+                String sameSite,
+                boolean secure
             ) {
             }
         }
 
         public record AccessToken(
             String secret,
-            long minutes
+            long durationMinutes
         ) {
         }
     }

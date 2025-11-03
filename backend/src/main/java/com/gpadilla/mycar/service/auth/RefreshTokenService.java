@@ -1,5 +1,6 @@
 package com.gpadilla.mycar.service.auth;
 
+import com.gpadilla.mycar.config.AppProperties;
 import com.gpadilla.mycar.dtos.auth.RefreshTokenDto;
 import com.gpadilla.mycar.entity.RefreshToken;
 import com.gpadilla.mycar.entity.Usuario;
@@ -22,6 +23,7 @@ public class RefreshTokenService {
     private final RefreshTokenRepository repository;
     private final SecureRandom secureRandom = new SecureRandom();
     private final Base64.Encoder base64Encoder = Base64.getUrlEncoder().withoutPadding();
+    private final AppProperties appProperties;
 
     private String generateRandomToken() {
         byte[] bytes = new byte[TOKEN_LENGTH_BYTES];
@@ -31,9 +33,12 @@ public class RefreshTokenService {
 
     @Transactional
     public RefreshTokenDto createToken(Usuario user, boolean rememberMe) {
+        AppProperties.Auth.RefreshToken tokenConfig = appProperties.auth().refreshToken();
         String token = generateRandomToken();
         Instant now = Instant.now();
-        Instant expiry = now.plus(rememberMe ? 30 : 7, ChronoUnit.DAYS);
+        Instant expiry = rememberMe
+                ? now.plus(tokenConfig.rememberMeDurationDays(), ChronoUnit.DAYS)
+                : now.plus(tokenConfig.defaultDurationMinutes(), ChronoUnit.MINUTES);
 
         RefreshToken entity = RefreshToken.builder()
                 .tokenHash(token)
