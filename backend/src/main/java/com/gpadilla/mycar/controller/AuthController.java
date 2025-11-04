@@ -36,7 +36,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginRequestDto loginRequest) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequest) {
         CurrentUser user = authService.getAuthenticatedUser(loginRequest);
 
         Usuario usuario = usuarioService.find(user.getId());
@@ -44,9 +44,9 @@ public class AuthController {
         RefreshTokenDto refreshToken = refreshTokenService.createToken(usuario, loginRequest.isRemember());
         ResponseCookie refreshTokenCookie = refreshTokenCookieHelper.createRefreshCookie(refreshToken);
 
-        AuthResponseDto response = AuthResponseDto.builder()
+        LoginResponseDto response = LoginResponseDto.builder()
                 .token(accessToken)
-                .status(AuthStatusDto.authenticated(user.getId(), user.getRoles()))
+                .user(new AuthUserDto(user.getId(), user.getRoles()))
                 .build();
 
         return ResponseEntity.ok()
@@ -68,12 +68,13 @@ public class AuthController {
                 .build();
     }
 
-    @GetMapping("/status")
-    public ResponseEntity<AuthStatusDto> authStatus(@AuthenticationPrincipal CurrentUser user) {
-        if (user != null) {
-            return ResponseEntity.ok(AuthStatusDto.authenticated(user.getId(), user.getRoles()));
+    @GetMapping("/me")
+    public ResponseEntity<AuthUserDto> authStatus(@AuthenticationPrincipal CurrentUser user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(AuthStatusDto.unauthenticated());
+
+        return ResponseEntity.ok(new AuthUserDto(user.getId(), user.getRoles()));
     }
 
     @PostMapping("/refresh")

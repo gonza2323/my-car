@@ -1,5 +1,4 @@
 import { createContext, ReactNode, useEffect, useMemo, useState } from 'react';
-import { loadAccessToken, removeClientAccessToken } from '@/api/axios';
 import { useGetAuthStatus } from '@/hooks';
 
 export const AuthContext = createContext();
@@ -13,16 +12,14 @@ export function AuthProvider({ children }) {
   });
 
   useEffect(() => {
-    console.log("Auth status change")
-    console.log(data)
     if (data) {
       setAuth({
-        isAuthenticated: data.isAuthenticated,
+        isAuthenticated: true,
         userId: data.userId,
         roles: data.roles || [],
       });
     }
-  }, [data, isLoading]);
+  }, [isLoading]);
 
   const value = useMemo(() => ({
     ...auth,

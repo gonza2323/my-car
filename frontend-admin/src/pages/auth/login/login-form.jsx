@@ -32,10 +32,6 @@ export function LoginForm({ ...props }) {
     login(
       { variables },
       {
-        onSuccess: () => {
-          // todo: fix
-          navigate(redirectTo, { replace: true });
-        },
         onError: error => handleFormErrors(form, error)
       }
     )

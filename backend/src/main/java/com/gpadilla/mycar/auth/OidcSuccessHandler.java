@@ -34,7 +34,7 @@ public class OidcSuccessHandler implements AuthenticationSuccessHandler {
         CurrentUser userDetails = (CurrentUser) authentication.getPrincipal();
         Usuario user = usuarioService.find(userDetails.getId());
 
-        RefreshTokenDto refreshToken = refreshTokenService.createToken(user, false);
+        RefreshTokenDto refreshToken = refreshTokenService.createToken(user, true);
         ResponseCookie cookie = refreshTokenCookieHelper.createRefreshCookie(refreshToken);
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

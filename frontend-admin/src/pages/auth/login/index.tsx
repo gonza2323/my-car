@@ -1,10 +1,11 @@
-import { PiGoogleLogoDuotone as GoogleIcon, PiMicrosoftOutlookLogoDuotone as WindowsIcon } from 'react-icons/pi';
+import { PiGoogleLogoDuotone as GoogleIcon, PiMicrosoftOutlookLogoDuotone as OutlookIcon } from 'react-icons/pi';
 import { NavLink } from 'react-router-dom';
 import { Anchor, Button, Divider, Group, Stack, Text, Title } from '@mantine/core';
 import { Page } from '@/components/page';
 import { UnderlineShape } from '@/components/underline-shape';
 import { paths } from '@/routes';
 import { LoginForm } from './login-form';
+import { app } from '@/config';
 
 export default function LoginPage() {
   return (
@@ -33,11 +34,24 @@ export default function LoginPage() {
         </Stack>
 
         <Group grow>
-          <Button leftSection={<GoogleIcon size="1rem" />} variant="outline" color="gray">
+          <Button
+            component="a"
+            href={`${app.baseUrl}/oauth2/authorization/auth0?connection=google-oauth2`}
+            leftSection={<GoogleIcon size="1rem" />}
+            variant="outline"
+            color="gray"
+          >
             Login con Google
           </Button>
-          <Button leftSection={<WindowsIcon size="1rem" />} variant="outline" color="gray">
-            Login con Outlook
+
+          <Button
+            component="a"
+            href={`${app.baseUrl}/oauth2/authorization/auth0?connection=windowslive`}
+            leftSection={<OutlookIcon size="1rem" />}
+            variant="outline"
+            color="gray"
+          >
+            Login con Microsoft
           </Button>
         </Group>
 

@@ -43,7 +43,8 @@ public class SecurityConfig {
             JwtAuthenticationConverter jwtAuthenticationConverter,
             CustomOidcUserService customOidcUserService,
             OidcSuccessHandler oidcSuccessHandler,
-            OidcFailureHandler oidcFailureHandler) throws Exception {
+            OidcFailureHandler oidcFailureHandler,
+            CustomAuthorizationRequestResolver requestResolver) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -59,6 +60,8 @@ public class SecurityConfig {
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(userInfo -> userInfo
                                 .oidcUserService(customOidcUserService))
+                        .authorizationEndpoint(a -> a
+                                .authorizationRequestResolver(requestResolver))
                         .successHandler(oidcSuccessHandler)
                         .failureHandler(oidcFailureHandler)
                         .permitAll())
