@@ -10,5 +10,5 @@ public interface ImagenRepository extends BaseRepository<Imagen, Long> {
 
     List<Imagen> findAllByCaracteristicasAutoIdAndEliminadoFalse(Long caracteristicasAutoId);
 
-    List<Imagen> findAllByTipoAndEliminadoFalse(TipoImagen tipo);
+    List<Imagen> findAllByTipoImagenAndEliminadoFalse(TipoImagen tipo);
 }

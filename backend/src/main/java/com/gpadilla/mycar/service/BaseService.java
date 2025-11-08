@@ -34,7 +34,7 @@ public abstract class BaseService<
     @Transactional(readOnly = true)
     public E find(ID id) {
         return repository.findByIdAndEliminadoFalse(id)
-                .orElseThrow(() -> new BusinessException(entityName + " not found"));
+                .orElseThrow(() -> new BusinessException( "La " + entityName + " solicitada no existe o fue eliminada."));
     }
 
     @Transactional(readOnly = true)

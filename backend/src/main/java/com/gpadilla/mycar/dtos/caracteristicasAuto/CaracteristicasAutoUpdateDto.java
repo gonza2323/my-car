@@ -7,6 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaracteristicasAutoUpdateDto extends IdentifiableDto<Long> {
-    private int cantTotalVehiculos;
+    private int cantTotalAutos;
     private int cantidadAlquilados;
 }

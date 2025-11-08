@@ -7,6 +7,7 @@ import com.gpadilla.mycar.entity.CostoAuto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -25,9 +26,11 @@ public interface CostoAutoMapper extends BaseMapper<
     void updateEntity(CostoAutoUpdateDto dto, @MappingTarget CostoAuto entity);
 
     @Override
+    @Named("toDto")
     CostoAutoDto toDto(CostoAuto entity);
 
     @Override
+    @Named("toSummary")
     CostoAutoDto toSummaryDto(CostoAuto entity);
 }
 

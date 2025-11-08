@@ -9,6 +9,6 @@ import lombok.*;
 public class AutoCreateDto {
     private String patente;
     private EstadoAuto estadoAuto;
-    private Long caracteristicasAutoId;
+    private Long caracteristicasAuto;
 }
 

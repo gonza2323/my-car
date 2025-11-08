@@ -7,6 +7,7 @@ import com.gpadilla.mycar.dtos.caracteristicasAuto.CaracteristicasAutoUpdateDto;
 import com.gpadilla.mycar.entity.CaracteristicasAuto;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
@@ -24,12 +25,18 @@ public interface CaracteristicasAutoMapper extends BaseMapper<
         > {
 
     @Override
+    @Mapping(target = "cantTotalAutos", source = "cantTotalAutos")
+    @Mapping(target = "cantidadAlquilados", source = "cantidadAlquilados")
     CaracteristicasAuto toEntity(CaracteristicasAutoCreateDto dto);
 
     @Override
     void updateEntity(CaracteristicasAutoUpdateDto dto, @MappingTarget CaracteristicasAuto entity);
 
     @Override
+    @Mapping(target = "imagenes", qualifiedByName = "toDto")
+    @Mapping(target = "costos", qualifiedByName = "toDto")
+    @Mapping(target = "cantTotalAutos", source = "cantTotalAutos")
+    @Mapping(target = "cantidadAlquilados", source = "cantidadAlquilados")
     CaracteristicasAutoDetailDto toDto(CaracteristicasAuto entity);
 
     @Override

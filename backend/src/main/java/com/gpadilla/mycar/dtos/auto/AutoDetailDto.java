@@ -13,5 +13,5 @@ public class AutoDetailDto extends IdentifiableDto<Long> {
     private String patente;
     private EstadoAuto estadoAuto;
     private boolean eliminado;
-    private Long caracteristicasAutoId;
+    private Long caracteristicasAuto;
 }
