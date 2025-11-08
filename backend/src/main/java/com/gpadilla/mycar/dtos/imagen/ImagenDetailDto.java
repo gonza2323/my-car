@@ -11,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class ImagenDetailDto extends IdentifiableDto<Long> {
     private String nombre;
+    private String mime;
     private boolean eliminada;
     private TipoImagen tipo;
 }

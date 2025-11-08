@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 public class ImagenCreateDto {
     private String nombre;
+    private String mime;
     private byte[] contenido; // o String url
     private TipoImagen tipo;
     private Long caracteristicasAutoId;

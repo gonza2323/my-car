@@ -14,11 +14,17 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Imagen extends BaseEntity<Long>{
+
     @Column(nullable = false)
     private String nombre;
+
+    @Column(nullable = false, length = 100)
+    private String mime;
+
     @Lob //ver si guardar la foto o la url / direccion para mas velocidad
     @Column(nullable = false)
     private byte[] contenido;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoImagen tipoImagen;
