@@ -5,7 +5,7 @@ import com.gpadilla.mycar.dtos.auto.AutoDetailDto;
 import com.gpadilla.mycar.dtos.auto.AutoSummaryDto;
 import com.gpadilla.mycar.dtos.auto.AutoUpdateDto;
 import com.gpadilla.mycar.entity.Auto;
-import com.gpadilla.mycar.entity.EstadoAuto;
+import com.gpadilla.mycar.enums.EstadoAuto;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.AutoMapper;
 import com.gpadilla.mycar.repository.AutoRepository;

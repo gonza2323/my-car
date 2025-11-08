@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface EmpresaRepository extends BaseRepository<Empresa, String> {
+public interface EmpresaRepository extends BaseRepository<Empresa, Long> {
     Optional<Empresa> findByNombreIgnoreCase(String nombre);
 }

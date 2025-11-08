@@ -21,5 +21,5 @@ public class LoginRequestDto {
     @NotNull(message = "Ingrese su contraseña")
     private String password;
 
-    private boolean remember = false;
+    private boolean remember;
 }

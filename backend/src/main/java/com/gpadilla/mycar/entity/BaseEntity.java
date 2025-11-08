@@ -16,6 +16,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseEntity<ID extends Serializable> {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected ID id;

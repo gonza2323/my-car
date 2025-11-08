@@ -27,8 +27,7 @@ public class CaracteristicasAutoController {
     // 🔹 Actualizar modelo
     @PutMapping("/{id}")
     public ResponseEntity<CaracteristicasAutoDetailDto> update(@PathVariable Long id, @RequestBody CaracteristicasAutoUpdateDto dto) {
-        dto.setId(id);
-        return ResponseEntity.ok(service.updateAndReturnDto(dto));
+        return ResponseEntity.ok(service.updateAndReturnDto(id, dto));
     }
 
     // 🔹 Eliminar modelo

@@ -1,6 +1,5 @@
 package com.gpadilla.mycar.dtos.usuario;
 
-import com.gpadilla.mycar.dtos.IdentifiableDto;
 import com.gpadilla.mycar.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +12,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsuarioSummaryDto extends IdentifiableDto<Long> {
+public class UsuarioSummaryDto {
+    private Long id;
     private String email;
     private UserRole rol;
 }

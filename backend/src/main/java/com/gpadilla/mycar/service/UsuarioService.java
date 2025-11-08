@@ -1,75 +1,98 @@
 package com.gpadilla.mycar.service;
 
-import com.gpadilla.mycar.dtos.usuario.UsuarioCreateDto;
+import com.gpadilla.mycar.config.AppProperties;
 import com.gpadilla.mycar.dtos.usuario.UsuarioDetailDto;
-import com.gpadilla.mycar.dtos.usuario.UsuarioSummaryDto;
-import com.gpadilla.mycar.dtos.usuario.UsuarioUpdateDto;
 import com.gpadilla.mycar.entity.Usuario;
 import com.gpadilla.mycar.enums.UserRole;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.UsuarioMapper;
 import com.gpadilla.mycar.repository.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UsuarioService extends BaseService<
-        Usuario,
-        Long,
-        UsuarioRepository,
-        UsuarioDetailDto,
-        UsuarioSummaryDto,
-        UsuarioCreateDto,
-        UsuarioUpdateDto,
-        UsuarioMapper> {
+@RequiredArgsConstructor
+public class UsuarioService {
 
+    private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final AppProperties properties;
+    private final UsuarioMapper usuarioMapper;
 
-    public UsuarioService(UsuarioRepository repository, UsuarioMapper mapper, PasswordEncoder passwordEncoder) {
-        super("Usuario", repository, mapper);
-        this.passwordEncoder = passwordEncoder;
+    @Transactional(readOnly = true)
+    public Usuario find(Long id) {
+        return repository.findByIdAndEliminadoFalse(id)
+                .orElseThrow(() -> new BusinessException("Usuario no encontrado"));
     }
 
-    @Override
-    protected void preCreate(UsuarioCreateDto dto, Usuario usuario) {
-        String passwordHash = passwordEncoder.encode(dto.getPassword());
-        usuario.setPassword(passwordHash);
+    @Transactional(readOnly = true)
+    public UsuarioDetailDto findDto(Long id) {
+        return usuarioMapper.toDto(find(id));
     }
 
-    @Override
-    protected void validateCreate(UsuarioCreateDto dto) {
-        validarEmailUnico(dto.getEmail(), null);
-
-        if (!dto.getPassword().equals(dto.getPasswordConfirmacion()))
-            throw new BusinessException("Las contraseñas no coinciden");
-    }
-
-    @Override
-    protected void validateUpdate(UsuarioUpdateDto dto) {
-        validarEmailUnico(dto.getEmail(), dto.getId());
-    }
-
-    public void validarEmailUnico(String nombre, Long excludeId) {
-        boolean exists = (excludeId == null)
-                ? repository.existsByEmailAndEliminadoFalse(nombre)
-                : repository.existsByEmailAndIdNotAndEliminadoFalse(nombre, excludeId);
-
-        if (exists)
-            throw new BusinessException("El email de usuario ya está en uso");
-    }
-
+    // clientes o empleados (desde admin)
     @Transactional
-    public Usuario registerUserFromAuth0(String providerId, String email) {
-        validarEmailUnico(email, null);
+    public Usuario createUserNoPassword(String email, UserRole rol) {
+        String defaultPassword = properties.auth().defaultPassword();
+        String passwordHash = passwordEncoder.encode(defaultPassword);
+
+        Usuario usuario = Usuario.builder()
+                .email(email)
+                .password(passwordHash)
+                .rol(rol)
+                .hasCompletedProfile(true)
+                .mustChangePassword(true)
+                .build();
+
+        return repository.save(usuario);
+    }
+
+    // solo clientes
+    @Transactional
+    public Usuario createUserFromEmailPassword(String email, String password, String passwordConfirm) {
+        validarEmail(email);
+        validarClave(password, passwordConfirm);
+
+        String passwordHash = passwordEncoder.encode(password);
+
+        Usuario usuario = Usuario.builder()
+                .email(email)
+                .password(passwordHash)
+                .rol(UserRole.CLIENTE)
+                .hasCompletedProfile(false)
+                .mustChangePassword(false)
+                .build();
+
+        return repository.save(usuario);
+    }
+
+    // solo clientes
+    @Transactional
+    public Usuario createUserFromProvider(String providerId, String email) {
+        validarEmail(email);
         
         Usuario usuario = Usuario.builder()
                 .email(email)
                 .password(null)
                 .providerId(providerId)
                 .rol(UserRole.CLIENTE)
-                .hasCompletedProfile(false).build();
+                .hasCompletedProfile(false)
+                .mustChangePassword(false)
+                .build();
 
         return repository.save(usuario);
+    }
+
+    private void validarClave(String password, String passwordConfirm) {
+        if (!password.equals(passwordConfirm))
+            throw new BusinessException("Las contraseñas no coinciden");
+    }
+
+    private void validarEmail(String nombre) {
+        boolean taken = repository.existsByEmailAndEliminadoFalse(nombre);
+        if (taken)
+            throw new BusinessException("El email de usuario ya está en uso");
     }
 }

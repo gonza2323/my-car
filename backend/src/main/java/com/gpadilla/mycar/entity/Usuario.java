@@ -29,4 +29,7 @@ public class Usuario extends BaseEntity<Long> {
 
     @Column(nullable = false)
     private Boolean hasCompletedProfile;
+
+    @Column(nullable = false)
+    private Boolean mustChangePassword;
 }

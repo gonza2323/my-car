@@ -24,8 +24,7 @@ public class CostoAutoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CostoAutoDto> update(@PathVariable Long id, @RequestBody CostoAutoUpdateDto dto) {
-        dto.setId(id);
-        return ResponseEntity.ok(service.updateAndReturnDto(dto));
+        return ResponseEntity.ok(service.updateAndReturnDto(id, dto));
     }
 
     @DeleteMapping("/{id}")

@@ -1,6 +1,6 @@
 package com.gpadilla.mycar.dtos.auto;
 
-import com.gpadilla.mycar.entity.EstadoAuto;
+import com.gpadilla.mycar.enums.EstadoAuto;
 import lombok.*;
 
 @Data

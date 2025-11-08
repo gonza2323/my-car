@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Getter
@@ -19,13 +18,7 @@ import org.hibernate.annotations.UuidGenerator;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "empresas")
-public class Empresa extends BaseEntity<String> {
-
-    @Id
-    @GeneratedValue
-    @UuidGenerator
-    private String id;
-
+public class Empresa extends BaseEntity<Long> {
 
     @NotEmpty(message = "La razon social no puede estar vacío")
     @Size(max = 50, message = "La razon social no puede superar los 50 caracteres")

@@ -1,6 +1,5 @@
 package com.gpadilla.mycar.dtos.caracteristicasAuto;
 
-import com.gpadilla.mycar.dtos.IdentifiableDto;
 import com.gpadilla.mycar.dtos.costoAuto.CostoAutoDto;
 import com.gpadilla.mycar.dtos.imagen.ImagenDetailDto;
 import lombok.*;
@@ -11,7 +10,8 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaracteristicasAutoDetailDto extends IdentifiableDto<Long> {
+public class CaracteristicasAutoDetailDto {
+    private Long id;
     private String marca;
     private String modelo;
     private int cantidadPuertas;

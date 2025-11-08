@@ -1,4 +1,4 @@
-package com.gpadilla.mycar.entity;
+package com.gpadilla.mycar.enums;
 
 public enum EstadoAuto {
     DISPONIBLE,

@@ -1,7 +1,7 @@
 package com.gpadilla.mycar.repository;
 
 import com.gpadilla.mycar.entity.Imagen;
-import com.gpadilla.mycar.entity.TipoImagen;
+import com.gpadilla.mycar.enums.TipoImagen;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 

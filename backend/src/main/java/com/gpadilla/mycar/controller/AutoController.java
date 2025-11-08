@@ -28,8 +28,7 @@ public class AutoController {
     // 🔹 Actualizar un vehículo
     @PutMapping("/{id}")
     public ResponseEntity<AutoDetailDto> update(@PathVariable Long id, @RequestBody AutoUpdateDto dto) {
-        dto.setId(id);
-        return ResponseEntity.ok(service.updateAndReturnDto(dto));
+        return ResponseEntity.ok(service.updateAndReturnDto(id, dto));
     }
 
     // 🔹 Eliminar un vehículo (soft delete)

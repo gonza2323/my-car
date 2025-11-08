@@ -1,5 +1,6 @@
 package com.gpadilla.mycar.entity;
 
+import com.gpadilla.mycar.enums.TipoImagen;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

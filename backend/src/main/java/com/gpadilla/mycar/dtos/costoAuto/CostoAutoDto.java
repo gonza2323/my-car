@@ -1,6 +1,5 @@
 package com.gpadilla.mycar.dtos.costoAuto;
 
-import com.gpadilla.mycar.dtos.IdentifiableDto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import java.util.Date;
@@ -9,7 +8,8 @@ import java.util.Date;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CostoAutoDto extends IdentifiableDto<Long> {
+public class CostoAutoDto {
+    private Long id;
     private Date fechaDesde;
     private Date fechaHasta;
     private double costoTotal;

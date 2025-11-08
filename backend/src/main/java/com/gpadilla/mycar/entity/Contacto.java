@@ -6,10 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@Getter @Setter
 @Table(name = "contacto")
 @Inheritance(strategy = InheritanceType.JOINED)
-@Getter @Setter
-public abstract class Contacto extends BaseEntity<String> {
+public abstract class Contacto extends BaseEntity<Long> {
 
     @Enumerated(EnumType.STRING)
     private TipoContacto tipoContacto; // PERSONAL o LABORAL

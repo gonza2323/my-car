@@ -1,6 +1,5 @@
 package com.gpadilla.mycar.service;
 
-import com.gpadilla.mycar.dtos.IdentifiableDto;
 import com.gpadilla.mycar.entity.BaseEntity;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.BaseMapper;
@@ -18,7 +17,7 @@ public abstract class BaseService<
         DetailDto,
         SummaryDto,
         CreateDto,
-        UpdateDto extends IdentifiableDto<ID>,
+        UpdateDto,
         M extends BaseMapper<E, DetailDto, SummaryDto, CreateDto, UpdateDto>> {
 
     private final String entityName;
@@ -62,9 +61,9 @@ public abstract class BaseService<
     }
 
     @Transactional
-    public E update(UpdateDto dto) {
-        validateUpdate(dto);
-        E entity = find(dto.getId());
+    public E update(ID id, UpdateDto dto) {
+        validateUpdate(id, dto);
+        E entity = find(id);
         preUpdate(dto, entity);
         updateEntity(dto, entity);
         repository.save(entity);
@@ -82,8 +81,8 @@ public abstract class BaseService<
     }
 
     @Transactional
-    public DetailDto updateAndReturnDto(UpdateDto dto) {
-        E entity = update(dto);
+    public DetailDto updateAndReturnDto(ID id, UpdateDto dto) {
+        E entity = update(id, dto);
         return toDetailDto(entity);
     }
 
@@ -119,7 +118,7 @@ public abstract class BaseService<
     // las funciones post_() ocurren después de persistir la entidad
 
     protected void validateCreate(CreateDto dto) {}
-    protected void validateUpdate(UpdateDto updateDto) {}
+    protected void validateUpdate(ID id, UpdateDto updateDto) {}
 
     protected void preCreate(CreateDto dto, E entity) {}
     protected void postCreate(CreateDto dto, E entity) {}

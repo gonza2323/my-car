@@ -1,5 +1,6 @@
 package com.gpadilla.mycar.entity;
 
+import com.gpadilla.mycar.enums.EstadoAuto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

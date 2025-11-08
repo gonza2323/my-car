@@ -1,7 +1,6 @@
 package com.gpadilla.mycar.dtos.auto;
 
-import com.gpadilla.mycar.dtos.IdentifiableDto;
-import com.gpadilla.mycar.entity.EstadoAuto;
+import com.gpadilla.mycar.enums.EstadoAuto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -9,7 +8,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AutoSummaryDto extends IdentifiableDto<Long> {
+public class AutoSummaryDto {
+    private Long id;
     private String patente;
     private EstadoAuto estadoAuto;
 }

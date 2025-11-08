@@ -11,8 +11,9 @@ public record AppProperties(
     String frontendUrl,
     List<String> corsOrigins
 ) {
-    public record Auth(RefreshToken refreshToken, AccessToken accessToken) {
-
+    public record Auth(RefreshToken refreshToken, AccessToken accessToken,
+       String defaultPassword
+    ) {
         public record RefreshToken(Cookie cookie,
             long defaultDurationMinutes,
             long rememberMeDurationDays
@@ -29,7 +30,6 @@ public record AppProperties(
         public record AccessToken(
             String secret,
             long durationMinutes
-        ) {
-        }
+        ) {}
     }
 }

@@ -1,8 +1,10 @@
 package com.gpadilla.mycar.controller;
 
 import com.gpadilla.mycar.auth.CurrentUser;
+import com.gpadilla.mycar.auth.CustomUserDetails;
 import com.gpadilla.mycar.component.RefreshTokenCookieHelper;
 import com.gpadilla.mycar.dtos.auth.*;
+import com.gpadilla.mycar.dtos.cliente.SignUpFormDto;
 import com.gpadilla.mycar.entity.Usuario;
 import com.gpadilla.mycar.service.UsuarioService;
 import com.gpadilla.mycar.service.auth.AccessTokenService;
@@ -37,11 +39,31 @@ public class AuthController {
     @PostMapping("/login")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequest) {
-        CurrentUser user = authService.getAuthenticatedUser(loginRequest);
+        CustomUserDetails user = authService.loginWithEmailPassword(loginRequest);
 
         Usuario usuario = usuarioService.find(user.getId());
         AccessTokenDto accessToken = accessTokenService.createToken(user.getId(), user.getRoles());
         RefreshTokenDto refreshToken = refreshTokenService.createToken(usuario, loginRequest.isRemember());
+        ResponseCookie refreshTokenCookie = refreshTokenCookieHelper.createRefreshCookie(refreshToken);
+
+        LoginResponseDto response = LoginResponseDto.builder()
+                .token(accessToken)
+                .user(new AuthUserDto(user.getId(), user.getRoles()))
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .body(response);
+    }
+
+    @PostMapping("/signup")
+    @PreAuthorize("isAnonymous()")
+    public ResponseEntity<LoginResponseDto> singup(@RequestBody SignUpFormDto loginRequest) {
+        CurrentUser user = authService.registerUserWithEmailAndPassword(loginRequest);
+
+        Usuario usuario = usuarioService.find(user.getId());
+        AccessTokenDto accessToken = accessTokenService.createToken(user.getId(), user.getRoles());
+        RefreshTokenDto refreshToken = refreshTokenService.createToken(usuario, true);
         ResponseCookie refreshTokenCookie = refreshTokenCookieHelper.createRefreshCookie(refreshToken);
 
         LoginResponseDto response = LoginResponseDto.builder()

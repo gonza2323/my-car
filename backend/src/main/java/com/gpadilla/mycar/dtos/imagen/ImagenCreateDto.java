@@ -1,6 +1,6 @@
 package com.gpadilla.mycar.dtos.imagen;
 
-import com.gpadilla.mycar.entity.TipoImagen;
+import com.gpadilla.mycar.enums.TipoImagen;
 import lombok.*;
 
 @Data
