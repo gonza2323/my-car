@@ -1,0 +1,35 @@
+package com.gpadilla.mycar.entity;
+
+import com.gpadilla.mycar.enums.TipoTelefono;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@Table(name = "contacto_telefonico")
+@Getter @Setter
+public class ContactoTelefonico extends Contacto {
+
+    private String telefono;
+
+    @Enumerated(EnumType.STRING)
+    private TipoTelefono tipoTelefono; // FIJO o CELULAR
+
+
+    public String getTelefonoLimpio() { //Limpia el numero de telefono
+        if (telefono == null) return "";
+        return telefono.replaceAll("[\\s-]", "");
+    }
+
+    public String getWhatsAppLink() { // Genera el link para Whatsapp Web
+        if (tipoTelefono == TipoTelefono.CELULAR) {
+            return "https://wa.me/" + getTelefonoLimpio();
+        }
+        return null;
+    }
+
+    public boolean isPuedeAbrirWhatsApp() {
+        return tipoTelefono == TipoTelefono.CELULAR;
+    }
+
+}
