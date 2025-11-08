@@ -1,12 +1,21 @@
 package com.gpadilla.mycar.auth;
 
 import com.gpadilla.mycar.enums.UserRole;
-import org.springframework.stereotype.Component;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Collection;
+import java.security.Principal;
+import java.util.List;
 
-@Component
-public interface CurrentUser {
-    Long getId();
-    Collection<UserRole> getRoles();
+@Getter
+@RequiredArgsConstructor
+public class CurrentUser implements Principal {
+
+    private final Long id;
+    private final List<UserRole> roles;
+
+    @Override
+    public String getName() {
+        return id.toString();
+    }
 }

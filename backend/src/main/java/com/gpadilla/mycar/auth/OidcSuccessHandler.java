@@ -31,8 +31,8 @@ public class OidcSuccessHandler implements AuthenticationSuccessHandler {
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException {
 
-        CurrentUser userDetails = (CurrentUser) authentication.getPrincipal();
-        Usuario user = usuarioService.find(userDetails.getId());
+        CustomOidcUser userDetails = (CustomOidcUser) authentication.getPrincipal();
+        Usuario user = usuarioService.find(userDetails.getUserId());
 
         RefreshTokenDto refreshToken = refreshTokenService.createToken(user, true);
         ResponseCookie cookie = refreshTokenCookieHelper.createRefreshCookie(refreshToken);
