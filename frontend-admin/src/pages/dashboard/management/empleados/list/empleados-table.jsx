@@ -3,13 +3,13 @@ import { Text } from "@mantine/core"
 import { usePagination } from "@/api/helpers"
 import { AddButton } from "@/components/add-button"
 import { DataTable } from "@/components/data-table"
-import { useGetLocalidades, useDeleteLocalidad, useAuth } from "@/hooks"
+import { useGetEmpleados, useDeleteEmpleado, useAuth } from "@/hooks"
 import { paths } from "@/routes"
 import { Link, NavLink, useNavigate } from "react-router-dom"
 import { modals } from "@mantine/modals"
 import { notifications } from "@mantine/notifications"
 
-export function LocalidadesTable() {
+export function EmpleadosTable() {
   const { roles } = useAuth();
   const isJefe = roles.includes('JEFE');
   const navigate = useNavigate()
@@ -18,15 +18,15 @@ export function LocalidadesTable() {
   const { sort } = DataTable.useDataTable({
     sortConfig: {
       direction: "asc",
-      column: "nombre"
+      column: "apellido"
     }
   })
 
-  const { data, isLoading } = useGetLocalidades({
+  const { data, isLoading } = useGetEmpleados({
     query: {
       page,
       size,
-      // status: tabs.value as Localidad['status'],
+      // status: tabs.value as Empleado['status'],
       sort: sort.query
     }
   })
@@ -40,40 +40,40 @@ export function LocalidadesTable() {
     }
   }, [data, page, setPage])
 
-  const deleteMutation = useDeleteLocalidad()
+  const deleteMutation = useDeleteEmpleado()
 
   const columns = useMemo(
     () => [
       {
-        accessor: "nombre",
-        title: "Nombre",
+        accessor: "tipoDocumento",
+        title: "Tipo Documento",
         sortable: true,
-        render: localidad => (
-          <Text truncate="end">{localidad.nombre}</Text>
+        render: empleado => (
+          <Text truncate="end">{empleado.tipoDocumento}</Text>
         )
       },
       {
-        accessor: "departamento.nombre",
-        title: "Departamento",
+        accessor: "numeroDocumento",
+        title: "N Documento",
         sortable: true,
-        render: localidad => (
-          <Text truncate="end">{localidad.departamentoNombre}</Text>
+        render: empleado => (
+          <Text truncate="end">{empleado.numeroDocumento}</Text>
         )
       },
       {
-        accessor: "departamento.provincia.nombre",
-        title: "Provincia",
+        accessor: "apellido",
+        title: "Nombre completo",
         sortable: true,
-        render: localidad => (
-          <Text truncate="end">{localidad.provinciaNombre}</Text>
+        render: empleado => (
+          <Text truncate="end">{empleado.nombre + ' ' + empleado.apellido}</Text>
         )
       },
       {
-        accessor: "departamento.provincia.pais.nombre",
-        title: "País",
+        accessor: "tipoEmpleado",
+        title: "Tipo Empleado",
         sortable: true,
-        render: localidad => (
-          <Text truncate="end">{localidad.paisNombre}</Text>
+        render: empleado => (
+          <Text truncate="end">{empleado.tipoEmpleado}</Text>
         )
       },
       {
@@ -81,15 +81,11 @@ export function LocalidadesTable() {
         title: "Acciones",
         textAlign: "right",
         width: 100,
-        render: localidad => (
+        render: empleado => (
           <DataTable.Actions
-            onView={() =>
-              navigate(paths.dashboard.management.localidades.view(localidad.id))
-            }
-            onEdit={isJefe ? () =>
-              navigate(paths.dashboard.management.localidades.edit(localidad.id))
-              : undefined}
-            onDelete={isJefe ? () => handleDelete(localidad) : undefined}
+            onView={ () => navigate(paths.dashboard.management.empleados.view(empleado.id)) }
+            onEdit={ () => navigate(paths.dashboard.management.empleados.edit(empleado.id)) }
+            onDelete={ () => handleDelete(empleado)}
           />
         ),
       }
@@ -97,28 +93,28 @@ export function LocalidadesTable() {
     []
   )
 
-  const handleDelete = localidad => {
+  const handleDelete = empleado => {
     modals.openConfirmModal({
       title: "Confirmar borrado",
-      children: <Text>¿Está seguro de que desea borrar el localidad?</Text>,
+      children: <Text>¿Está seguro de que desea borrar el empleado?</Text>,
       labels: { confirm: "Delete", cancel: "Cancel" },
       confirmProps: { color: "red" },
       onConfirm: () => {
         deleteMutation.mutate({
-          model: localidad,
-          route: { id: localidad.id }
+          model: empleado,
+          route: { id: empleado.id }
         }, {
           onSuccess: () => {
             notifications.show({
               title: 'Borrado',
-              message: 'La localidad fue borrada con éxito',
+              message: 'La empleado fue borrada con éxito',
               color: 'green',
             });
           },
           onFailure: (error) => {
             notifications.show({
               title: 'Error',
-              message: error.message || 'No se pudo borrar la localidad',
+              message: error.message || 'No se pudo borrar la empleado',
               color: 'red',
             });
           }
@@ -130,18 +126,17 @@ export function LocalidadesTable() {
   return (
     <DataTable.Container>
       <DataTable.Title
-        title="Localidades"
-        description="Lista de localidades"
+        title="Empleados"
+        description="Lista de empleados"
         actions={
-          isJefe && (
           <AddButton
             variant="default"
             size="xs"
             component={NavLink}
-            to={paths.dashboard.management.localidades.add}
+            to={paths.dashboard.management.empleados.add}
           >
-            Agregar localidad
-          </AddButton>)
+            Agregar empleado
+          </AddButton>
         }
       />
 
@@ -150,9 +145,9 @@ export function LocalidadesTable() {
       <DataTable.Content>
         <DataTable.Table
           minHeight={240}
-          noRecordsText={DataTable.noRecordsText("localidad")}
-          recordsPerPageLabel={DataTable.recordsPerPageLabel("localidades")}
-          paginationText={DataTable.paginationText("localidades")}
+          noRecordsText={DataTable.noRecordsText("empleado")}
+          recordsPerPageLabel={DataTable.recordsPerPageLabel("empleados")}
+          paginationText={DataTable.paginationText("empleados")}
           page={page + 1}
           records={data?.data ?? []}
           fetching={isLoading}

@@ -5,3 +5,5 @@ export * from './localidades.js';
 export * from './departamentos.js';
 export * from './provincias.js';
 export * from './paises.js';
+export * from './empleados.js';
+export * from './clientes.js';

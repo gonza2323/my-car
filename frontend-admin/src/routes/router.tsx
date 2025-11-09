@@ -83,6 +83,28 @@ const router = createBrowserRouter([
             element: <Navigate to={paths.dashboard.management.customers.root} replace />,
           },
           {
+            path: paths.dashboard.management.empleados.root,
+            children: [
+              {
+                index: true,
+                path: paths.dashboard.management.empleados.root,
+                element: <Navigate to={paths.dashboard.management.empleados.list} replace />,
+              },
+              {
+                path: paths.dashboard.management.empleados.list,
+                element: LazyPage(() => import('@/pages/dashboard/management/empleados/list')),
+              },
+              {
+                path: paths.dashboard.management.empleados.add,
+                element: LazyPage(() => import('@/pages/dashboard/management/empleados/add')),
+              },
+              {
+                path: paths.dashboard.management.empleados.root + '/:empleadoId',
+                element: LazyPage(() => import('@/pages/dashboard/management/empleados/detail')),
+              },
+            ],
+          },
+          {
             path: paths.dashboard.management.localidades.root,
             children: [
               {

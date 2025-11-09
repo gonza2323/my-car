@@ -1,12 +1,15 @@
 package com.gpadilla.mycar.service;
 
 import com.gpadilla.mycar.dtos.empleado.EmpleadoCreateDto;
+import com.gpadilla.mycar.dtos.empleado.EmpleadoSummaryDto;
 import com.gpadilla.mycar.entity.geo.Direccion;
 import com.gpadilla.mycar.entity.Empleado;
 import com.gpadilla.mycar.entity.Usuario;
 import com.gpadilla.mycar.mapper.EmpleadoMapper;
 import com.gpadilla.mycar.repository.EmpleadoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,5 +25,9 @@ public class EmpleadoService {
         empleado.setUsuario(usuario);
         empleado.setDireccion(direccion);
         return empleadoRepository.save(empleado);
+    }
+
+    public Page<EmpleadoSummaryDto> findDtos(Pageable pageable) {
+        return empleadoRepository.findAllByEliminadoFalse(pageable);
     }
 }

@@ -18,6 +18,13 @@ export const paths = {
     home: '/dashboard/home',
     management: {
       root: '/dashboard/management',
+      empleados: {
+        root: '/dashboard/management/empleados',
+        list: '/dashboard/management/empleados/list',
+        view: (empleados: number) => `/dashboard/management/empleados/${empleados}`,
+        edit: (empleados: number) => `/dashboard/management/empleados/${empleados}/edit`,
+        add: '/dashboard/management/empleados/add',
+      },
       localidades: {
         root: '/dashboard/management/localidades',
         list: '/dashboard/management/localidades/list',

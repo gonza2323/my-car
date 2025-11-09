@@ -50,6 +50,17 @@ export const menu: MenuItem[] = [
     header: 'Management',
     section: [
       {
+        name: 'Empleados',
+        icon: PiMapPinDuotone,
+        href: paths.dashboard.management.empleados.root,
+        dropdownItems: [
+          {
+            name: 'List',
+            href: paths.dashboard.management.empleados.list,
+          },
+        ],
+      },
+      {
         name: 'Localidades',
         icon: PiMapPinDuotone,
         href: paths.dashboard.management.localidades.root,
