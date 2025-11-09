@@ -1,10 +1,11 @@
-import { Box, Button, Grid, Group, Select, Stack, TextInput } from '@mantine/core';
+import { Box, Button, Grid, Group, Loader, Select, Stack, TextInput } from '@mantine/core';
 import { paths } from '@/routes';
 import { useForm, zodResolver } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { LocalidadCreateDto as LocalidadCreateSchema } from '@/api/dtos';
 import { useCreateLocalidad, useGetDepartamentos, useGetPaises, useGetProvincias } from '@/hooks';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export default function LocalidadCreateForm() {
   const navigate = useNavigate();
@@ -25,6 +26,10 @@ export default function LocalidadCreateForm() {
   } = useGetPaises({ query: { size: 99999 } });
 
   const paises = paisResponse?.data ?? [];
+  const paisOptions = [
+    { value: '', label: 'Seleccione un país' },
+    ...paises.map(p => ({ value: String(p.id), label: p.nombre })),
+  ];
 
   const {
     data: provinciaResponse,
@@ -35,6 +40,10 @@ export default function LocalidadCreateForm() {
   );
 
   const provincias = provinciaResponse?.data ?? [];
+  const provinciaOptions = [
+    { value: '', label: 'Seleccione una provincia' },
+    ...provincias.map(p => ({ value: String(p.id), label: p.nombre })),
+  ];
 
   const {
     data: departamentoResponse,
@@ -45,6 +54,18 @@ export default function LocalidadCreateForm() {
   );
 
   const departamentos = departamentoResponse?.data ?? [];
+  const departamentoOptions = [
+    { value: '', label: 'Seleccione un departamento' },
+    ...departamentos.map(d => ({ value: String(d.id), label: d.nombre })),
+  ];
+
+  useEffect(() => {
+    form.setFieldValue('provinciaId', '');
+  }, [form.values.paisId]);
+
+  useEffect(() => {
+    form.setFieldValue('departamentoId', '');
+  }, [form.values.provinciaId]);
 
   // --- Create mutation
   const createLocalidad = useCreateLocalidad();
@@ -86,7 +107,11 @@ export default function LocalidadCreateForm() {
         label="País"
         searchable={true}
         placeholder="Seleccione un país"
-        data={paises.map((p) => ({ value: String(p.id), label: p.nombre }))}
+        data={paisOptions}
+        disabled={paisLoading}
+        rightSection={paisLoading && <Loader size="sm" />}
+        withCheckIcon={false}
+        allowDeselect={false}
         {...form.getInputProps('paisId')}
       />
 
@@ -96,9 +121,11 @@ export default function LocalidadCreateForm() {
         placeholder={
           form.values.paisId ? 'Seleccione una provincia' : 'Seleccione un país primero'
         }
-        data={provincias.map((p) => ({ value: String(p.id), label: p.nombre }))}
-        loading={provinciaLoading}
-        disabled={!form.values.paisId}
+        data={provinciaOptions}
+        disabled={!form.values.paisId || provinciaLoading}
+        rightSection={provinciaLoading && <Loader size="sm" />}
+        withCheckIcon={false}
+        allowDeselect={false}
         {...form.getInputProps('provinciaId')}
       />
 
@@ -108,12 +135,14 @@ export default function LocalidadCreateForm() {
         placeholder={
           form.values.provinciaId ? 'Seleccione un departamento' : 'Seleccione una provincia primero'
         }
-        data={departamentos.map((d) => ({ value: String(d.id), label: d.nombre }))}
-        loading={departamentoLoading}
-        disabled={!form.values.provinciaId}
+        data={departamentoOptions}
+        disabled={!form.values.provinciaId || departamentoLoading}
+        rightSection={departamentoLoading && <Loader size="sm" />}
+        withCheckIcon={false}
+        allowDeselect={false}
         {...form.getInputProps('departamentoId')}
       />
-      
+
       <Group justify="flex-end" mt="md">
         <Button
           variant="outline"

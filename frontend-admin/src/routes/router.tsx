@@ -80,7 +80,7 @@ const router = createBrowserRouter([
           {
             index: true,
             path: paths.dashboard.management.root,
-            element: <Navigate to={paths.dashboard.management.customers.root} replace />,
+            element: <Navigate to={paths.dashboard.management.empleados.root} replace />,
           },
           {
             path: paths.dashboard.management.empleados.root,

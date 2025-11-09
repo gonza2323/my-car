@@ -72,12 +72,18 @@ public abstract class BaseService<
     }
 
     @Transactional
-    public void delete(ID id) {
-        E entity = find(id);
+    public E delete(E entity) {
         preDelete(entity);
         entity.setEliminado(true);
         repository.save(entity);
         postDelete(entity);
+        return entity;
+    }
+
+    @Transactional
+    public E delete(ID id) {
+        E entity = find(id);
+        return delete(entity);
     }
 
     @Transactional

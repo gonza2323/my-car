@@ -11,10 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/empleados")
@@ -26,9 +23,16 @@ public class EmpleadoController {
 
     @PostMapping
     @PreAuthorize("hasRole('JEFE')")
-    public ResponseEntity<Void> registrarEmpleado(@Valid EmpleadoCreateRequestDto request) {
+    public ResponseEntity<Void> registrarEmpleado(@Valid @RequestBody EmpleadoCreateRequestDto request) {
         empleadoFacade.registrarEmpleado(request);
         return ResponseEntity.ok(null);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('JEFE')")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        empleadoFacade.borrarEmpleado(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping

@@ -5,6 +5,7 @@ import com.gpadilla.mycar.dtos.empleado.EmpleadoSummaryDto;
 import com.gpadilla.mycar.entity.geo.Direccion;
 import com.gpadilla.mycar.entity.Empleado;
 import com.gpadilla.mycar.entity.Usuario;
+import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.EmpleadoMapper;
 import com.gpadilla.mycar.repository.EmpleadoRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,21 @@ public class EmpleadoService {
         return empleadoRepository.save(empleado);
     }
 
+    @Transactional(readOnly = true)
     public Page<EmpleadoSummaryDto> findDtos(Pageable pageable) {
         return empleadoRepository.findAllByEliminadoFalse(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Empleado find(Long id) {
+        return empleadoRepository.findByIdAndEliminadoFalse(id)
+                .orElseThrow(() -> new BusinessException("Empleado no encontrado"));
+    }
+
+    @Transactional
+    public Empleado delete(Long id) {
+        Empleado empleado = find(id);
+        empleado.setEliminado(true);
+        return empleadoRepository.save(empleado);
     }
 }
