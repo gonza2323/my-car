@@ -19,7 +19,7 @@ public class ClienteController {
     private final ClienteFacade clienteFacade;
 
     @PostMapping
-    @PreAuthorize("hasRole('JEFE')")
+    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
     public ResponseEntity<Void> registrarCliente(@Valid ClienteCreateRequestDto request) {
         clienteFacade.registrarClientePorFormularioAdmin(request);
         return ResponseEntity.ok(null);

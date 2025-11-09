@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "contacto_telefonico")
 @Getter @Setter
+@Table(name = "contacto_telefonico")
 public class ContactoTelefonico extends Contacto {
 
     private String telefono;
