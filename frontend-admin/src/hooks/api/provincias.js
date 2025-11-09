@@ -2,25 +2,25 @@ import { createDeleteMutationHook, createGetQueryHook, createPaginationQueryHook
 import { notifications } from '@mantine/notifications';
 import { z } from 'zod';
 
-const QUERY_KEY = 'localidades';
-const BASE_ENDPOINT = 'localidades';
+const QUERY_KEY = 'provincias';
+const BASE_ENDPOINT = 'provincias';
 
-export const useGetLocalidad = createGetQueryHook({
+export const useGetProvincia = createGetQueryHook({
   endpoint: `${BASE_ENDPOINT}/:id`,
   queryKey: QUERY_KEY,
 });
 
-export const useGetLocalidades = createPaginationQueryHook({
+export const useGetProvincias = createPaginationQueryHook({
   endpoint: BASE_ENDPOINT,
   queryKey: QUERY_KEY,
 });
 
-export const useCreateLocalidad = createPostMutationHook({
+export const useCreateProvincia = createPostMutationHook({
   endpoint: BASE_ENDPOINT,
   queryKey: QUERY_KEY,
 });
 
-export const useDeleteLocalidad = createDeleteMutationHook({
+export const useDeleteProvincia = createDeleteMutationHook({
   endpoint: `${BASE_ENDPOINT}/:id`,
   queryKey: QUERY_KEY,
 });

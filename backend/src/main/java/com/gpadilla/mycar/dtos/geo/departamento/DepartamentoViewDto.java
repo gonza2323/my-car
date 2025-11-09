@@ -14,8 +14,8 @@ public class DepartamentoViewDto {
     private String nombre;
 
     private Long provinciaId;
-    private Long provinciaNombre;
+    private String provinciaNombre;
 
     private Long paisId;
-    private Long paisNombre;
+    private String paisNombre;
 }

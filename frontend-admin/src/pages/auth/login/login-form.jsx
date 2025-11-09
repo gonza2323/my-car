@@ -9,6 +9,7 @@ import { TextInput } from "@/components/forms/text-input"
 import { useAuth, useLogin } from "@/hooks"
 import { paths } from "@/routes"
 import { handleFormErrors } from "@/utilities/form"
+import { notifications } from "@mantine/notifications"
 
 export function LoginForm({ ...props }) {
   const { mutate: login, isPending } = useLogin()
@@ -23,7 +24,7 @@ export function LoginForm({ ...props }) {
     validate: zodResolver(LoginRequestSchema),
     initialValues: {
       email: "admin@gmail.com",
-      password: "admin",
+      password: "",
       remember: false
     }
   })
@@ -32,7 +33,11 @@ export function LoginForm({ ...props }) {
     login(
       { variables },
       {
-        onError: error => handleFormErrors(form, error)
+        onSuccess: () => notifications.show({ title: 'Welcome back!', message: 'You have successfully logged in' }),
+        onError: error => {
+          handleFormErrors(form, error);
+          notifications.show({ message: error.message, color: 'red' });
+        }
       }
     )
   })

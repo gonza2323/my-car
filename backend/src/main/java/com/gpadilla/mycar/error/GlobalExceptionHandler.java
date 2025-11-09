@@ -46,12 +46,6 @@ public class GlobalExceptionHandler {
             BusinessException ex,
             HttpServletRequest request) {
 
-        // Si el mensaje contiene "no existe" o "eliminada", devolvemos 200 OK en lugar de error
-        if (ex.getMessage().toLowerCase().contains("no existe") || ex.getMessage().toLowerCase().contains("eliminada")) {
-            Map<String, String> body = Map.of("message", ex.getMessage());
-            return ResponseEntity.ok(body);
-        }
-
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Business Error",

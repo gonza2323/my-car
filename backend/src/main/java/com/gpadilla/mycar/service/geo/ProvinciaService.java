@@ -8,6 +8,8 @@ import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.geo.ProvinciaMapper;
 import com.gpadilla.mycar.repository.geo.ProvinciaRepository;
 import com.gpadilla.mycar.service.BaseService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -50,5 +52,10 @@ public class ProvinciaService extends BaseService<
     protected void validateUpdate(Long id, ProvinciaCreateOrUpdateDto dto) {
         if (repository.existsByNombreAndPaisIdAndIdNotAndEliminadoFalse(dto.getNombre(), dto.getPaisId(), id))
             throw new BusinessException("Ya existe una provincia con ese nombre en ese país");
+    }
+
+    public Page<ProvinciaViewDto> findDtos(Pageable pageable, Long paisId) {
+        Page<Provincia> provincias = repository.buscarPorPaisId(pageable, paisId);
+        return provincias.map(this::toSummaryDto);
     }
 }

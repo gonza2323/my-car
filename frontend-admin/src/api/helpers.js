@@ -118,10 +118,10 @@ export function createPostMutationHook({
       onSuccess: (data, variables, context) => {
         if (queryKey)
           queryClient.invalidateQueries({ queryKey: [queryKey], refetchActive: true });
-        onSuccess?.(data, variables, queryClient, context);
+        onSuccess?.(data, variables, context, queryClient);
       },
       onError: (error, variables, context) => {
-        onError?.(error, variables, queryClient, context);
+        onError?.(error, variables, context, queryClient);
       },
       ...mutationOptions,
     });
@@ -156,10 +156,10 @@ export function createPutMutationHook({
       onSuccess: (data, variables, context) => {
         if (queryKey)
           queryClient.invalidateQueries({ queryKey: [queryKey] });
-        onSuccess?.(data, variables, queryClient, context);
+        onSuccess?.(data, variables, context, queryClient);
       },
       onError: (error, variables, context) => {
-        onError?.(error, variables, queryClient, context);
+        onError?.(error, variables, context, queryClient);
       },
       ...mutationOptions,
     });
@@ -191,10 +191,10 @@ export function createDeleteMutationHook({
       onSuccess: (data, variables, context) => {
         if (queryKey)
           queryClient.invalidateQueries({ queryKey: [queryKey] });
-        onSuccess?.(data, variables, queryClient, context);
+        onSuccess?.(data, variables, context, queryClient);
       },
       onError: (error, variables, context) => {
-        onError?.(error, variables, queryClient, context);
+        onError?.(error, variables, context, queryClient);
       },
       ...mutationOptions,
     });

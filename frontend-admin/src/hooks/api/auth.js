@@ -30,10 +30,8 @@ export const useLogin = () => {
         roles: data.user.roles || []
       });
       queryClient.invalidateQueries(['auth-status'], { refetchActive: true });
-      notifications.show({ title: 'Welcome back!', message: 'You have successfully logged in' });
     },
     onError: (err) => {
-      notifications.show({ message: err.message, color: 'red' });
     },
   });
 };

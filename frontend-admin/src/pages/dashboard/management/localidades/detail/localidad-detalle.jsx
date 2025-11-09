@@ -21,7 +21,19 @@ export default function LocalidadDetalle({ localidadId }) {
       <Stack gap="sm">
         <Group>
           <Text color="dimmed">Nombre:</Text>
-          <Text>{localidad?.denominacion || "-"}</Text>
+          <Text>{localidad?.nombre || "-"}</Text>
+        </Group>
+        <Group>
+          <Text color="dimmed">Departamento:</Text>
+          <Text>{localidad?.departamentoNombre || "-"}</Text>
+        </Group>
+        <Group>
+          <Text color="dimmed">Provincia:</Text>
+          <Text>{localidad?.provinciaNombre || "-"}</Text>
+        </Group>
+        <Group>
+          <Text color="dimmed">País:</Text>
+          <Text>{localidad?.paisNombre || "-"}</Text>
         </Group>
       </Stack>
 

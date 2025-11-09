@@ -14,11 +14,11 @@ public class LocalidadViewDto {
     private String nombre;
 
     private Long departamentoId;
-    private Long departamentoNombre;
+    private String departamentoNombre;
 
     private Long provinciaId;
-    private Long provinciaNombre;
+    private String provinciaNombre;
 
     private Long paisId;
-    private Long paisNombre;
+    private String paisNombre;
 }

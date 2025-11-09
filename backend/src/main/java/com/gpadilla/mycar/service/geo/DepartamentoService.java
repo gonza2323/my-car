@@ -2,12 +2,14 @@ package com.gpadilla.mycar.service.geo;
 
 import com.gpadilla.mycar.dtos.geo.departamento.DepartamentoCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.geo.departamento.DepartamentoViewDto;
-import com.gpadilla.mycar.entity.geo.Provincia;
 import com.gpadilla.mycar.entity.geo.Departamento;
+import com.gpadilla.mycar.entity.geo.Provincia;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.geo.DepartamentoMapper;
 import com.gpadilla.mycar.repository.geo.DepartamentoRepository;
 import com.gpadilla.mycar.service.BaseService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -50,5 +52,10 @@ public class DepartamentoService extends BaseService<
     protected void validateUpdate(Long id, DepartamentoCreateOrUpdateDto dto) {
         if (repository.existsByNombreAndProvinciaIdAndIdNotAndEliminadoFalse(dto.getNombre(), dto.getProvinciaId(), id))
             throw new BusinessException("Ya existe un departamento con ese nombre en esa provincia");
+    }
+
+    public Page<DepartamentoViewDto> findDtos(Pageable pageable, Long provinciaId) {
+        Page<Departamento> departamentos = repository.buscarPorProvinciaId(pageable, provinciaId);
+        return departamentos.map(this::toSummaryDto);
     }
 }

@@ -98,10 +98,10 @@ const router = createBrowserRouter([
                 path: paths.dashboard.management.localidades.add,
                 element: LazyPage(() => import('@/pages/dashboard/management/localidades/add')),
               },
-              // {
-              //   path: paths.dashboard.management.localidades.root + '/:localidadId',
-              //   element: LazyPage(() => import('@/pages/dashboard/management/localidades/detail')),
-              // },
+              {
+                path: paths.dashboard.management.localidades.root + '/:localidadId',
+                element: LazyPage(() => import('@/pages/dashboard/management/localidades/detail')),
+              },
             ],
           },
         ],

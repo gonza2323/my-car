@@ -8,6 +8,8 @@ import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.geo.LocalidadMapper;
 import com.gpadilla.mycar.repository.geo.LocalidadRepository;
 import com.gpadilla.mycar.service.BaseService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -50,5 +52,10 @@ public class LocalidadService extends BaseService<
     protected void validateUpdate(Long id, LocalidadCreateOrUpdateDto dto) {
         if (repository.existsByNombreAndDepartamentoIdAndIdNotAndEliminadoFalse(dto.getNombre(), dto.getDepartamentoId(), id))
             throw new BusinessException("Ya existe una localidad con ese nombre en ese departamento");
+    }
+
+    public Page<LocalidadViewDto> findDtos(Pageable pageable, Long departamentoId) {
+        Page<Localidad> localidades = repository.buscarPorDepartamentoId(pageable, departamentoId);
+        return localidades.map(this::toSummaryDto);
     }
 }

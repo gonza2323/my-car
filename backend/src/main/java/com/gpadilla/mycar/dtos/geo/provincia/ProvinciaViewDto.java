@@ -14,5 +14,5 @@ public class ProvinciaViewDto {
     private String nombre;
 
     private Long paisId;
-    private Long paisNombre;
+    private String paisNombre;
 }

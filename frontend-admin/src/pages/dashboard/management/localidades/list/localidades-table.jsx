@@ -3,19 +3,22 @@ import { Text } from "@mantine/core"
 import { usePagination } from "@/api/helpers"
 import { AddButton } from "@/components/add-button"
 import { DataTable } from "@/components/data-table"
-import { useGetLocalidades, useDeleteLocalidad } from "@/hooks"
+import { useGetLocalidades, useDeleteLocalidad, useAuth } from "@/hooks"
 import { paths } from "@/routes"
-import { NavLink, useNavigate } from "react-router-dom"
+import { Link, NavLink, useNavigate } from "react-router-dom"
 import { modals } from "@mantine/modals"
+import { notifications } from "@mantine/notifications"
 
 export function LocalidadesTable() {
+  const { roles } = useAuth();
+  const isJefe = roles.includes('JEFE');
   const navigate = useNavigate()
   const { page, size, setSize: setSize, setPage } = usePagination()
   // const { tabs, filters, sort } = DataTable.useDataTable<SortableFields>({
   const { sort } = DataTable.useDataTable({
     sortConfig: {
       direction: "asc",
-      column: "denominacion"
+      column: "nombre"
     }
   })
 
@@ -42,11 +45,35 @@ export function LocalidadesTable() {
   const columns = useMemo(
     () => [
       {
-        accessor: "denominacion",
+        accessor: "nombre",
         title: "Nombre",
         sortable: true,
         render: localidad => (
-          <Text truncate="end">{localidad.denominacion}</Text>
+          <Text truncate="end">{localidad.nombre}</Text>
+        )
+      },
+      {
+        accessor: "departamento.nombre",
+        title: "Departamento",
+        sortable: true,
+        render: localidad => (
+          <Text component="a" to="google.com" truncate="end">{localidad.departamentoNombre}</Text>
+        )
+      },
+      {
+        accessor: "departamento.provincia.nombre",
+        title: "Provincia",
+        sortable: true,
+        render: localidad => (
+          <Text truncate="end">{localidad.provinciaNombre}</Text>
+        )
+      },
+      {
+        accessor: "departamento.provincia.pais.nombre",
+        title: "País",
+        sortable: true,
+        render: localidad => (
+          <Text truncate="end">{localidad.paisNombre}</Text>
         )
       },
       {
@@ -56,19 +83,15 @@ export function LocalidadesTable() {
         width: 100,
         render: localidad => (
           <DataTable.Actions
-            onView={() => {
-              navigate(
-                paths.dashboard.management.localidades.view(localidad.id)
-              )
-            }}
-            onEdit={() => {
-              navigate(
-                paths.dashboard.management.localidades.edit(localidad.id)
-              )
-            }}
-            onDelete={() => handleDelete(localidad)}
+            onView={() =>
+              navigate(paths.dashboard.management.localidades.view(localidad.id))
+            }
+            onEdit={isJefe ? () =>
+              navigate(paths.dashboard.management.localidades.edit(localidad.id))
+              : undefined}
+            onDelete={isJefe ? () => handleDelete(localidad) : undefined}
           />
-        )
+        ),
       }
     ],
     []
@@ -84,6 +107,21 @@ export function LocalidadesTable() {
         deleteMutation.mutate({
           model: localidad,
           route: { id: localidad.id }
+        }, {
+          onSuccess: () => {
+            notifications.show({
+              title: 'Borrado',
+              message: 'La localidad fue borrada con éxito',
+              color: 'green',
+            });
+          },
+          onFailure: (error) => {
+            notifications.show({
+              title: 'Error',
+              message: error.message || 'No se pudo borrar la localidad',
+              color: 'red',
+            });
+          }
         })
       }
     })
@@ -95,6 +133,7 @@ export function LocalidadesTable() {
         title="Localidades"
         description="Lista de localidades"
         actions={
+          isJefe && (
           <AddButton
             variant="default"
             size="xs"
@@ -102,7 +141,7 @@ export function LocalidadesTable() {
             to={paths.dashboard.management.localidades.add}
           >
             Agregar localidad
-          </AddButton>
+          </AddButton>)
         }
       />
 

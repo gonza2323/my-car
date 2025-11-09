@@ -1,23 +1,23 @@
 import { Page } from "@/components/page"
 import { PageHeader } from "@/components/page-header"
 import { paths } from "@/routes"
-import ProveedorDetalle from "./localidad-detalle"
+import LocalidadDetalle from "./localidad-detalle"
 import { useParams } from "react-router-dom"
 
 const breadcrumbs = [
   { label: "Dashboard", href: paths.dashboard.root },
   { label: "Management", href: paths.dashboard.management.root },
-  { label: "Proveedores", href: paths.dashboard.management.proveedores.root },
-  { label: "Detalle Proveedor" }
+  { label: "Localidades", href: paths.dashboard.management.localidades.root },
+  { label: "Detalle Localidad" }
 ]
 
 export default function LocalidadDetailPage() {
-  const { proveedorId } = useParams()
+  const { localidadId } = useParams()
 
   return (
-    <Page title="Detalle proveedor">
-      <PageHeader title="Detalle proveedor" breadcrumbs={breadcrumbs} />
-      <ProveedorDetalle proveedorId={proveedorId} />
+    <Page title="Detalle Localidad">
+      <PageHeader title="Detalle Localidad" breadcrumbs={breadcrumbs} />
+      <LocalidadDetalle localidadId={localidadId} />
     </Page>
   )
 }

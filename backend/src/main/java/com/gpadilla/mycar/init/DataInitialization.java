@@ -179,7 +179,9 @@ public class DataInitialization implements CommandLineRunner {
 
     @Transactional
     protected void crearEmpleados() {
-        for (int i = 1; i <= CANT_EMPLEADOS; i++) {
+        int cantEmpleados = cargarEmpleadosEspecificos();
+
+        for (int i = 1; i <= CANT_EMPLEADOS - cantEmpleados; i++) {
             Long localidadId = localidades.get(faker.random().nextInt(localidades.size())).getId();
             EmpleadoCreateRequestDto empleadoDto = EmpleadoCreateRequestDto.builder()
                     .nombre(faker.name().firstName())
@@ -204,4 +206,68 @@ public class DataInitialization implements CommandLineRunner {
         }
     }
 
+    @Transactional
+    protected int cargarEmpleadosEspecificos() {
+        Long localidadId = localidades.get(faker.random().nextInt(localidades.size())).getId();
+        empleadoFacade.registrarEmpleado(EmpleadoCreateRequestDto.builder()
+                .nombre("Admin")
+                .apellido("Sistema")
+                .email("admin@gmail.com")
+                .tipoEmpleado(TipoEmpleado.JEFE)
+                .tipoDocumento(faker.random().nextEnum(TipoDocumento.class))
+                .numeroDocumento(faker.number().digits(7))
+                .fechaNacimiento(faker.timeAndDate().birthday(18, 100))
+                .direccion(DireccionCreateOrUpdateDto.builder()
+                        .calle(faker.address().streetName())
+                        .numeracion(faker.address().buildingNumber())
+                        .barrio(faker.address().cityName())
+                        .manzanaPiso(faker.address().streetSuffix())
+                        .casaDepartamento(faker.address().secondaryAddress())
+                        .referencia(faker.lorem().sentence(3))
+                        .localidadId(localidadId)
+                        .build())
+                .build());
+
+        localidadId = localidades.get(faker.random().nextInt(localidades.size())).getId();
+        empleadoFacade.registrarEmpleado(EmpleadoCreateRequestDto.builder()
+                .nombre("Pepe")
+                .apellido("Argento")
+                .email("pepeargento@gmail.com")
+                .tipoEmpleado(TipoEmpleado.JEFE)
+                .tipoDocumento(faker.random().nextEnum(TipoDocumento.class))
+                .numeroDocumento(faker.number().digits(7))
+                .fechaNacimiento(faker.timeAndDate().birthday(18, 100))
+                .direccion(DireccionCreateOrUpdateDto.builder()
+                        .calle(faker.address().streetName())
+                        .numeracion(faker.address().buildingNumber())
+                        .barrio(faker.address().cityName())
+                        .manzanaPiso(faker.address().streetSuffix())
+                        .casaDepartamento(faker.address().secondaryAddress())
+                        .referencia(faker.lorem().sentence(3))
+                        .localidadId(localidadId)
+                        .build())
+                .build());
+
+        localidadId = localidades.get(faker.random().nextInt(localidades.size())).getId();
+        empleadoFacade.registrarEmpleado(EmpleadoCreateRequestDto.builder()
+                .nombre("Moni")
+                .apellido("Argento")
+                .email("moniargento@gmail.com")
+                .tipoEmpleado(TipoEmpleado.ADMINISTRATIVO)
+                .tipoDocumento(faker.random().nextEnum(TipoDocumento.class))
+                .numeroDocumento(faker.number().digits(7))
+                .fechaNacimiento(faker.timeAndDate().birthday(18, 100))
+                .direccion(DireccionCreateOrUpdateDto.builder()
+                        .calle(faker.address().streetName())
+                        .numeracion(faker.address().buildingNumber())
+                        .barrio(faker.address().cityName())
+                        .manzanaPiso(faker.address().streetSuffix())
+                        .casaDepartamento(faker.address().secondaryAddress())
+                        .referencia(faker.lorem().sentence(3))
+                        .localidadId(localidadId)
+                        .build())
+                .build());
+
+        return 3;
+    }
 }
