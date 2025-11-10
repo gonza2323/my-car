@@ -95,4 +95,8 @@ public class UsuarioService {
         if (taken)
             throw new BusinessException("El email de usuario ya está en uso");
     }
+
+    public void delete(Usuario usuario) {
+        usuario.setEliminado(true);
+    }
 }

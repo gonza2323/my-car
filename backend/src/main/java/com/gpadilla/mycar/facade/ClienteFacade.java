@@ -4,8 +4,9 @@ import com.gpadilla.mycar.dtos.cliente.ClienteCompleteProfileDto;
 import com.gpadilla.mycar.dtos.cliente.ClienteCreateDto;
 import com.gpadilla.mycar.dtos.cliente.ClienteCreateRequestDto;
 import com.gpadilla.mycar.dtos.cliente.SignUpFormDto;
-import com.gpadilla.mycar.entity.geo.Direccion;
+import com.gpadilla.mycar.entity.Cliente;
 import com.gpadilla.mycar.entity.Usuario;
+import com.gpadilla.mycar.entity.geo.Direccion;
 import com.gpadilla.mycar.enums.UserRole;
 import com.gpadilla.mycar.mapper.ClienteMapper;
 import com.gpadilla.mycar.service.ClienteService;
@@ -55,5 +56,14 @@ public class ClienteFacade {
         clienteService.create(clienteDto, usuario, direccion);
 
         usuario.setHasCompletedProfile(true);
+    }
+
+    public void borrarCliente(Long id) {
+        // todo falta imagen
+        // todo falta contacto
+
+        Cliente cliente = clienteService.delete(id);
+        usuarioService.delete(cliente.getUsuario());
+        direccionService.delete(cliente.getDireccion());
     }
 }

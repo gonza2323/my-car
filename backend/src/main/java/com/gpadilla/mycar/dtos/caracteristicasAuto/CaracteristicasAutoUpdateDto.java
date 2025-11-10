@@ -6,6 +6,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaracteristicasAutoUpdateDto {
-    private int cantTotalAutos;
-    private int cantidadAlquilados;
+    private String marca;
+    private String modelo;
+    private int cantidadPuertas;
+    private int cantidadAsientos;
+    private int anio;
 }

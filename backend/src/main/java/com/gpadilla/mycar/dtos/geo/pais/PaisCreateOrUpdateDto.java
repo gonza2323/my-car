@@ -1,7 +1,6 @@
 package com.gpadilla.mycar.dtos.geo.pais;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaisCreateOrUpdateDto {
-    @NotBlank(message = "Debe indicar el nombre de la localidad")
+    @NotBlank(message = "Debe indicar el nombre del país")
     private String nombre;
 }

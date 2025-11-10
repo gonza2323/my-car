@@ -1,13 +1,14 @@
 package com.gpadilla.mycar.init;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gpadilla.mycar.dtos.caracteristicasAuto.CaracteristicasAutoCreateDto;
+import com.gpadilla.mycar.dtos.cliente.ClienteCreateRequestDto;
 import com.gpadilla.mycar.dtos.empleado.EmpleadoCreateRequestDto;
 import com.gpadilla.mycar.dtos.geo.direccion.DireccionCreateOrUpdateDto;
+import com.gpadilla.mycar.dtos.geo.nacionalidad.NacionalidadCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.geo.pais.PaisCreateOrUpdateDto;
-import com.gpadilla.mycar.entity.geo.Departamento;
-import com.gpadilla.mycar.entity.geo.Localidad;
-import com.gpadilla.mycar.entity.geo.Pais;
-import com.gpadilla.mycar.entity.geo.Provincia;
+import com.gpadilla.mycar.entity.CaracteristicasAuto;
+import com.gpadilla.mycar.entity.geo.*;
 import com.gpadilla.mycar.enums.TipoDocumento;
 import com.gpadilla.mycar.enums.TipoEmpleado;
 import com.gpadilla.mycar.facade.ClienteFacade;
@@ -18,7 +19,9 @@ import com.gpadilla.mycar.repository.geo.DepartamentoRepository;
 import com.gpadilla.mycar.repository.geo.LocalidadRepository;
 import com.gpadilla.mycar.repository.geo.PaisRepository;
 import com.gpadilla.mycar.repository.geo.ProvinciaRepository;
+import com.gpadilla.mycar.service.CaracteristicasAutoService;
 import com.gpadilla.mycar.service.UsuarioService;
+import com.gpadilla.mycar.service.geo.NacionalidadService;
 import com.gpadilla.mycar.service.geo.PaisService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -49,9 +52,13 @@ public class DataInitialization implements CommandLineRunner {
     private final Faker faker;
 
     private final int CANT_EMPLEADOS = 15;
+    private final int CANT_NACIONALIDADES = 180;
     private final int CANT_CLIENTES = 100;
+    private final int CANT_MODELOS_VEHICULOS = 10;
     private final ClienteFacade clienteFacade;
     private final UsuarioService usuarioService;
+    private final NacionalidadService nacionalidadService;
+    private final CaracteristicasAutoService caracteristicasAutoService;
 
     private List<Localidad> localidades;
 
@@ -71,14 +78,31 @@ public class DataInitialization implements CommandLineRunner {
 
         System.out.println("Creando datos iniciales...");
 
+        List<Nacionalidad> nacionalidades = crearNacionalidades();
         List<Pais> paises = crearPaises();
         cargarUbicacionesArgentina(paises.getFirst());
         crearEmpleados();
+        crearClientes(nacionalidades);
+        crearCaracteristicasVehiculos();
 
         System.out.println("Datos iniciales creados.");
     }
 
-    private List<Pais> crearPaises() {
+    @Transactional
+    protected List<Nacionalidad> crearNacionalidades() {
+        List<Nacionalidad> nacionalidades = new ArrayList<>();
+        for (int i = 0; i < CANT_NACIONALIDADES; i++) {
+            nacionalidades.add(nacionalidadService.create(
+                    NacionalidadCreateOrUpdateDto.builder()
+                            .nombre(faker.unique().fetchFromYaml("address.country"))
+                            .build()
+            ));
+        }
+        return nacionalidades;
+    }
+
+    @Transactional
+    protected List<Pais> crearPaises() {
         List<Pais> paises = new ArrayList<>();
 
         paises.add(paisService.create(new PaisCreateOrUpdateDto("Argentina")));
@@ -181,7 +205,7 @@ public class DataInitialization implements CommandLineRunner {
     protected void crearEmpleados() {
         int cantEmpleados = cargarEmpleadosEspecificos();
 
-        for (int i = 1; i <= CANT_EMPLEADOS - cantEmpleados; i++) {
+        for (int i = 0; i < CANT_EMPLEADOS - cantEmpleados; i++) {
             Long localidadId = localidades.get(faker.random().nextInt(localidades.size())).getId();
             EmpleadoCreateRequestDto empleadoDto = EmpleadoCreateRequestDto.builder()
                     .nombre(faker.name().firstName())
@@ -269,5 +293,47 @@ public class DataInitialization implements CommandLineRunner {
                 .build());
 
         return 3;
+    }
+
+    @Transactional
+    protected void crearClientes(List<Nacionalidad> nacionalidades) {
+        for (int i = 0; i < CANT_CLIENTES; i++) {
+            Long localidadId = localidades.get(faker.random().nextInt(localidades.size())).getId();
+            Long nacionalidadId = nacionalidades.get(faker.random().nextInt(nacionalidades.size())).getId();
+            ClienteCreateRequestDto clienteDto = ClienteCreateRequestDto.builder()
+                    .nombre(faker.name().firstName())
+                    .apellido(faker.name().lastName())
+                    .email(faker.internet().emailAddress())
+                    .nacionalidadId(nacionalidadId)
+                    .tipoDocumento(faker.random().nextEnum(TipoDocumento.class))
+                    .numeroDocumento(faker.number().digits(7))
+                    .fechaNacimiento(faker.timeAndDate().birthday(18, 100))
+                    .direccion(DireccionCreateOrUpdateDto.builder()
+                            .calle(faker.address().streetName())
+                            .numeracion(faker.address().buildingNumber())
+                            .barrio(faker.address().cityName())
+                            .manzanaPiso(faker.address().streetSuffix())
+                            .casaDepartamento(faker.address().secondaryAddress())
+                            .referencia(faker.lorem().sentence(3))
+                            .localidadId(localidadId)
+                            .build())
+                    .build();
+
+            clienteFacade.registrarClientePorFormularioAdmin(clienteDto);
+        }
+    }
+
+    @Transactional
+    protected List<CaracteristicasAuto> crearCaracteristicasVehiculos() {
+        List<CaracteristicasAuto> modelos = new ArrayList<>();
+        for (int i = 0; i < CANT_MODELOS_VEHICULOS; i++) {
+            modelos.add(caracteristicasAutoService.create(CaracteristicasAutoCreateDto.builder()
+                    .marca(faker.vehicle().make())
+                    .modelo(faker.vehicle().model())
+                    .anio(faker.number().numberBetween(1999, 2025))
+                    .cantidadAsientos(faker.number().numberBetween(2, 5))
+                    .cantidadPuertas(faker.number().numberBetween(2, 6)).build()));
+        }
+        return modelos;
     }
 }

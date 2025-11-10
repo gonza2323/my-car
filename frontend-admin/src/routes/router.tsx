@@ -80,7 +80,73 @@ const router = createBrowserRouter([
           {
             index: true,
             path: paths.dashboard.management.root,
-            element: <Navigate to={paths.dashboard.management.customers.root} replace />,
+            element: <Navigate to={paths.dashboard.management.empleados.root} replace />,
+          },
+          {
+            path: paths.dashboard.management.clientes.root,
+            children: [
+              {
+                index: true,
+                path: paths.dashboard.management.clientes.root,
+                element: <Navigate to={paths.dashboard.management.clientes.list} replace />,
+              },
+              {
+                path: paths.dashboard.management.clientes.list,
+                element: LazyPage(() => import('@/pages/dashboard/management/clientes/list')),
+              },
+              {
+                path: paths.dashboard.management.clientes.add,
+                element: LazyPage(() => import('@/pages/dashboard/management/clientes/add')),
+              },
+              {
+                path: paths.dashboard.management.clientes.root + '/:clienteId',
+                element: LazyPage(() => import('@/pages/dashboard/management/clientes/detail')),
+              },
+            ],
+          },
+          {
+            path: paths.dashboard.management.empleados.root,
+            children: [
+              {
+                index: true,
+                path: paths.dashboard.management.empleados.root,
+                element: <Navigate to={paths.dashboard.management.empleados.list} replace />,
+              },
+              {
+                path: paths.dashboard.management.empleados.list,
+                element: LazyPage(() => import('@/pages/dashboard/management/empleados/list')),
+              },
+              {
+                path: paths.dashboard.management.empleados.add,
+                element: LazyPage(() => import('@/pages/dashboard/management/empleados/add')),
+              },
+              {
+                path: paths.dashboard.management.empleados.root + '/:empleadoId',
+                element: LazyPage(() => import('@/pages/dashboard/management/empleados/detail')),
+              },
+            ],
+          },
+          {
+            path: paths.dashboard.management.modelos.root,
+            children: [
+              {
+                index: true,
+                path: paths.dashboard.management.modelos.root,
+                element: <Navigate to={paths.dashboard.management.modelos.list} replace />,
+              },
+              {
+                path: paths.dashboard.management.modelos.list,
+                element: LazyPage(() => import('@/pages/dashboard/management/modelos/list')),
+              },
+              {
+                path: paths.dashboard.management.modelos.add,
+                element: LazyPage(() => import('@/pages/dashboard/management/modelos/add')),
+              },
+              {
+                path: paths.dashboard.management.modelos.root + '/:modeloId',
+                element: LazyPage(() => import('@/pages/dashboard/management/modelos/detail')),
+              },
+            ],
           },
           {
             path: paths.dashboard.management.localidades.root,

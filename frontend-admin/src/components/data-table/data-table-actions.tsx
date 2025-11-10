@@ -26,6 +26,8 @@ export function DataTableActions({
 }: DataTableActionsProps) {
   return (
     <Group gap={gap} justify={justify} wrap={wrap} {...props}>
+      {children}
+
       {onView && (
         <Tooltip label="Show">
           <ActionIcon variant="default" onClick={onView}>
@@ -56,8 +58,6 @@ export function DataTableActions({
           </ActionIcon>
         </Tooltip>
       )}
-
-      {children}
     </Group>
   );
 }

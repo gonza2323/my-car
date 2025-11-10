@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Setter
@@ -15,6 +17,12 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Alquiler extends BaseEntity<Long> {
+
+    @Column(nullable = false)
+    private LocalDate fechaDesde;
+
+    @Column(nullable = false)
+    private LocalDate fechaHasta;
 
     @Column(nullable = false)
     private Double monto;
@@ -25,4 +33,7 @@ public class Alquiler extends BaseEntity<Long> {
 
     @ManyToOne(optional = false)
     private Cliente cliente;
+
+    @ManyToOne(optional = false)
+    private Auto auto;
 }

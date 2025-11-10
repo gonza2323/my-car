@@ -34,5 +34,6 @@ public class CaracteristicasAutoService extends BaseService<
                     throw new BusinessException("Ya existe un modelo '" + dto.getModelo() + "' de la marca '" + dto.getMarca() + "'");
                 });
     }
+
 }
 

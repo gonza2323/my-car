@@ -124,7 +124,7 @@ public class EmpresaService extends BaseService<
     /* ==================== Opcional: sin eliminación en singleton ==================== */
 
     @Override
-    public void delete(Long id) {
+    public Empresa delete(Long id) {
         throw new UnsupportedOperationException("No se permite eliminar la empresa en este modo singleton.");
     }
 }

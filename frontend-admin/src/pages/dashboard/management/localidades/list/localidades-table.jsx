@@ -57,7 +57,7 @@ export function LocalidadesTable() {
         title: "Departamento",
         sortable: true,
         render: localidad => (
-          <Text component="a" to="google.com" truncate="end">{localidad.departamentoNombre}</Text>
+          <Text truncate="end">{localidad.departamentoNombre}</Text>
         )
       },
       {

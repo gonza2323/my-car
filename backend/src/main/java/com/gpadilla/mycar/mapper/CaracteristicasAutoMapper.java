@@ -25,18 +25,21 @@ public interface CaracteristicasAutoMapper extends BaseMapper<
         > {
 
     @Override
-    @Mapping(target = "cantTotalAutos", source = "cantTotalAutos")
-    @Mapping(target = "cantidadAlquilados", source = "cantidadAlquilados")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "eliminado", ignore = true)
+    @Mapping(target = "cantTotalAutos", ignore = true)
     CaracteristicasAuto toEntity(CaracteristicasAutoCreateDto dto);
 
     @Override
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "eliminado", ignore = true)
     void updateEntity(CaracteristicasAutoUpdateDto dto, @MappingTarget CaracteristicasAuto entity);
 
     @Override
     @Mapping(target = "imagenes", qualifiedByName = "toDto")
     @Mapping(target = "costos", qualifiedByName = "toDto")
     @Mapping(target = "cantTotalAutos", source = "cantTotalAutos")
-    @Mapping(target = "cantidadAlquilados", source = "cantidadAlquilados")
+    @Mapping(target = "cantidadAlquilados", ignore = true)
     CaracteristicasAutoDetailDto toDto(CaracteristicasAuto entity);
 
     @Override

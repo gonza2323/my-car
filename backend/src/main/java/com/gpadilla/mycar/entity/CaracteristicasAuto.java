@@ -36,18 +36,15 @@ public class CaracteristicasAuto extends BaseEntity<Long> {
     @Column(nullable = false)
     private int cantTotalAutos;
 
-    @Column(nullable = false)
-    private int cantidadAlquilados;
-
-    // 🔹 Relación Uno a Muchos con Imagen
+    // Relación Uno a Muchos con Imagen
     @OneToMany(mappedBy = "caracteristicasAuto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Imagen> imagenes = new java.util.ArrayList<>();
 
-    // 🔹 Relación 1:N con Auto
+    // Relación 1:N con Auto
     @OneToMany(mappedBy = "caracteristicasAuto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Auto> autos = new ArrayList<>();
 
-    // 🔹 Relación 1:N con CostoAuto
+    // Relación 1:N con CostoAuto
     @OneToMany(mappedBy = "caracteristicasAuto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<CostoAuto> costos = new ArrayList<>();
 }
