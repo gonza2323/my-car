@@ -238,7 +238,7 @@ export function createPaginationQueryHook({
   queryOptions = {},
   axiosOptions = {}
 }) {
-  return (params) => {
+  return (params, specificQueryOptions) => {
     const query = { page: 0, size: 25, ...params?.query };
     const route = params?.route || {};
     const url = createUrl(endpoint, query, route);
@@ -259,6 +259,7 @@ export function createPaginationQueryHook({
         },
       }),
       ...queryOptions,
+      ...specificQueryOptions
     });
   };
 }

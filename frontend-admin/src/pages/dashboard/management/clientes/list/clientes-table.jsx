@@ -1,15 +1,16 @@
 import { useEffect, useMemo } from "react"
-import { Text } from "@mantine/core"
+import { ActionIcon, Text, Tooltip } from "@mantine/core"
 import { usePagination } from "@/api/helpers"
 import { AddButton } from "@/components/add-button"
 import { DataTable } from "@/components/data-table"
-import { useGetEmpleados, useDeleteEmpleado, useAuth } from "@/hooks"
+import { useGetClientes, useDeleteCliente, useAuth } from "@/hooks"
 import { paths } from "@/routes"
 import { Link, NavLink, useNavigate } from "react-router-dom"
 import { modals } from "@mantine/modals"
 import { notifications } from "@mantine/notifications"
+import { PiWhatsappLogoDuotone } from "react-icons/pi"
 
-export function EmpleadosTable() {
+export function ClientesTable() {
   const { roles } = useAuth();
   const isJefe = roles.includes('JEFE');
   const navigate = useNavigate()
@@ -22,11 +23,11 @@ export function EmpleadosTable() {
     }
   })
 
-  const { data, isLoading } = useGetEmpleados({
+  const { data, isLoading } = useGetClientes({
     query: {
       page,
       size,
-      // status: tabs.value as Empleado['status'],
+      // status: tabs.value as Cliente['status'],
       sort: sort.query
     }
   })
@@ -40,7 +41,7 @@ export function EmpleadosTable() {
     }
   }, [data, page, setPage])
 
-  const deleteMutation = useDeleteEmpleado()
+  const deleteMutation = useDeleteCliente()
 
   const columns = useMemo(
     () => [
@@ -48,32 +49,32 @@ export function EmpleadosTable() {
         accessor: "tipoDocumento",
         title: "Tipo Documento",
         sortable: true,
-        render: empleado => (
-          <Text truncate="end">{empleado.tipoDocumento}</Text>
+        render: cliente => (
+          <Text truncate="end">{cliente.tipoDocumento}</Text>
         )
       },
       {
         accessor: "numeroDocumento",
         title: "N Documento",
         sortable: true,
-        render: empleado => (
-          <Text truncate="end">{empleado.numeroDocumento}</Text>
+        render: cliente => (
+          <Text truncate="end">{cliente.numeroDocumento}</Text>
         )
       },
       {
         accessor: "apellido",
         title: "Nombre completo",
         sortable: true,
-        render: empleado => (
-          <Text truncate="end">{empleado.nombre + ' ' + empleado.apellido}</Text>
+        render: cliente => (
+          <Text truncate="end">{cliente.nombre + ' ' + cliente.apellido}</Text>
         )
       },
       {
-        accessor: "tipoEmpleado",
-        title: "Tipo Empleado",
+        accessor: "email",
+        title: "Correo",
         sortable: true,
-        render: empleado => (
-          <Text truncate="end">{empleado.tipoEmpleado}</Text>
+        render: cliente => (
+          <Text truncate="end">{cliente.usuarioEmail}</Text>
         )
       },
       {
@@ -81,40 +82,51 @@ export function EmpleadosTable() {
         title: "Acciones",
         textAlign: "right",
         width: 100,
-        render: empleado => (
+        render: cliente => (
           <DataTable.Actions
-            onView={ () => navigate(paths.dashboard.management.empleados.view(empleado.id)) }
-            onEdit={ () => navigate(paths.dashboard.management.empleados.edit(empleado.id)) }
-            onDelete={ () => handleDelete(empleado)}
-          />
+            onView={() => navigate(paths.dashboard.management.clientes.view(cliente.id))}
+            onEdit={() => navigate(paths.dashboard.management.clientes.edit(cliente.id))}
+            onDelete={() => handleDelete(cliente)}
+          >
+            <Tooltip label="WhatsApp">
+              <ActionIcon
+              component="a"
+              href={`https://wa.me/${cliente.telefono}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="default">
+                <PiWhatsappLogoDuotone size="1rem" />
+              </ActionIcon>
+            </Tooltip>
+          </DataTable.Actions>
         ),
       }
     ],
     []
   )
 
-  const handleDelete = empleado => {
+  const handleDelete = cliente => {
     modals.openConfirmModal({
       title: "Confirmar borrado",
-      children: <Text>¿Está seguro de que desea borrar el empleado?</Text>,
+      children: <Text>¿Está seguro de que desea borrar el cliente?</Text>,
       labels: { confirm: "Delete", cancel: "Cancel" },
       confirmProps: { color: "red" },
       onConfirm: () => {
         deleteMutation.mutate({
-          model: empleado,
-          route: { id: empleado.id }
+          model: cliente,
+          route: { id: cliente.id }
         }, {
           onSuccess: () => {
             notifications.show({
               title: 'Borrado',
-              message: 'El empleado fue borrado con éxito',
+              message: 'El cliente fue borrado con éxito',
               color: 'green',
             });
           },
           onFailure: (error) => {
             notifications.show({
               title: 'Error',
-              message: error.message || 'No se pudo borrar el empleado',
+              message: error.message || 'No se pudo borrar el cliente',
               color: 'red',
             });
           }
@@ -126,16 +138,16 @@ export function EmpleadosTable() {
   return (
     <DataTable.Container>
       <DataTable.Title
-        title="Empleados"
-        description="Lista de empleados"
+        title="Clientes"
+        description="Lista de clientes"
         actions={
           <AddButton
             variant="default"
             size="xs"
             component={NavLink}
-            to={paths.dashboard.management.empleados.add}
+            to={paths.dashboard.management.clientes.add}
           >
-            Agregar empleado
+            Agregar cliente
           </AddButton>
         }
       />
@@ -145,9 +157,9 @@ export function EmpleadosTable() {
       <DataTable.Content>
         <DataTable.Table
           minHeight={240}
-          noRecordsText={DataTable.noRecordsText("empleado")}
-          recordsPerPageLabel={DataTable.recordsPerPageLabel("empleados")}
-          paginationText={DataTable.paginationText("empleados")}
+          noRecordsText={DataTable.noRecordsText("cliente")}
+          recordsPerPageLabel={DataTable.recordsPerPageLabel("clientes")}
+          paginationText={DataTable.paginationText("clientes")}
           page={page + 1}
           records={data?.data ?? []}
           fetching={isLoading}

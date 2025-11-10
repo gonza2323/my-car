@@ -1,8 +1,11 @@
 package com.gpadilla.mycar.repository;
 
 import com.gpadilla.mycar.entity.CaracteristicasAuto;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,4 +16,24 @@ public interface CaracteristicasAutoRepository
     Optional<CaracteristicasAuto> findByMarcaAndModeloAndEliminadoFalse(String marca, String modelo);
 
     List<CaracteristicasAuto> findAllByMarcaAndEliminadoFalse(String marca);
+
+    @Query("""
+    SELECT DISTINCT c
+    FROM CaracteristicasAuto c
+    JOIN c.autos a
+    WHERE c.eliminado = false
+    AND a.eliminado = false
+    AND NOT EXISTS (
+        SELECT al
+        FROM Alquiler al
+        WHERE al.auto = a
+          AND al.eliminado = false
+          AND :startDate < al.fechaHasta
+          AND :endDate > al.fechaDesde
+    )
+""")
+    List<CaracteristicasAuto> encontrarModelosDisponiblesParaAlquiler(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 }

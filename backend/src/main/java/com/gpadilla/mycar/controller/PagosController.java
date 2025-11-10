@@ -25,7 +25,7 @@ public class PagosController {
 
     @PostMapping
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<PaymentResponse> registrarPagoManual(
+    public ResponseEntity<PaymentResponse> solicitarLinkMercadoPago(
             @RequestBody PaymentRequest request,
             @AuthenticationPrincipal CurrentUser user) throws MPException, MPApiException {
 

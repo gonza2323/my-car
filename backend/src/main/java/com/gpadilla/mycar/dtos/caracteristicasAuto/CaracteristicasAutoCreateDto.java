@@ -10,6 +10,4 @@ public class CaracteristicasAutoCreateDto {
     private int cantidadPuertas;
     private int cantidadAsientos;
     private int anio;
-    private int cantTotalAutos;
-    private int cantidadAlquilados;
 }

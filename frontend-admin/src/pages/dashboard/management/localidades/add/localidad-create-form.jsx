@@ -3,22 +3,34 @@ import { paths } from '@/routes';
 import { useForm, zodResolver } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { LocalidadCreateDto as LocalidadCreateSchema } from '@/api/dtos';
-import { useCreateLocalidad, useGetDepartamentos, useGetPaises, useGetProvincias } from '@/hooks';
+import { useCreateLocalidad, useGetDepartamentos, useGetLocalidades, useGetPaises, useGetProvincias } from '@/hooks';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function LocalidadCreateForm() {
   const navigate = useNavigate();
 
   const form = useForm({
     validate: zodResolver(LocalidadCreateSchema),
+    mode: 'uncontrolled',
     initialValues: {
       nombre: '',
       paisId: '',
       provinciaId: '',
       departamentoId: '',
     },
+    onValuesChange: (values) => {
+      setPaisId(values.paisId);
+      setProvinciaId(values.provinciaId);
+      setDepartamentoId(values.departamentoId);
+      setLocalidadId(values.localidadId);
+    }
   });
+
+  const [paisId, setPaisId] = useState('');
+  const [provinciaId, setProvinciaId] = useState('');
+  const [departamentoId, setDepartamentoId] = useState('');
+  const [localidadId, setLocalidadId] = useState('');
 
   const {
     data: paisResponse,
@@ -27,7 +39,6 @@ export default function LocalidadCreateForm() {
 
   const paises = paisResponse?.data ?? [];
   const paisOptions = [
-    { value: '', label: 'Seleccione un país' },
     ...paises.map(p => ({ value: String(p.id), label: p.nombre })),
   ];
 
@@ -35,13 +46,12 @@ export default function LocalidadCreateForm() {
     data: provinciaResponse,
     isLoading: provinciaLoading,
   } = useGetProvincias(
-    { query: { size: 99999, paisId: form.values.paisId } },
-    { enabled: !!form.values.paisId }
+    { query: { size: 99999, paisId: paisId } },
+    { enabled: !!paisId }
   );
 
   const provincias = provinciaResponse?.data ?? [];
   const provinciaOptions = [
-    { value: '', label: 'Seleccione una provincia' },
     ...provincias.map(p => ({ value: String(p.id), label: p.nombre })),
   ];
 
@@ -49,23 +59,48 @@ export default function LocalidadCreateForm() {
     data: departamentoResponse,
     isLoading: departamentoLoading,
   } = useGetDepartamentos(
-    { query: { size: 99999, provinciaId: form.values.provinciaId } },
-    { enabled: !!form.values.provinciaId }
+    { query: { size: 99999, provinciaId: provinciaId } },
+    { enabled: !!provinciaId }
   );
 
   const departamentos = departamentoResponse?.data ?? [];
   const departamentoOptions = [
-    { value: '', label: 'Seleccione un departamento' },
     ...departamentos.map(d => ({ value: String(d.id), label: d.nombre })),
   ];
 
-  useEffect(() => {
-    form.setFieldValue('provinciaId', '');
-  }, [form.values.paisId]);
+  const {
+    data: localidadesResponse,
+    isLoading: localidadesLoading,
+  } = useGetLocalidades(
+    { query: { size: 99999, departamentoId: departamentoId } },
+    { enabled: !!departamentoId }
+  );
+
+  const localidades = localidadesResponse?.data ?? [];
+  const localidadesOptions = [
+    ...localidades.map(d => ({ value: String(d.id), label: d.nombre })),
+  ];
 
   useEffect(() => {
-    form.setFieldValue('departamentoId', '');
-  }, [form.values.provinciaId]);
+    if (provinciaId !== '') {
+      setProvinciaId('')
+      form.setValues({provinciaId: ''});
+    }
+  }, [paisId]);
+
+  useEffect(() => {
+    if (departamentoId !== '') {
+      setDepartamentoId('')
+      form.setValues({departamentoId: ''});
+    }
+  }, [provinciaId]);
+
+  useEffect(() => {
+    if (localidadId !== '') {
+      setLocalidadId('')
+      form.setValues({localidadId: ''});
+    }
+  }, [departamentoId]);
 
   // --- Create mutation
   const createLocalidad = useCreateLocalidad();
@@ -104,6 +139,7 @@ export default function LocalidadCreateForm() {
       />
 
       <Select
+        {...form.getInputProps('paisId')}
         label="País"
         searchable={true}
         placeholder="Seleccione un país"
@@ -112,35 +148,44 @@ export default function LocalidadCreateForm() {
         rightSection={paisLoading && <Loader size="sm" />}
         withCheckIcon={false}
         allowDeselect={false}
-        {...form.getInputProps('paisId')}
       />
 
       <Select
+        {...form.getInputProps('provinciaId')}
         label="Provincia"
         searchable={true}
         placeholder={
-          form.values.paisId ? 'Seleccione una provincia' : 'Seleccione un país primero'
+          !paisId
+            ? "Seleccione primero un país"
+            : provinciaOptions.length === 0
+            ? "No se encontraron provincias"
+            : "Seleccione una provincia"
         }
         data={provinciaOptions}
-        disabled={!form.values.paisId || provinciaLoading}
+        disabled={!paisId || provinciaLoading || !provinciaOptions.length}
         rightSection={provinciaLoading && <Loader size="sm" />}
         withCheckIcon={false}
         allowDeselect={false}
-        {...form.getInputProps('provinciaId')}
+        key={form.key('provinciaId')}
       />
 
       <Select
+        {...form.getInputProps('departamentoId')}
         label="Departamento"
         searchable={true}
         placeholder={
-          form.values.provinciaId ? 'Seleccione un departamento' : 'Seleccione una provincia primero'
+          !provinciaId
+            ? "Seleccione primero una provincia"
+            : departamentoOptions.length === 0
+            ? "No se encontraron departamentos"
+            : "Seleccione un departamento"
         }
         data={departamentoOptions}
-        disabled={!form.values.provinciaId || departamentoLoading}
+        disabled={!provinciaId || departamentoLoading || !departamentoOptions.length}
         rightSection={departamentoLoading && <Loader size="sm" />}
         withCheckIcon={false}
         allowDeselect={false}
-        {...form.getInputProps('departamentoId')}
+        key={form.key('departamentoId')}
       />
 
       <Group justify="flex-end" mt="md">

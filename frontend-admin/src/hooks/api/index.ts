@@ -7,3 +7,4 @@ export * from './provincias.js';
 export * from './paises.js';
 export * from './empleados.js';
 export * from './clientes.js';
+export * from './nacionalidades.js';

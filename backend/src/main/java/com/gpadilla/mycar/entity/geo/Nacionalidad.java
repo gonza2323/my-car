@@ -1,5 +1,6 @@
-package com.gpadilla.mycar.entity;
+package com.gpadilla.mycar.entity.geo;
 
+import com.gpadilla.mycar.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;

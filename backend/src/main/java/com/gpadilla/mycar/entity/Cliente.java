@@ -1,5 +1,6 @@
 package com.gpadilla.mycar.entity;
 
+import com.gpadilla.mycar.entity.geo.Nacionalidad;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;

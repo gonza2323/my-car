@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -25,4 +28,7 @@ public class Auto extends BaseEntity<Long> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caracteristicas_auto_id", nullable = false)
     private CaracteristicasAuto caracteristicasAuto;
+
+    @OneToMany(mappedBy = "auto", fetch = FetchType.LAZY)
+    private List<Alquiler> alquileres = new ArrayList<>();
 }

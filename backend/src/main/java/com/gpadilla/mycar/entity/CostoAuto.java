@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -16,14 +16,14 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CostoAuto extends BaseEntity<Long>{
-    @Temporal(TemporalType.DATE)
-    private Date fechaDesde;
-
-    @Temporal(TemporalType.DATE)
-    private Date fechaHasta;
+    @Column(nullable = false)
+    private LocalDate fechaDesde;
 
     @Column(nullable = false)
-    private double costoTotal;
+    private LocalDate fechaHasta;
+
+    @Column(nullable = false)
+    private Double costoTotal;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caracteristicas_auto_id", nullable = false)

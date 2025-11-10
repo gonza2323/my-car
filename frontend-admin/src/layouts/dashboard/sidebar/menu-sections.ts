@@ -50,6 +50,17 @@ export const menu: MenuItem[] = [
     header: 'Management',
     section: [
       {
+        name: 'Clientes',
+        icon: PiUserDuotone,
+        href: paths.dashboard.management.clientes.root,
+        dropdownItems: [
+          {
+            name: 'List',
+            href: paths.dashboard.management.clientes.list,
+          },
+        ],
+      },
+      {
         name: 'Empleados',
         icon: PiUsersDuotone,
         href: paths.dashboard.management.empleados.root,
@@ -68,39 +79,6 @@ export const menu: MenuItem[] = [
           {
             name: 'List',
             href: paths.dashboard.management.localidades.list,
-          },
-        ],
-      },
-      {
-        name: 'Personas',
-        icon: PiUserDuotone,
-        href: paths.dashboard.management.personas.root,
-        dropdownItems: [
-          {
-            name: 'List',
-            href: paths.dashboard.management.personas.list,
-          },
-        ],
-      },
-      {
-        name: 'Autores',
-        icon: PiPencilDuotone,
-        href: paths.dashboard.management.autores.root,
-        dropdownItems: [
-          {
-            name: 'List',
-            href: paths.dashboard.management.autores.list,
-          },
-        ],
-      },
-      {
-        name: 'Libros',
-        icon: PiBookDuotone,
-        href: paths.dashboard.management.libros.root,
-        dropdownItems: [
-          {
-            name: 'List',
-            href: paths.dashboard.management.libros.list,
           },
         ],
       },

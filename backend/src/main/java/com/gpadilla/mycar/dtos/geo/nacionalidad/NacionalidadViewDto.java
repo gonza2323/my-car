@@ -1,6 +1,5 @@
-package com.gpadilla.mycar.dtos.geo.pais;
+package com.gpadilla.mycar.dtos.geo.nacionalidad;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaisCreateOrUpdateDto {
-    @NotBlank(message = "Debe indicar el nombre del país")
+public class NacionalidadViewDto {
+    private Long id;
     private String nombre;
 }

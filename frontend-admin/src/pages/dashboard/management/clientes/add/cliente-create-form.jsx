@@ -5,24 +5,25 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { paths } from '@/routes';
 import {
-  useCreateEmpleado,
+  useCreateCliente,
   useGetPaises,
   useGetProvincias,
   useGetDepartamentos,
   useGetLocalidades,
+  useGetNacionalidades,
 } from '@/hooks';
 import { DateInput, DatePicker, DatePickerInput } from '@mantine/dates';
-import { EmpleadoCreateDto } from '@/api/dtos';
+import { ClienteCreateDto } from '@/api/dtos';
 import { useEffect, useMemo, useState } from 'react';
 import { queryOptions } from '@tanstack/react-query';
 
 
-export default function EmpleadoCreateForm() {
+export default function ClienteCreateForm() {
   const navigate = useNavigate();
-  const createEmpleado = useCreateEmpleado();
+  const createCliente = useCreateCliente();
 
   const form = useForm({
-    validate: zodResolver(EmpleadoCreateDto),
+    validate: zodResolver(ClienteCreateDto),
     mode: 'uncontrolled',
     initialValues: {
       nombre: '',
@@ -31,8 +32,8 @@ export default function EmpleadoCreateForm() {
       tipoDocumento: 'DNI',
       numeroDocumento: '',
       telefono: '',
-      tipoEmpleado: 'JEFE',
       email: '',
+      nacionalidadId: '',
       direccion: {
         calle: '',
         numeracion: '',
@@ -58,6 +59,16 @@ export default function EmpleadoCreateForm() {
   const [provinciaId, setProvinciaId] = useState('');
   const [departamentoId, setDepartamentoId] = useState('');
   const [localidadId, setLocalidadId] = useState('');
+
+  const {
+    data: nacionalidadResponse,
+    isLoading: nacionalidadLoading,
+  } = useGetNacionalidades({ query: { size: 99999 } });
+
+  const nacionalidades = nacionalidadResponse?.data ?? [];
+  const nacionalidadOptions = [
+    ...nacionalidades.map(p => ({ value: String(p.id), label: p.nombre })),
+  ];
 
   const {
     data: paisResponse,
@@ -130,15 +141,15 @@ export default function EmpleadoCreateForm() {
   }, [departamentoId]);
 
   const handleSubmit = form.onSubmit((values) => {
-    createEmpleado.mutate(
+    createCliente.mutate(
       { variables: values },
       {
         onSuccess: () => {
           notifications.show({
             title: 'Éxito',
-            message: 'Empleado creado correctamente',
+            message: 'Cliente creado correctamente',
           });
-          navigate(paths.dashboard.management.empleados.list);
+          navigate(paths.dashboard.management.clientes.list);
         },
         onError: (error) => {
           notifications.show({
@@ -179,16 +190,20 @@ export default function EmpleadoCreateForm() {
 
       <TextInput label="Número de documento" {...form.getInputProps('numeroDocumento')} />
       <TextInput label="Teléfono" {...form.getInputProps('telefono')} />
+      <TextInput label="Email" {...form.getInputProps('email')} />
 
       <Select
-        label="Tipo de empleado"
-        data={['JEFE', 'ADMINISTRATIVO']}
+        {...form.getInputProps('nacionalidadId')}
+        label="Nacionalidad"
+        searchable={true}
+        placeholder="Seleccione la nacionalidad"
+        data={nacionalidadOptions}
+        disabled={nacionalidadLoading}
+        rightSection={nacionalidadLoading && <Loader size="sm" />}
+        withCheckIcon={false}
         allowDeselect={false}
-        checkIconPosition='right'
-        {...form.getInputProps('tipoEmpleado')}
       />
 
-      <TextInput label="Email" {...form.getInputProps('email')} />
 
       <Stack mt="md">
         <Select
@@ -269,10 +284,10 @@ export default function EmpleadoCreateForm() {
       </Stack>
 
       <Group position="right" mt="md">
-        <Button variant="outline" component={NavLink} to={paths.dashboard.management.empleados.list}>
+        <Button variant="outline" component={NavLink} to={paths.dashboard.management.clientes.list}>
           Cancelar
         </Button>
-        <Button type="submit" loading={createEmpleado.isPending}>
+        <Button type="submit" loading={createCliente.isPending}>
           Crear
         </Button>
       </Group>

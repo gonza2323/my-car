@@ -1,13 +1,12 @@
 package com.gpadilla.mycar.init;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gpadilla.mycar.dtos.cliente.ClienteCreateRequestDto;
 import com.gpadilla.mycar.dtos.empleado.EmpleadoCreateRequestDto;
 import com.gpadilla.mycar.dtos.geo.direccion.DireccionCreateOrUpdateDto;
+import com.gpadilla.mycar.dtos.geo.nacionalidad.NacionalidadCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.geo.pais.PaisCreateOrUpdateDto;
-import com.gpadilla.mycar.entity.geo.Departamento;
-import com.gpadilla.mycar.entity.geo.Localidad;
-import com.gpadilla.mycar.entity.geo.Pais;
-import com.gpadilla.mycar.entity.geo.Provincia;
+import com.gpadilla.mycar.entity.geo.*;
 import com.gpadilla.mycar.enums.TipoDocumento;
 import com.gpadilla.mycar.enums.TipoEmpleado;
 import com.gpadilla.mycar.facade.ClienteFacade;
@@ -19,6 +18,7 @@ import com.gpadilla.mycar.repository.geo.LocalidadRepository;
 import com.gpadilla.mycar.repository.geo.PaisRepository;
 import com.gpadilla.mycar.repository.geo.ProvinciaRepository;
 import com.gpadilla.mycar.service.UsuarioService;
+import com.gpadilla.mycar.service.geo.NacionalidadService;
 import com.gpadilla.mycar.service.geo.PaisService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -49,9 +49,11 @@ public class DataInitialization implements CommandLineRunner {
     private final Faker faker;
 
     private final int CANT_EMPLEADOS = 15;
+    private final int CANT_NACIONALIDADES = 180;
     private final int CANT_CLIENTES = 100;
     private final ClienteFacade clienteFacade;
     private final UsuarioService usuarioService;
+    private final NacionalidadService nacionalidadService;
 
     private List<Localidad> localidades;
 
@@ -71,14 +73,30 @@ public class DataInitialization implements CommandLineRunner {
 
         System.out.println("Creando datos iniciales...");
 
+        List<Nacionalidad> nacionalidades = crearNacionalidades();
         List<Pais> paises = crearPaises();
         cargarUbicacionesArgentina(paises.getFirst());
         crearEmpleados();
+        crearClientes(nacionalidades);
 
         System.out.println("Datos iniciales creados.");
     }
 
-    private List<Pais> crearPaises() {
+    @Transactional
+    protected List<Nacionalidad> crearNacionalidades() {
+        List<Nacionalidad> nacionalidades = new ArrayList<>();
+        for (int i = 0; i < CANT_NACIONALIDADES; i++) {
+            nacionalidades.add(nacionalidadService.create(
+                    NacionalidadCreateOrUpdateDto.builder()
+                            .nombre(faker.unique().fetchFromYaml("address.country"))
+                            .build()
+            ));
+        }
+        return nacionalidades;
+    }
+
+    @Transactional
+    protected List<Pais> crearPaises() {
         List<Pais> paises = new ArrayList<>();
 
         paises.add(paisService.create(new PaisCreateOrUpdateDto("Argentina")));
@@ -269,5 +287,33 @@ public class DataInitialization implements CommandLineRunner {
                 .build());
 
         return 3;
+    }
+
+    @Transactional
+    protected void crearClientes(List<Nacionalidad> nacionalidades) {
+        for (int i = 1; i <= CANT_CLIENTES; i++) {
+            Long localidadId = localidades.get(faker.random().nextInt(localidades.size())).getId();
+            Long nacionalidadId = nacionalidades.get(faker.random().nextInt(nacionalidades.size())).getId();
+            ClienteCreateRequestDto clienteDto = ClienteCreateRequestDto.builder()
+                    .nombre(faker.name().firstName())
+                    .apellido(faker.name().lastName())
+                    .email(faker.internet().emailAddress())
+                    .nacionalidadId(nacionalidadId)
+                    .tipoDocumento(faker.random().nextEnum(TipoDocumento.class))
+                    .numeroDocumento(faker.number().digits(7))
+                    .fechaNacimiento(faker.timeAndDate().birthday(18, 100))
+                    .direccion(DireccionCreateOrUpdateDto.builder()
+                            .calle(faker.address().streetName())
+                            .numeracion(faker.address().buildingNumber())
+                            .barrio(faker.address().cityName())
+                            .manzanaPiso(faker.address().streetSuffix())
+                            .casaDepartamento(faker.address().secondaryAddress())
+                            .referencia(faker.lorem().sentence(3))
+                            .localidadId(localidadId)
+                            .build())
+                    .build();
+
+            clienteFacade.registrarClientePorFormularioAdmin(clienteDto);
+        }
     }
 }
