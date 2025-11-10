@@ -4,6 +4,7 @@ import com.gpadilla.mycar.enums.TipoContacto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter @Setter

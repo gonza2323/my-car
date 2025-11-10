@@ -1,21 +1,20 @@
 package com.gpadilla.mycar.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.gpadilla.mycar.entity.geo.Direccion;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
+@SuperBuilder
 @NoArgsConstructor
 @Table(name = "empresas")
 public class Empresa extends BaseEntity<Long> {
@@ -24,6 +23,7 @@ public class Empresa extends BaseEntity<Long> {
     @Size(max = 50, message = "La razon social no puede superar los 50 caracteres")
     private String nombre;
 
-    @NotNull(message = "El campo eliminado no puede ser nulo")
-    private Boolean eliminado = false;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_direccion", nullable = false, foreignKey = @ForeignKey(name = "fk_empresa_direccion"))
+    private Direccion direccion;
 }
