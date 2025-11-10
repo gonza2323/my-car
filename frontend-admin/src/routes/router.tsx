@@ -127,6 +127,28 @@ const router = createBrowserRouter([
             ],
           },
           {
+            path: paths.dashboard.management.modelos.root,
+            children: [
+              {
+                index: true,
+                path: paths.dashboard.management.modelos.root,
+                element: <Navigate to={paths.dashboard.management.modelos.list} replace />,
+              },
+              {
+                path: paths.dashboard.management.modelos.list,
+                element: LazyPage(() => import('@/pages/dashboard/management/modelos/list')),
+              },
+              {
+                path: paths.dashboard.management.modelos.add,
+                element: LazyPage(() => import('@/pages/dashboard/management/modelos/add')),
+              },
+              {
+                path: paths.dashboard.management.modelos.root + '/:modeloId',
+                element: LazyPage(() => import('@/pages/dashboard/management/modelos/detail')),
+              },
+            ],
+          },
+          {
             path: paths.dashboard.management.localidades.root,
             children: [
               {

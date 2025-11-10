@@ -2,6 +2,7 @@ package com.gpadilla.mycar.dtos.caracteristicasAuto;
 import lombok.*;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaracteristicasAutoCreateDto {

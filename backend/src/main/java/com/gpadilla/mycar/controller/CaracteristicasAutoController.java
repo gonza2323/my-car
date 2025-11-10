@@ -14,7 +14,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/caracteristicas")
+@RequestMapping("/api/v1/modelos")
 @RequiredArgsConstructor
 @EnableMethodSecurity(prePostEnabled = true)
 public class CaracteristicasAutoController {

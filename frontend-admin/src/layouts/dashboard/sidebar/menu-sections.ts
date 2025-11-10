@@ -1,6 +1,7 @@
 import { ElementType } from 'react';
 import {
   PiBookDuotone,
+  PiCarDuotone,
   PiChartLineUpDuotone,
   PiChatCenteredDotsDuotone,
   PiFilesDuotone,
@@ -68,6 +69,28 @@ export const menu: MenuItem[] = [
           {
             name: 'List',
             href: paths.dashboard.management.empleados.list,
+          },
+        ],
+      },
+      {
+        name: 'Modelos',
+        icon: PiCarDuotone,
+        href: paths.dashboard.management.modelos.root,
+        dropdownItems: [
+          {
+            name: 'List',
+            href: paths.dashboard.management.modelos.list,
+          },
+        ],
+      },
+      {
+        name: 'Vehículos',
+        icon: PiCarDuotone,
+        href: paths.dashboard.management.vehiculos.root,
+        dropdownItems: [
+          {
+            name: 'List',
+            href: paths.dashboard.management.vehiculos.list,
           },
         ],
       },

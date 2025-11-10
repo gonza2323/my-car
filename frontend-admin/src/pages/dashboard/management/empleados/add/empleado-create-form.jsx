@@ -152,7 +152,7 @@ export default function EmpleadoCreateForm() {
   });
 
   return (
-    <Stack component="form" onSubmit={handleSubmit}>
+    <Stack component="form" onSubmit={handleSubmit} maw={400}>
       <Grid>
         <Grid.Col span={6}>
           <TextInput label="Nombre" {...form.getInputProps('nombre')} />
