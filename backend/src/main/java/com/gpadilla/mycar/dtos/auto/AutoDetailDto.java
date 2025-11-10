@@ -12,6 +12,12 @@ public class AutoDetailDto {
     private Long id;
     private String patente;
     private EstadoAuto estadoAuto;
-    private boolean eliminado;
-    private Long caracteristicasAuto;
+
+    private Long caracteristicaAutoId;
+    private String marca;
+    private String modelo;
+    private int cantidadPuertas;
+    private int cantidadAsientos;
+    private int anio;
+    private int cantTotalAutos;
 }

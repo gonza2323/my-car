@@ -5,6 +5,7 @@ import com.gpadilla.mycar.dtos.auto.AutoDetailDto;
 import com.gpadilla.mycar.dtos.auto.AutoSummaryDto;
 import com.gpadilla.mycar.dtos.auto.AutoUpdateDto;
 import com.gpadilla.mycar.service.AutoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/v1/autos")
+@RequestMapping("/api/v1/vehiculos")
 @RequiredArgsConstructor
 @EnableMethodSecurity(prePostEnabled = true)
 public class AutoController {
@@ -25,14 +26,14 @@ public class AutoController {
     // 🔹 Crear un vehículo
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMINISTRATIVO', 'JEFE')")
-    public ResponseEntity<AutoDetailDto> create(@RequestBody AutoCreateDto dto) {
+    public ResponseEntity<AutoDetailDto> create(@Valid @RequestBody AutoCreateDto dto) {
         return ResponseEntity.ok(service.createAndReturnDto(dto));
     }
 
     // 🔹 Actualizar un vehículo
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRATIVO', 'JEFE')")
-    public ResponseEntity<AutoDetailDto> update(@PathVariable Long id, @RequestBody AutoUpdateDto dto) {
+    public ResponseEntity<AutoDetailDto> update(@PathVariable Long id, @Valid @RequestBody AutoUpdateDto dto) {
         return ResponseEntity.ok(service.updateAndReturnDto(id, dto));
     }
 

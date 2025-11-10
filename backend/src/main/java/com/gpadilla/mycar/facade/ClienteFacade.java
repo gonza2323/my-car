@@ -31,7 +31,7 @@ public class ClienteFacade {
     }
 
     @Transactional
-    public void registrarClientePorFormularioAdmin(ClienteCreateRequestDto request) {
+    public Long registrarClientePorFormularioAdmin(ClienteCreateRequestDto request) {
         // todo falta imagen
         // todo falta contacto
 
@@ -40,7 +40,8 @@ public class ClienteFacade {
         Direccion direccion = direccionService.create(request.getDireccion());
 
         ClienteCreateDto clienteDto = clienteMapper.toDto(request);
-        clienteService.create(clienteDto, usuario, direccion);
+        Cliente cliente = clienteService.create(clienteDto, usuario, direccion);
+        return cliente.getId();
     }
 
     @Transactional

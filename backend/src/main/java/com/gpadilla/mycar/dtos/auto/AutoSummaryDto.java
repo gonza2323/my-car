@@ -12,5 +12,10 @@ public class AutoSummaryDto {
     private Long id;
     private String patente;
     private EstadoAuto estadoAuto;
+
+    private Long caracteristicaAutoId;
+    private String marca;
+    private String modelo;
+    private int anio;
 }
 

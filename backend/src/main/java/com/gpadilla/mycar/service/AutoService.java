@@ -5,6 +5,7 @@ import com.gpadilla.mycar.dtos.auto.AutoDetailDto;
 import com.gpadilla.mycar.dtos.auto.AutoSummaryDto;
 import com.gpadilla.mycar.dtos.auto.AutoUpdateDto;
 import com.gpadilla.mycar.entity.Auto;
+import com.gpadilla.mycar.entity.CaracteristicasAuto;
 import com.gpadilla.mycar.enums.EstadoAuto;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.AutoMapper;
@@ -24,8 +25,18 @@ public class AutoService extends BaseService<
         AutoUpdateDto,
         AutoMapper> {
 
-    public AutoService(AutoRepository repository, AutoMapper mapper) {
+    private final CaracteristicasAutoService caracteristicasAutoService;
+
+    public AutoService(AutoRepository repository, AutoMapper mapper, CaracteristicasAutoService caracteristicasAutoService) {
         super("Auto", repository, mapper);
+        this.caracteristicasAutoService = caracteristicasAutoService;
+    }
+
+    @Override
+    protected void preCreate(AutoCreateDto dto, Auto vehiculo) {
+        CaracteristicasAuto modelo = caracteristicasAutoService.find(dto.getCaracteristicasAutoId());
+        vehiculo.setCaracteristicasAuto(modelo);
+        vehiculo.setEstadoAuto(EstadoAuto.DISPONIBLE);
     }
 
     // Ejemplo de validación específica:

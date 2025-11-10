@@ -148,6 +148,28 @@ const router = createBrowserRouter([
               },
             ],
           },
+                    {
+            path: paths.dashboard.management.vehiculos.root,
+            children: [
+              {
+                index: true,
+                path: paths.dashboard.management.vehiculos.root,
+                element: <Navigate to={paths.dashboard.management.vehiculos.list} replace />,
+              },
+              {
+                path: paths.dashboard.management.vehiculos.list,
+                element: LazyPage(() => import('@/pages/dashboard/management/vehiculos/list')),
+              },
+              {
+                path: paths.dashboard.management.vehiculos.add,
+                element: LazyPage(() => import('@/pages/dashboard/management/vehiculos/add')),
+              },
+              {
+                path: paths.dashboard.management.vehiculos.root + '/:vehiculoId',
+                element: LazyPage(() => import('@/pages/dashboard/management/vehiculos/detail')),
+              },
+            ],
+          },
           {
             path: paths.dashboard.management.localidades.root,
             children: [

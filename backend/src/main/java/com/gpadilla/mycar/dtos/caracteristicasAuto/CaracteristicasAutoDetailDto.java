@@ -18,7 +18,6 @@ public class CaracteristicasAutoDetailDto {
     private int cantidadAsientos;
     private int anio;
     private int cantTotalAutos;
-    private int cantidadAlquilados;
 
     private List<ImagenDetailDto> imagenes;
     private List<CostoAutoDto> costos;

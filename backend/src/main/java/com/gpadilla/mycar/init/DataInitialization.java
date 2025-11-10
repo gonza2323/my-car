@@ -1,12 +1,14 @@
 package com.gpadilla.mycar.init;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gpadilla.mycar.dtos.auto.AutoCreateDto;
 import com.gpadilla.mycar.dtos.caracteristicasAuto.CaracteristicasAutoCreateDto;
 import com.gpadilla.mycar.dtos.cliente.ClienteCreateRequestDto;
 import com.gpadilla.mycar.dtos.empleado.EmpleadoCreateRequestDto;
 import com.gpadilla.mycar.dtos.geo.direccion.DireccionCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.geo.nacionalidad.NacionalidadCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.geo.pais.PaisCreateOrUpdateDto;
+import com.gpadilla.mycar.entity.Auto;
 import com.gpadilla.mycar.entity.CaracteristicasAuto;
 import com.gpadilla.mycar.entity.geo.*;
 import com.gpadilla.mycar.enums.TipoDocumento;
@@ -19,6 +21,7 @@ import com.gpadilla.mycar.repository.geo.DepartamentoRepository;
 import com.gpadilla.mycar.repository.geo.LocalidadRepository;
 import com.gpadilla.mycar.repository.geo.PaisRepository;
 import com.gpadilla.mycar.repository.geo.ProvinciaRepository;
+import com.gpadilla.mycar.service.AutoService;
 import com.gpadilla.mycar.service.CaracteristicasAutoService;
 import com.gpadilla.mycar.service.UsuarioService;
 import com.gpadilla.mycar.service.geo.NacionalidadService;
@@ -59,6 +62,7 @@ public class DataInitialization implements CommandLineRunner {
     private final UsuarioService usuarioService;
     private final NacionalidadService nacionalidadService;
     private final CaracteristicasAutoService caracteristicasAutoService;
+    private final AutoService autoService;
 
     private List<Localidad> localidades;
 
@@ -82,8 +86,9 @@ public class DataInitialization implements CommandLineRunner {
         List<Pais> paises = crearPaises();
         cargarUbicacionesArgentina(paises.getFirst());
         crearEmpleados();
-        crearClientes(nacionalidades);
-        crearCaracteristicasVehiculos();
+        List<Long> clienteIds = crearClientes(nacionalidades);
+        List<CaracteristicasAuto> modelos = crearCaracteristicasVehiculos();
+        crearVehiculos(modelos);
 
         System.out.println("Datos iniciales creados.");
     }
@@ -296,7 +301,8 @@ public class DataInitialization implements CommandLineRunner {
     }
 
     @Transactional
-    protected void crearClientes(List<Nacionalidad> nacionalidades) {
+    protected List<Long> crearClientes(List<Nacionalidad> nacionalidades) {
+        List<Long> clienteIds = new ArrayList<>();
         for (int i = 0; i < CANT_CLIENTES; i++) {
             Long localidadId = localidades.get(faker.random().nextInt(localidades.size())).getId();
             Long nacionalidadId = nacionalidades.get(faker.random().nextInt(nacionalidades.size())).getId();
@@ -318,9 +324,10 @@ public class DataInitialization implements CommandLineRunner {
                             .localidadId(localidadId)
                             .build())
                     .build();
-
-            clienteFacade.registrarClientePorFormularioAdmin(clienteDto);
+            Long id = clienteFacade.registrarClientePorFormularioAdmin(clienteDto);
+            clienteIds.add(id);
         }
+        return clienteIds;
     }
 
     @Transactional
@@ -335,5 +342,18 @@ public class DataInitialization implements CommandLineRunner {
                     .cantidadPuertas(faker.number().numberBetween(2, 6)).build()));
         }
         return modelos;
+    }
+
+    @Transactional
+    protected List<Auto> crearVehiculos(List<CaracteristicasAuto> modelos) {
+        List<Auto> vehiculos = new ArrayList<>();
+        for (int i = 0; i < CANT_MODELOS_VEHICULOS; i++) {
+            Long modeloId = modelos.get(faker.random().nextInt(modelos.size())).getId();
+            vehiculos.add(autoService.create(AutoCreateDto.builder()
+                    .patente(faker.vehicle().licensePlate())
+                    .caracteristicasAutoId(modeloId)
+                    .build()));
+        }
+        return vehiculos;
     }
 }

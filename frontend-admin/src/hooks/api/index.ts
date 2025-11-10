@@ -9,3 +9,4 @@ export * from './empleados.js';
 export * from './modelos.js';
 export * from './clientes.js';
 export * from './nacionalidades.js';
+export * from './vehiculos.js';
