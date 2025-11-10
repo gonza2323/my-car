@@ -14,6 +14,5 @@ public class CaracteristicasAutoDisponible {
     private Integer anio;
     private Integer cantidadPuertas;
     private Integer cantidadAsientos;
-    private Long cantidadDisponible;
     private Double precioPorDia;
 }

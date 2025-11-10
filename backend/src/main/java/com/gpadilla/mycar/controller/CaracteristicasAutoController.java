@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/modelos")
@@ -46,12 +45,14 @@ public class CaracteristicasAutoController {
 
     // 🔹 Obtener modelo por ID
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRATIVO', 'JEFE')")
     public ResponseEntity<CaracteristicasAutoDetailDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findDto(id));
     }
 
     // 🔹 Listar modelos con paginación
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRATIVO', 'JEFE')")
     public ResponseEntity<Page<CaracteristicasAutoSummaryDto>> findAll(Pageable pageable) {
         return ResponseEntity.ok(service.findDtos(pageable));
     }

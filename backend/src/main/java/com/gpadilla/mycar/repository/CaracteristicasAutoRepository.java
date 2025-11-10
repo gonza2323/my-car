@@ -22,7 +22,7 @@ public interface CaracteristicasAutoRepository
 
     @Query("""
     SELECT new com.gpadilla.mycar.dtos.caracteristicasAuto.CaracteristicasAutoDisponible(
-         c.id, c.marca, c.modelo, c.anio, c.cantidadPuertas, c.cantidadAsientos, COUNT(a),
+         c.id, c.marca, c.modelo, c.anio, c.cantidadPuertas, c.cantidadAsientos,
          (SELECT co.costoTotal
           FROM CostoAuto co
           WHERE co.caracteristicasAuto = c

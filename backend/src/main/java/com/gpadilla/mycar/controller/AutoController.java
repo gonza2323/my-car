@@ -47,12 +47,14 @@ public class AutoController {
 
     // 🔹 Obtener un vehículo por ID
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRATIVO', 'JEFE')")
     public ResponseEntity<AutoDetailDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findDto(id));
     }
 
     // 🔹 Listar vehículos con paginación
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRATIVO', 'JEFE')")
     public ResponseEntity<Page<AutoSummaryDto>> findAll(Pageable pageable) {
         return ResponseEntity.ok(service.findDtos(pageable));
     }

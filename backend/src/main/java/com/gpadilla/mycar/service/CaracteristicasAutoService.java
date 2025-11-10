@@ -39,7 +39,8 @@ public class CaracteristicasAutoService extends BaseService<
     protected void validateCreate(CaracteristicasAutoCreateDto dto) {
         repository.findByMarcaAndModeloAndAnioAndEliminadoFalse(dto.getMarca(), dto.getModelo(), dto.getAnio())
                 .ifPresent(c -> {
-                    throw new BusinessException("Ya existe un modelo '" + dto.getModelo() + "' de la marca '" + dto.getMarca() + "'");
+                    throw new BusinessException("Ya existe un modelo '" + dto.getModelo() + "' de la marca '" +
+                            dto.getMarca() + "' y año " + dto.getAnio());
                 });
     }
 
