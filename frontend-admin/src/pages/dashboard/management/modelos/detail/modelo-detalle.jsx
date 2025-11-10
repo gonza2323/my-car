@@ -1,39 +1,57 @@
-import { Alert, Button, Card, Group, Loader, Stack, Text } from "@mantine/core"
+import { Alert, Button, Card, Group, Image, Loader, Stack, Text } from "@mantine/core"
 import { paths } from "@/routes"
 import { NavLink } from "react-router-dom"
-import { useGetLocalidad } from "@/hooks"
+import { useGetModelo } from "@/hooks"
 
-export default function LocalidadDetalle({ localidadId }) {
-  const { data: localidad, isLoading, error } = useGetLocalidad({
-    route: { id: localidadId }
+export default function ModeloDetalle({ modeloId }) {
+  const { data: modelo, isLoading, error } = useGetModelo({
+    route: { id: modeloId }
   })
 
   if (isLoading) return <Loader />
   if (error)
     return (
       <Alert color="red" maw={400}>
-        Error al cargar localidad
+        Error al cargar modelo
       </Alert>
     )
 
+    console.log(modelo)
+
   return (
     <Card shadow="sm" padding="lg" maw={500}>
-      <Stack gap="sm">
+      <Card.Section>
+        <Image
+          src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"
+          height={160}
+          alt="Norway"
+        />
+      </Card.Section>
+      
+      <Stack gap="sm" mt="md">
         <Group>
-          <Text color="dimmed">Nombre:</Text>
-          <Text>{localidad?.nombre || "-"}</Text>
+          <Text color="dimmed">Marca:</Text>
+          <Text>{modelo?.marca || "-"}</Text>
         </Group>
         <Group>
-          <Text color="dimmed">Departamento:</Text>
-          <Text>{localidad?.departamentoNombre || "-"}</Text>
+          <Text color="dimmed">Modelo:</Text>
+          <Text>{modelo?.modelo || "-"}</Text>
         </Group>
         <Group>
-          <Text color="dimmed">Provincia:</Text>
-          <Text>{localidad?.provinciaNombre || "-"}</Text>
+          <Text color="dimmed">Año:</Text>
+          <Text>{modelo?.anio || "-"}</Text>
         </Group>
         <Group>
-          <Text color="dimmed">País:</Text>
-          <Text>{localidad?.paisNombre || "-"}</Text>
+          <Text color="dimmed">Asientos:</Text>
+          <Text>{modelo?.cantidadAsientos || "-"}</Text>
+        </Group>
+        <Group>
+          <Text color="dimmed">Puertas:</Text>
+          <Text>{modelo?.cantidadPuertas || "-"}</Text>
+        </Group>
+        <Group>
+          <Text color="dimmed">Cantidad de unidades:</Text>
+          <Text>{modelo?.cantTotalAutos || "-"}</Text>
         </Group>
       </Stack>
 
@@ -41,7 +59,7 @@ export default function LocalidadDetalle({ localidadId }) {
         <Button
           variant="outline"
           component={NavLink}
-          to={paths.dashboard.management.localidades.list}
+          to={paths.dashboard.management.modelos.list}
         >
           Volver
         </Button>

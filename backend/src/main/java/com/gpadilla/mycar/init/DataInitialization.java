@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gpadilla.mycar.dtos.auto.AutoCreateDto;
 import com.gpadilla.mycar.dtos.caracteristicasAuto.CaracteristicasAutoCreateDto;
 import com.gpadilla.mycar.dtos.cliente.ClienteCreateRequestDto;
+import com.gpadilla.mycar.dtos.costoAuto.CostoAutoCreateDto;
 import com.gpadilla.mycar.dtos.empleado.EmpleadoCreateRequestDto;
 import com.gpadilla.mycar.dtos.geo.direccion.DireccionCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.geo.nacionalidad.NacionalidadCreateOrUpdateDto;
@@ -23,6 +24,7 @@ import com.gpadilla.mycar.repository.geo.PaisRepository;
 import com.gpadilla.mycar.repository.geo.ProvinciaRepository;
 import com.gpadilla.mycar.service.AutoService;
 import com.gpadilla.mycar.service.CaracteristicasAutoService;
+import com.gpadilla.mycar.service.CostoAutoService;
 import com.gpadilla.mycar.service.UsuarioService;
 import com.gpadilla.mycar.service.geo.NacionalidadService;
 import com.gpadilla.mycar.service.geo.PaisService;
@@ -34,6 +36,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,11 +62,13 @@ public class DataInitialization implements CommandLineRunner {
     private final int CANT_NACIONALIDADES = 180;
     private final int CANT_CLIENTES = 100;
     private final int CANT_MODELOS_VEHICULOS = 10;
+    private final int CANT_VEHICULOS = 50;
     private final ClienteFacade clienteFacade;
     private final UsuarioService usuarioService;
     private final NacionalidadService nacionalidadService;
     private final CaracteristicasAutoService caracteristicasAutoService;
     private final AutoService autoService;
+    private final CostoAutoService costoAutoService;
 
     private List<Localidad> localidades;
 
@@ -82,13 +88,15 @@ public class DataInitialization implements CommandLineRunner {
 
         System.out.println("Creando datos iniciales...");
 
+        List<CaracteristicasAuto> modelos = crearCaracteristicasVehiculos();
+        crearVehiculos(modelos);
+        crearCostoVehiculos(modelos);
+
         List<Nacionalidad> nacionalidades = crearNacionalidades();
         List<Pais> paises = crearPaises();
         cargarUbicacionesArgentina(paises.getFirst());
         crearEmpleados();
         List<Long> clienteIds = crearClientes(nacionalidades);
-        List<CaracteristicasAuto> modelos = crearCaracteristicasVehiculos();
-        crearVehiculos(modelos);
 
         System.out.println("Datos iniciales creados.");
     }
@@ -334,9 +342,10 @@ public class DataInitialization implements CommandLineRunner {
     protected List<CaracteristicasAuto> crearCaracteristicasVehiculos() {
         List<CaracteristicasAuto> modelos = new ArrayList<>();
         for (int i = 0; i < CANT_MODELOS_VEHICULOS; i++) {
+            String[] makeAndModel = faker.vehicle().makeAndModel().split(" ", 2);
             modelos.add(caracteristicasAutoService.create(CaracteristicasAutoCreateDto.builder()
-                    .marca(faker.vehicle().make())
-                    .modelo(faker.vehicle().model())
+                    .marca(makeAndModel[0])
+                    .modelo(makeAndModel[1])
                     .anio(faker.number().numberBetween(1999, 2025))
                     .cantidadAsientos(faker.number().numberBetween(2, 5))
                     .cantidadPuertas(faker.number().numberBetween(2, 6)).build()));
@@ -347,13 +356,56 @@ public class DataInitialization implements CommandLineRunner {
     @Transactional
     protected List<Auto> crearVehiculos(List<CaracteristicasAuto> modelos) {
         List<Auto> vehiculos = new ArrayList<>();
-        for (int i = 0; i < CANT_MODELOS_VEHICULOS; i++) {
+        for (int i = 0; i < CANT_VEHICULOS; i++) {
             Long modeloId = modelos.get(faker.random().nextInt(modelos.size())).getId();
             vehiculos.add(autoService.create(AutoCreateDto.builder()
-                    .patente(faker.vehicle().licensePlate())
+                    .patente(faker.vehicle().licensePlate().toUpperCase())
                     .caracteristicasAutoId(modeloId)
                     .build()));
         }
         return vehiculos;
     }
+
+    @Transactional
+    protected void crearCostoVehiculos(List<CaracteristicasAuto> modelos) {
+        Faker faker = new Faker();
+
+        LocalDate startOverall = LocalDate.now().minusMonths(18); // ~1.5 years in the past
+        LocalDate endOverall = LocalDate.now().plusMonths(12);    // ~1 year in the future
+
+        for (CaracteristicasAuto modelo : modelos) {
+            int ranges = faker.number().numberBetween(2, 6); // random ranges per model
+            LocalDate currentStart = startOverall;
+
+            for (int i = 0; i < ranges; i++) {
+                long remainingDays = ChronoUnit.DAYS.between(currentStart, endOverall);
+
+                if (remainingDays <= 0) {
+                    break;
+                }
+
+                long daysForRange;
+                if (i == ranges - 1) {
+                    daysForRange = remainingDays; // last range takes all remaining days
+                } else {
+                    long maxDays = remainingDays - (ranges - i - 1); // leave at least 1 day per remaining range
+                    daysForRange = faker.number().numberBetween(1, maxDays);
+                }
+
+                LocalDate currentEnd = currentStart.plusDays(daysForRange - 1);
+                long costoTotal = faker.number().numberBetween(25000, 70000);
+
+                // Call your service
+                costoAutoService.create(CostoAutoCreateDto.builder()
+                        .caracteristicasAutoId(modelo.getId())
+                        .costoTotal(costoTotal)
+                        .fechaDesde(currentStart)
+                        .fechaHasta(currentEnd)
+                        .build());
+
+                currentStart = currentEnd.plusDays(1);
+            }
+        }
+    }
+
 }

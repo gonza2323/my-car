@@ -8,10 +8,13 @@ import com.gpadilla.mycar.service.CaracteristicasAutoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v1/modelos")
@@ -53,5 +56,15 @@ public class CaracteristicasAutoController {
     @GetMapping
     public ResponseEntity<Page<CaracteristicasAutoSummaryDto>> findAll(Pageable pageable) {
         return ResponseEntity.ok(service.findDtos(pageable));
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<?> buscarModelosDisponiblesPorFecha(
+            Pageable pageable,
+            @Param("fechaDesde") LocalDate fechaDesde,
+            @Param("fechaHasta") LocalDate fechaHasta) {
+
+        // TODO: LISTA DE MODELOS DISPONBILES
+        return ResponseEntity.noContent().build();
     }
 }

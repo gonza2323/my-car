@@ -12,7 +12,7 @@ public class FakerConfig {
 
     @Bean
     public Faker faker() {
-        long seed = 42L;
+        long seed = 123L;
         return new Faker(Locale.of("es", "AR"), new Random(seed));
     }
 }

@@ -1,4 +1,4 @@
-package com.gpadilla.mycar.dtos.costoAuto;
+package com.gpadilla.mycar.dtos.alquiler;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,10 +11,9 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CostoAutoCreateDto {
+public class AlquilerCreateDto {
     private LocalDate fechaDesde;
     private LocalDate fechaHasta;
-    private double costoTotal;
-    private Long caracteristicasAutoId;
+    private Long clienteId;
+    private Long caracteristicaAutoId;
 }
-

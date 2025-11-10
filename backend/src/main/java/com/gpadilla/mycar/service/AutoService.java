@@ -35,6 +35,7 @@ public class AutoService extends BaseService<
     @Override
     protected void preCreate(AutoCreateDto dto, Auto vehiculo) {
         CaracteristicasAuto modelo = caracteristicasAutoService.find(dto.getCaracteristicasAutoId());
+        modelo.setCantTotalAutos(modelo.getCantTotalAutos() + 1);
         vehiculo.setCaracteristicasAuto(modelo);
         vehiculo.setEstadoAuto(EstadoAuto.DISPONIBLE);
     }
@@ -53,6 +54,9 @@ public class AutoService extends BaseService<
         if (entity.getEstadoAuto() == EstadoAuto.ALQUILADO) {
             throw new BusinessException("No se puede eliminar un auto actualmente alquilado");
         }
+
+        CaracteristicasAuto modelo = entity.getCaracteristicasAuto();
+        modelo.setCantTotalAutos(Math.max(modelo.getCantTotalAutos() - 1, 0));
     }
 }
 

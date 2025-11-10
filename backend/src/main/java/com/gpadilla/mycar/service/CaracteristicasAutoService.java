@@ -28,8 +28,15 @@ public class CaracteristicasAutoService extends BaseService<
     }
 
     @Override
+    protected void preCreate(CaracteristicasAutoCreateDto dto, CaracteristicasAuto entity) {
+        entity.setCantTotalAutos(0);
+
+        // todo foto
+    }
+
+    @Override
     protected void validateCreate(CaracteristicasAutoCreateDto dto) {
-        repository.findByMarcaAndModeloAndEliminadoFalse(dto.getMarca(), dto.getModelo())
+        repository.findByMarcaAndModeloAndAnioAndEliminadoFalse(dto.getMarca(), dto.getModelo(), dto.getAnio())
                 .ifPresent(c -> {
                     throw new BusinessException("Ya existe un modelo '" + dto.getModelo() + "' de la marca '" + dto.getMarca() + "'");
                 });

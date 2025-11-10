@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface CaracteristicasAutoRepository
         extends BaseRepository<CaracteristicasAuto, Long> {
 
-    Optional<CaracteristicasAuto> findByMarcaAndModeloAndEliminadoFalse(String marca, String modelo);
+    Optional<CaracteristicasAuto> findByMarcaAndModeloAndAnioAndEliminadoFalse(String marca, String modelo, Integer anio);
 
     List<CaracteristicasAuto> findAllByMarcaAndEliminadoFalse(String marca);
 

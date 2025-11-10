@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/provincias").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/paises").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/nacionalidades").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/modelos/available").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
