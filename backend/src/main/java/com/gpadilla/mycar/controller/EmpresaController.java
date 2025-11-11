@@ -3,6 +3,7 @@ package com.gpadilla.mycar.controller;
 import com.gpadilla.mycar.dtos.empresa.EmpresaCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.empresa.EmpresaDetailDto;
 import com.gpadilla.mycar.service.EmpresaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,23 +18,15 @@ public class EmpresaController {
 
     private final EmpresaService service;
 
-    // Inicializa la única empresa si no existe (idempotente)
-    @PostMapping("/init")
-    @PreAuthorize("hasAnyRole('ADMINISTRATIVO','JEFE')")
-    public ResponseEntity<EmpresaDetailDto> init(@RequestBody EmpresaCreateOrUpdateDto dto) {
-        return ResponseEntity.ok(service.createIfAbsentAndReturnDto(dto));
-    }
-
-    // Devuelve el detalle de la única empresa
-    @GetMapping
-    public ResponseEntity<EmpresaDetailDto> get() {
+    @GetMapping("/detalle")
+    public ResponseEntity<EmpresaDetailDto> obtenerDetalle() {
         return ResponseEntity.ok(service.findSingletonDto());
     }
 
-    // Actualiza nombre y/o direccionId
-    @PutMapping
+
+    @PutMapping("/contacto")
     @PreAuthorize("hasAnyRole('ADMINISTRATIVO','JEFE')")
-    public ResponseEntity<EmpresaDetailDto> update(@RequestBody EmpresaCreateOrUpdateDto dto) {
-        return ResponseEntity.ok(service.updateSingletonAndReturnDto(dto));
+    public ResponseEntity<EmpresaDetailDto> actualizarContacto(@Valid @RequestBody EmpresaCreateOrUpdateDto dto) {
+        return ResponseEntity.ok(service.updateContacto(dto));
     }
 }

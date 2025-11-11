@@ -4,20 +4,31 @@ import com.gpadilla.mycar.entity.Contacto;
 import com.gpadilla.mycar.entity.ContactoCorreoElectronico;
 import com.gpadilla.mycar.entity.ContactoTelefonico;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ContactoRepository extends BaseRepository<Contacto, Long> {
 
-    @Query("select t from ContactoTelefonico t where t.eliminado=false and t.telefono=:telefono")
-    Optional<ContactoTelefonico> findTelefono(String telefono);
+    @Query("select ct from ContactoTelefonico ct " +
+            "where ct.usuario.id = :usuarioId and ct.eliminado = false " +
+            "order by ct.id desc")
+    Optional<ContactoTelefonico> findTelefonoVigenteByUsuarioId(@Param("usuarioId") Long usuarioId);
 
-    @Query("select c from ContactoCorreoElectronico c where c.eliminado=false and lower(c.email)=lower(:email)")
-    Optional<ContactoCorreoElectronico> findCorreo(String email);
+    @Query("select ct from ContactoTelefonico ct " +
+            "where ct.empresa.id = :empresaId and ct.eliminado = false " +
+            "order by ct.id desc")
+    Optional<ContactoTelefonico> findTelefonoVigenteByEmpresaId(@Param("empresaId") Long empresaId);
 
-    List<Contacto> findAllByEmpresaIdAndEliminadoFalse(Long empresaId);
-    List<Contacto> findAllByPersonaIdAndEliminadoFalse(Long personaId);
+    @Query("select cc from ContactoCorreoElectronico cc " +
+            "where cc.usuario.id = :usuarioId and cc.eliminado = false " +
+            "order by cc.id desc")
+    Optional<ContactoCorreoElectronico> findCorreoVigenteByUsuarioId(@Param("usuarioId") Long usuarioId);
+
+    @Query("select cc from ContactoCorreoElectronico cc " +
+            "where cc.empresa.id = :empresaId and cc.eliminado = false " +
+            "order by cc.id desc")
+    Optional<ContactoCorreoElectronico> findCorreoVigenteByEmpresaId(@Param("empresaId") Long empresaId);
 }

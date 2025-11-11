@@ -3,11 +3,8 @@ package com.gpadilla.mycar.service;
 import com.gpadilla.mycar.dtos.empresa.EmpresaCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.empresa.EmpresaDetailDto;
 import com.gpadilla.mycar.entity.Empresa;
-import com.gpadilla.mycar.entity.geo.Direccion;
 import com.gpadilla.mycar.mapper.EmpresaMapper;
 import com.gpadilla.mycar.repository.EmpresaRepository;
-import com.gpadilla.mycar.repository.geo.DireccionRepository;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,82 +17,32 @@ public class EmpresaService extends BaseService<
         Long,
         EmpresaRepository,
         EmpresaDetailDto,            // Detail
-        EmpresaDetailDto,            // Summary (reutilizado)
+        EmpresaDetailDto,
         EmpresaCreateOrUpdateDto,    // Create
         EmpresaCreateOrUpdateDto,    // Update
         EmpresaMapper> {
 
-    private final DireccionRepository direccionRepository;
-
     public EmpresaService(
             EmpresaRepository repository,
-            EmpresaMapper mapper,
-            DireccionRepository direccionRepository
+            EmpresaMapper mapper
     ) {
         super("Empresa", repository, mapper);
-        this.direccionRepository = direccionRepository;
-    }
-
-    /* ==================== Validaciones mínimas ==================== */
-
-    @Override
-    protected void validateCreate(EmpresaCreateOrUpdateDto dto) {
-        if (dto.getNombre() == null || dto.getNombre().isBlank()) {
-            throw new RuntimeException("El nombre de la empresa es obligatorio.");
-        }
-        if (dto.getDireccionId() == null) {
-            throw new RuntimeException("La dirección es obligatoria.");
-        }
     }
 
     @Override
     protected void validateUpdate(Long id, EmpresaCreateOrUpdateDto dto) {
-        if (dto.getNombre() == null || dto.getNombre().isBlank()) {
-            throw new RuntimeException("El nombre de la empresa es obligatorio.");
-        }
-        if (dto.getDireccionId() == null) {
-            throw new RuntimeException("La dirección es obligatoria.");
-        }
-    }
-
-    /* ==================== Hooks (resolver direccionId) ==================== */
-
-    @Override
-    protected void preCreate(EmpresaCreateOrUpdateDto dto, Empresa entity) {
-        entity.setDireccion(resolveDireccion(dto.getDireccionId()));
-    }
-
-    @Override
-    protected void preUpdate(EmpresaCreateOrUpdateDto dto, Empresa entity) {
-        if (dto.getDireccionId() != null) {
-            entity.setDireccion(resolveDireccion(dto.getDireccionId()));
+        boolean telefonoVacio = dto.getTelefonoPrincipal() == null || dto.getTelefonoPrincipal().isBlank();
+        boolean emailVacio = dto.getEmailPrincipal() == null || dto.getEmailPrincipal().isBlank();
+        if (telefonoVacio && emailVacio) {
+            throw new RuntimeException("Debe indicar al menos un dato de contacto para actualizar.");
         }
     }
-
-    private Direccion resolveDireccion(Long id) {
-        return direccionRepository.findByIdAndEliminadoFalse(id)
-                .orElseThrow(() -> new RuntimeException("La dirección no existe o fue eliminada."));
-    }
-
-    /* ==================== Mapping a Detail ==================== */
 
     @Override
     protected EmpresaDetailDto toDetailDto(Empresa entity) {
-        // Si luego querés enriquecer con teléfono/email principal, hacelo acá antes de retornar.
         return mapper.toDto(entity);
     }
 
-    /* ==================== “Empresa única” – métodos públicos ==================== */
-
-    /** Inicializa si no existe; si existe, devuelve la actual. Idempotente. */
-    public EmpresaDetailDto createIfAbsentAndReturnDto(EmpresaCreateOrUpdateDto dto) {
-        Optional<Empresa> existente = findSingletonEntity();
-        if (existente.isPresent()) {
-            return toDetailDto(existente.get());
-        }
-        Empresa creada = create(dto);                // usa BaseService.create(...)
-        return toDetailDto(creada);
-    }
 
     /** Devuelve el detalle de la única empresa. */
     public EmpresaDetailDto findSingletonDto() {
@@ -104,8 +51,8 @@ public class EmpresaService extends BaseService<
         return toDetailDto(e);
     }
 
-    /** Actualiza la única empresa (nombre/direccionId). */
-    public EmpresaDetailDto updateSingletonAndReturnDto(EmpresaCreateOrUpdateDto dto) {
+    /** Actualiza únicamente los datos de contacto principales. */
+    public EmpresaDetailDto updateContacto(EmpresaCreateOrUpdateDto dto) {
         Empresa e = findSingletonEntity()
                 .orElseThrow(() -> new RuntimeException("La empresa aún no fue inicializada."));
         Empresa actualizada = update(e.getId(), dto); // usa BaseService.update(...)
@@ -116,9 +63,7 @@ public class EmpresaService extends BaseService<
 
     /** Obtiene la “única” empresa activa: el primer registro no eliminado. */
     private Optional<Empresa> findSingletonEntity() {
-        return repository.findByEliminadoFalse(PageRequest.of(0, 1))
-                .stream()
-                .findFirst();
+        return repository.findFirstByEliminadoFalseOrderByIdAsc();
     }
 
     /* ==================== Opcional: sin eliminación en singleton ==================== */

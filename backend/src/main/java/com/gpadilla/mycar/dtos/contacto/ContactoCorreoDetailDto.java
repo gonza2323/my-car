@@ -16,5 +16,6 @@ public class ContactoCorreoDetailDto {
     private String email;
     private String observacion;
     private Long empresaId;
-    private Long personaId;
+    private Long usuarioId;
+    private Boolean eliminado;
 }

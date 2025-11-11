@@ -10,7 +10,7 @@ import org.mapstruct.*;
 public interface EmpresaMapper extends BaseMapper<
         Empresa,
         EmpresaDetailDto,           // Detail
-        EmpresaDetailDto,           // Summary (reutilizado)
+        EmpresaDetailDto,
         EmpresaCreateOrUpdateDto,   // Create
         EmpresaCreateOrUpdateDto    // Update
         > {

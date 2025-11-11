@@ -1,22 +1,28 @@
 package com.gpadilla.mycar.entity;
 
 import com.gpadilla.mycar.enums.TipoTelefono;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @Table(name = "contacto_telefonico")
 public class ContactoTelefonico extends Contacto {
 
+    @Column(nullable = false, length = 25)
     private String telefono;
 
     @Enumerated(EnumType.STRING)
     private TipoTelefono tipoTelefono; // FIJO o CELULAR
 
 
-    public String getTelefonoLimpio() { //Limpia el numero de telefono
+    public String getTelefonoLimpio() { // Limpia el numero de telefono
         if (telefono == null) return "";
         return telefono.replaceAll("[\\s-]", "");
     }

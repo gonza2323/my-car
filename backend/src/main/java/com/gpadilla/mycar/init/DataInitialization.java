@@ -11,12 +11,15 @@ import com.gpadilla.mycar.dtos.geo.nacionalidad.NacionalidadCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.geo.pais.PaisCreateOrUpdateDto;
 import com.gpadilla.mycar.entity.Auto;
 import com.gpadilla.mycar.entity.CaracteristicasAuto;
+import com.gpadilla.mycar.entity.ContactoTelefonico;
+import com.gpadilla.mycar.entity.Empresa;
 import com.gpadilla.mycar.entity.geo.*;
 import com.gpadilla.mycar.enums.TipoDocumento;
 import com.gpadilla.mycar.enums.TipoEmpleado;
 import com.gpadilla.mycar.facade.ClienteFacade;
 import com.gpadilla.mycar.facade.EmpleadoFacade;
 import com.gpadilla.mycar.init.geo.*;
+import com.gpadilla.mycar.repository.EmpresaRepository;
 import com.gpadilla.mycar.repository.UsuarioRepository;
 import com.gpadilla.mycar.repository.geo.DepartamentoRepository;
 import com.gpadilla.mycar.repository.geo.LocalidadRepository;
@@ -26,6 +29,7 @@ import com.gpadilla.mycar.service.AutoService;
 import com.gpadilla.mycar.service.CaracteristicasAutoService;
 import com.gpadilla.mycar.service.CostoAutoService;
 import com.gpadilla.mycar.service.UsuarioService;
+import com.gpadilla.mycar.service.geo.DireccionService;
 import com.gpadilla.mycar.service.geo.NacionalidadService;
 import com.gpadilla.mycar.service.geo.PaisService;
 import jakarta.transaction.Transactional;
@@ -69,6 +73,11 @@ public class DataInitialization implements CommandLineRunner {
     private final CaracteristicasAutoService caracteristicasAutoService;
     private final AutoService autoService;
     private final CostoAutoService costoAutoService;
+
+    //-----
+    private final EmpresaRepository empresaRepository;
+    private final DireccionService direccionService;
+    //-----
 
     private List<Localidad> localidades;
 
@@ -337,6 +346,43 @@ public class DataInitialization implements CommandLineRunner {
         }
         return clienteIds;
     }
+
+//    //---------------
+    @Transactional
+    protected void crearEmpresaInicial() {
+        if (empresaRepository.count() > 0) {
+            return;
+        }
+
+        Localidad localidadBase = (localidades != null && !localidades.isEmpty())
+                ? localidades.getFirst()
+                : localidadRepository.findAll().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Debe existir al menos una localidad para crear la empresa"));
+
+        Direccion direccion = direccionService.create(
+                DireccionCreateOrUpdateDto.builder()
+                        .calle("Av. San Martín")
+                        .numeracion("1450")
+                        .barrio("Centro")
+                        .manzanaPiso(null)
+                        .casaDepartamento(null)
+                        .referencia("Casa central")
+                        .localidadId(localidadBase.getId())
+                        .build()
+        );
+
+        Empresa empresa = Empresa.builder()
+                .nombre("MyCar S.A.")
+                .telefonoPrincipal("+54 261 555 0000")
+                .emailPrincipal("gimnasiosport21@gmail.com")
+                .direccion(direccion)
+                .eliminado(false)
+                .build();
+
+        empresaRepository.save(empresa);
+    }
+//    //---------------
 
     @Transactional
     protected List<CaracteristicasAuto> crearCaracteristicasVehiculos() {
