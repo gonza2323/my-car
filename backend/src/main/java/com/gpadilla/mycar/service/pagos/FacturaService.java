@@ -1,9 +1,6 @@
 package com.gpadilla.mycar.service.pagos;
 
-import com.gpadilla.mycar.entity.Alquiler;
-import com.gpadilla.mycar.entity.DetalleFactura;
-import com.gpadilla.mycar.entity.Factura;
-import com.gpadilla.mycar.entity.FormaDePago;
+import com.gpadilla.mycar.entity.*;
 import com.gpadilla.mycar.enums.EstadoFactura;
 import com.gpadilla.mycar.enums.TipoDePago;
 import com.gpadilla.mycar.error.BusinessException;
@@ -21,12 +18,16 @@ public class FacturaService {
     private final FacturaRepository facturaRepository;
 
     @Transactional
-    public Factura crearFacturaDeAlquiler(Alquiler alquiler, EstadoFactura estado, TipoDePago tipoDePago) {
+    public Factura crearFacturaDeAlquiler(Alquiler alquiler, EstadoFactura estado, TipoDePago tipoDePago, Promocion promocion) {
+        Double total = alquiler.getMonto();
+        if (promocion != null)
+            total = total * (1 - promocion.getPorcentajeDescuento());
+
         Factura factura = Factura.builder()
                 .numeroFactura(generarSiguienteNumeroDeFactura())
                 .estado(estado)
                 .fechaFactura(LocalDate.now())
-                .totalPagado(alquiler.getMonto())
+                .totalPagado(total)
                 .eliminado(false)
                 .build();
 
@@ -34,11 +35,13 @@ public class FacturaService {
                 .tipoDePago(tipoDePago)
                 .observacion("")
                 .build());
-// todo promociones
+
         factura.setDetalles(List.of(
                 DetalleFactura.builder()
                         .factura(factura)
                         .alquiler(alquiler)
+                        .subtotal(alquiler.getMonto())
+                        .promocion(promocion)
                         .build()));
 
         return facturaRepository.save(factura);

@@ -12,9 +12,15 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class DetalleFactura extends BaseEntity<Long> {
 
+    @Column(nullable = false)
+    private Double subtotal;
+
     @ManyToOne(optional = false)
     private Factura factura;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     private Alquiler alquiler;
+
+    @ManyToOne
+    private Promocion promocion;
 }

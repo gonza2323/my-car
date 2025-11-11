@@ -1,10 +1,7 @@
 package com.gpadilla.mycar.facade;
 
 import com.gpadilla.mycar.dtos.alquiler.AlquilerCreateRequestDto;
-import com.gpadilla.mycar.entity.Alquiler;
-import com.gpadilla.mycar.entity.Auto;
-import com.gpadilla.mycar.entity.Cliente;
-import com.gpadilla.mycar.entity.Factura;
+import com.gpadilla.mycar.entity.*;
 import com.gpadilla.mycar.enums.EstadoFactura;
 import com.gpadilla.mycar.enums.EstadoPagoAlquiler;
 import com.gpadilla.mycar.enums.TipoDePago;
@@ -28,6 +25,7 @@ public class AlquilerFacade {
     private final CaracteristicasAutoService caracteristicasAutoService;
     private final CostoAutoService costoAutoService;
     private final FacturaService facturaService;
+    private final PromocionService promocionService;
 
     @Transactional
     public void registrarAlquiler(AlquilerCreateRequestDto request) {
@@ -67,10 +65,17 @@ public class AlquilerFacade {
                         ? EstadoFactura.SIN_DEFINIR
                         : EstadoFactura.PAGADA;
 
-        // todo codigo promocion
-        Factura factura = facturaService.crearFacturaDeAlquiler(alquiler, estadoFactura, request.getFormaDePago());
+        Promocion promocion = null;
 
-        // todo enviar pdf por mail si está pagada, si no, no
+        // si el usuario mandó un código de descuento lo validamos
+        if (request.getCodigoDescuento() != null && !request.getCodigoDescuento().isEmpty())
+            promocion = promocionService.validarCodigoPromocion(request.getCodigoDescuento());
+
+        Factura factura = facturaService.crearFacturaDeAlquiler(alquiler, estadoFactura, request.getFormaDePago(), promocion);
+
+        if (estadoFactura == EstadoFactura.PAGADA) {
+            // todo enviar pdf por mail si está pagada, si no, recién cuando la pague por MP
+        }
 
         // todo configurar recordario por mail y wp
     }

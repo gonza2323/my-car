@@ -24,18 +24,13 @@ public class PagosFacade {
     private final AlquilerService alquilerService;
     private final MercadoPagoService mercadoPagoService;
     private final FacturaService facturaService;
-    private final AlquilerFacade alquilerFacade;
 
     @Transactional
     public PaymentResponse generarLinkDePagoMPClientes(Long alquilerId, Long clienteId) throws MPException, MPApiException {
-        Alquiler alquiler = alquilerService.find(alquilerId);
-        validarAlquilerParaPagoCliente(alquiler, clienteId);
-
         Factura factura = facturaService.buscarFacturaDeAlquiler(alquilerId);
         validarFacturaNoPagada(factura);
 
-        // todo usar promocion (buscar factura)
-        String urlDePago = mercadoPagoService.createPreference(alquilerId, alquiler.getMonto());
+        String urlDePago = mercadoPagoService.createPreference(alquilerId, factura.getTotalPagado());
 
         return PaymentResponse.builder()
                 .alquilerId(alquilerId)

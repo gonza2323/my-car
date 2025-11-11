@@ -11,3 +11,4 @@ export * from './clientes.js';
 export * from './nacionalidades.js';
 export * from './vehiculos.js';
 export * from './alquileres.js';
+export * from './promociones.js';
