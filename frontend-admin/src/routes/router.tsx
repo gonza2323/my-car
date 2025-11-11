@@ -109,6 +109,28 @@ const router = createBrowserRouter([
             ],
           },
           {
+            path: paths.dashboard.management.promociones.root,
+            children: [
+              {
+                index: true,
+                path: paths.dashboard.management.promociones.root,
+                element: <Navigate to={paths.dashboard.management.promociones.list} replace />,
+              },
+              {
+                path: paths.dashboard.management.promociones.list,
+                element: LazyPage(() => import('@/pages/dashboard/management/promociones/list')),
+              },
+              {
+                path: paths.dashboard.management.promociones.add,
+                element: LazyPage(() => import('@/pages/dashboard/management/promociones/add')),
+              },
+              {
+                path: paths.dashboard.management.promociones.root + '/:promocionId',
+                element: LazyPage(() => import('@/pages/dashboard/management/promociones/detail')),
+              },
+            ],
+          },
+          {
             path: paths.dashboard.management.clientes.root,
             children: [
               {

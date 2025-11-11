@@ -11,6 +11,7 @@ import {
   PiMapPinDuotone,
   PiMoneyDuotone,
   PiPencilDuotone,
+  PiSealPercentDuotone,
   PiShieldCheckDuotone,
   PiShoppingCart,
   PiSquaresFourDuotone,
@@ -64,6 +65,17 @@ export const menu: MenuItem[] = [
           {
             name: 'List',
             href: paths.dashboard.management.alquileres.list,
+          },
+        ],
+      },
+      {
+        name: 'Promociones',
+        icon: PiSealPercentDuotone,
+        href: paths.dashboard.management.promociones.root,
+        dropdownItems: [
+          {
+            name: 'List',
+            href: paths.dashboard.management.promociones.list,
           },
         ],
       },

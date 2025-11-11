@@ -28,6 +28,13 @@ export const paths = {
           model: (modeloId: number) => `/dashboard/management/alquileres/add/${modeloId}`,
         }
       },
+      promociones: {
+        root: '/dashboard/management/promociones',
+        list: '/dashboard/management/promociones/list',
+        view: (promocionId: number) => `/dashboard/management/promociones/${promocionId}`,
+        edit: (promocionId: number) => `/dashboard/management/promociones/${promocionId}/edit`,
+        add: '/dashboard/management/promociones/add',
+      },
       clientes: {
         root: '/dashboard/management/clientes',
         list: '/dashboard/management/clientes/list',
