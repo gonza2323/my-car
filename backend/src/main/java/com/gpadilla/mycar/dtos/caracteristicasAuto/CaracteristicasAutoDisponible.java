@@ -15,4 +15,5 @@ public class CaracteristicasAutoDisponible {
     private Integer cantidadPuertas;
     private Integer cantidadAsientos;
     private Double precioPorDia;
+    private Double precioTotal;
 }
