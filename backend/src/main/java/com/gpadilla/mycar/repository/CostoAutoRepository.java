@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CostoAutoRepository extends BaseRepository<CostoAuto, Long> {
@@ -25,4 +26,12 @@ public interface CostoAutoRepository extends BaseRepository<CostoAuto, Long> {
             @Param("desde") LocalDate desde,
             @Param("hasta") LocalDate hasta
     );
+
+    @Query("""
+SELECT c FROM CostoAuto c
+    WHERE c.caracteristicasAuto.id = :modeloId
+        AND c.fechaDesde <= :fecha
+        AND c.fechaHasta >= :fecha
+""")
+    Optional<CostoAuto> buscarCostoDeModeloEnFecha(@Param("modeloId") Long modeloId, @Param("fecha") LocalDate fecha);
 }

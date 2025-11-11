@@ -13,6 +13,9 @@ import com.gpadilla.mycar.repository.AutoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Service
 @Transactional
 public class AutoService extends BaseService<
@@ -57,6 +60,15 @@ public class AutoService extends BaseService<
 
         CaracteristicasAuto modelo = entity.getCaracteristicasAuto();
         modelo.setCantTotalAutos(Math.max(modelo.getCantTotalAutos() - 1, 0));
+    }
+
+    @Transactional
+    public List<Auto> encontrarVehiculosDisponiblesParaAlquiler(
+            Long modeloId,
+            LocalDate fechaDesde,
+            LocalDate fechaHasta) {
+
+        return repository.encontrarVehiculosDisponiblesParaAlquiler(modeloId, fechaDesde, fechaHasta);
     }
 }
 

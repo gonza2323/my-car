@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/paises").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/nacionalidades").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/modelos/available").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/webhook/mercadopago").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )

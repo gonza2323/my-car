@@ -3,19 +3,21 @@ package com.gpadilla.mycar.controller;
 import com.gpadilla.mycar.entity.CaracteristicasAuto;
 import com.gpadilla.mycar.pdf.PdfGenerator;
 import com.gpadilla.mycar.repository.CaracteristicasAutoRepository;
-import com.gpadilla.mycar.service.CaracteristicasAutoService;
 import com.gpadilla.mycar.service.ReporteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.function.Function;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/reportes")
 @RequiredArgsConstructor
 public class ReporteController {
 

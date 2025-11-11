@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/webhook/mercadopago")
+@RequestMapping("/api/v1/webhook/mercadopago")
 @RequiredArgsConstructor
 public class MercadoPagoWebhookController {
 
