@@ -23,7 +23,10 @@ export const paths = {
         list: '/dashboard/management/alquileres/list',
         view: (alquilerId: number) => `/dashboard/management/alquileres/${alquilerId}`,
         edit: (alquilerId: number) => `/dashboard/management/alquileres/${alquilerId}/edit`,
-        add: '/dashboard/management/alquileres/add',
+        add: {
+          root: '/dashboard/management/alquileres/add', 
+          model: (modeloId: number) => `/dashboard/management/alquileres/add/${modeloId}`,
+        }
       },
       clientes: {
         root: '/dashboard/management/clientes',

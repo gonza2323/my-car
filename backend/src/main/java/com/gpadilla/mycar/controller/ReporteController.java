@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +21,7 @@ import java.util.function.Function;
 @RestController
 @RequestMapping("/api/v1/reportes")
 @RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled = true)
 public class ReporteController {
 
     private final ReporteService reporteService;
@@ -26,6 +29,7 @@ public class ReporteController {
     private final CaracteristicasAutoRepository caracteristicasAutoRepository;
 
     @GetMapping("/recaudacion")
+    @PreAuthorize("hasRole('JEFE')")
     public ResponseEntity<byte[]> generarReporte(
             @RequestParam String fechaInicio,
             @RequestParam String fechaFin
@@ -39,6 +43,7 @@ public class ReporteController {
     }
 
     @GetMapping("/modelos")
+    @PreAuthorize("hasRole('JEFE')")
     public ResponseEntity<byte[]> generarReporteModelos() {
         var modelos = caracteristicasAutoRepository.findAll();
         System.out.println("Cantidad de modelos encontrados: " + modelos.size());

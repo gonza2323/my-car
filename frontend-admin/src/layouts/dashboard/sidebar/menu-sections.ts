@@ -4,10 +4,12 @@ import {
   PiCarDuotone,
   PiChartLineUpDuotone,
   PiChatCenteredDotsDuotone,
+  PiCurrencyDollarDuotone,
   PiFilesDuotone,
   PiKanbanDuotone,
   PiLockKeyDuotone,
   PiMapPinDuotone,
+  PiMoneyDuotone,
   PiPencilDuotone,
   PiShieldCheckDuotone,
   PiShoppingCart,
@@ -50,6 +52,21 @@ export const menu: MenuItem[] = [
   {
     header: 'Management',
     section: [
+      {
+        name: 'Alquileres',
+        icon: PiCurrencyDollarDuotone,
+        href: paths.dashboard.management.alquileres.root,
+        dropdownItems: [
+          {
+            name: 'Nuevo',
+            href: paths.dashboard.management.alquileres.add.root,
+          },
+          {
+            name: 'List',
+            href: paths.dashboard.management.alquileres.list,
+          },
+        ],
+      },
       {
         name: 'Clientes',
         icon: PiUserDuotone,

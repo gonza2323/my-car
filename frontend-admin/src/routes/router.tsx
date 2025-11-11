@@ -83,6 +83,32 @@ const router = createBrowserRouter([
             element: <Navigate to={paths.dashboard.management.empleados.root} replace />,
           },
           {
+            path: paths.dashboard.management.alquileres.root,
+            children: [
+              {
+                index: true,
+                path: paths.dashboard.management.alquileres.root,
+                element: <Navigate to={paths.dashboard.management.alquileres.list} replace />,
+              },
+              {
+                path: paths.dashboard.management.alquileres.list,
+                element: LazyPage(() => import('@/pages/dashboard/management/alquileres/list')),
+              },
+              {
+                path: paths.dashboard.management.alquileres.add.root,
+                element: LazyPage(() => import('@/pages/dashboard/management/alquileres/add')),
+              },
+              {
+                path: paths.dashboard.management.alquileres.add.root + '/:modelId',
+                element: LazyPage(() => import('@/pages/dashboard/management/alquileres/add/modelo')),
+              },
+              {
+                path: paths.dashboard.management.alquileres.root + '/:alquilerId',
+                element: LazyPage(() => import('@/pages/dashboard/management/alquileres/detail')),
+              },
+            ],
+          },
+          {
             path: paths.dashboard.management.clientes.root,
             children: [
               {

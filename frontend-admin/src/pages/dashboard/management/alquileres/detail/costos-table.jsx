@@ -1,15 +1,13 @@
-import { useEffect, useMemo } from "react";
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Button, Group, Text } from "@mantine/core";
-import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
-import { usePagination } from "@/api/helpers";
-import { AddButton } from "@/components/add-button";
-import { DataTable } from "@/components/data-table";
-import { useAuth, useDeleteModelo, useGetModelos } from "@/hooks";
-import { paths } from "@/routes";
-import { client } from "@/api/axios";
-
+import { useEffect, useMemo } from "react"
+import { Text } from "@mantine/core"
+import { usePagination } from "@/api/helpers"
+import { AddButton } from "@/components/add-button"
+import { DataTable } from "@/components/data-table"
+import { useGetModelos, useDeleteModelo, useAuth } from "@/hooks"
+import { paths } from "@/routes"
+import { Link, NavLink, useNavigate } from "react-router-dom"
+import { modals } from "@mantine/modals"
+import { notifications } from "@mantine/notifications"
 
 export function ModelosTable() {
   const { roles } = useAuth();
@@ -116,26 +114,6 @@ export function ModelosTable() {
       }
     })
   }
-  const handleDownloadPdf = async () => {
-    try {
-      const response = await client.get("http://localhost:8080/api/v1/reportes/modelos", {
-        responseType: "blob",
-        headers: { Accept: "application/pdf" },
-      });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "modelos_autos.pdf");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error al generar PDF:", error);
-      alert("No se pudo generar el reporte de modelos");
-    }
-  };
 
   return (
     <DataTable.Container>
@@ -143,25 +121,14 @@ export function ModelosTable() {
         title="Modelos"
         description="Lista de modelos"
         actions={
-          <Group>
-            <Button
-              variant="filled"
-              size="xs"
-              color="blue"
-              onClick={handleDownloadPdf}
-              style={{ marginRight: "8px" }}
-            >
-              📄 Reporte PDF
-            </Button>
-            <AddButton
-              variant="default"
-              size="xs"
-              component={NavLink}
-              to={paths.dashboard.management.modelos.add}
-            >
-              Agregar modelo
-            </AddButton>
-          </Group>
+          <AddButton
+            variant="default"
+            size="xs"
+            component={NavLink}
+            to={paths.dashboard.management.modelos.add}
+          >
+            Agregar modelo
+          </AddButton>
         }
       />
 
@@ -187,5 +154,5 @@ export function ModelosTable() {
         />
       </DataTable.Content>
     </DataTable.Container>
-  );
+  )
 }

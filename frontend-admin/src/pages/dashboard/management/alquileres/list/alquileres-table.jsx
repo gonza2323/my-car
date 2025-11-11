@@ -6,12 +6,13 @@ import { notifications } from "@mantine/notifications";
 import { usePagination } from "@/api/helpers";
 import { AddButton } from "@/components/add-button";
 import { DataTable } from "@/components/data-table";
-import { useAuth, useDeleteModelo, useGetModelos } from "@/hooks";
+import { useAuth, useDeleteAlquiler, useGetAlquileres } from "@/hooks";
 import { paths } from "@/routes";
 import { client } from "@/api/axios";
+import { formatCurrency } from "@/utilities/number";
 
 
-export function ModelosTable() {
+export function AlquileresTable() {
   const { roles } = useAuth();
   const isJefe = roles.includes('JEFE');
   const navigate = useNavigate()
@@ -20,15 +21,15 @@ export function ModelosTable() {
   const { sort } = DataTable.useDataTable({
     sortConfig: {
       direction: "asc",
-      column: "marca"
+      column: "fechaDesde"
     }
   })
 
-  const { data, isLoading } = useGetModelos({
+  const { data, isLoading } = useGetAlquileres({
     query: {
       page,
       size,
-      // status: tabs.value as Modelo['status'],
+      // status: tabs.value as Alquiler['status'],
       sort: sort.query
     }
   })
@@ -42,32 +43,32 @@ export function ModelosTable() {
     }
   }, [data, page, setPage])
 
-  const deleteMutation = useDeleteModelo()
+  const deleteMutation = useDeleteAlquiler()
 
   const columns = useMemo(
     () => [
       {
-        accessor: "marca",
-        title: "Marca",
+        accessor: "fechaDesde",
+        title: "Desde",
         sortable: true,
-        render: modelo => (
-          <Text truncate="end">{modelo.marca}</Text>
+        render: alquiler => (
+          <Text truncate="end">{alquiler.fechaDesde}</Text>
         )
       },
       {
-        accessor: "modelo",
-        title: "Modelo",
+        accessor: "fechaHasta",
+        title: "Hasta",
         sortable: true,
-        render: modelo => (
-          <Text truncate="end">{modelo.modelo}</Text>
+        render: alquiler => (
+          <Text truncate="end">{alquiler.fechaHasta}</Text>
         )
       },
       {
-        accessor: "anio",
-        title: "Año",
+        accessor: "monto",
+        title: "Subtotal",
         sortable: true,
-        render: modelo => (
-          <Text truncate="end">{modelo.anio}</Text>
+        render: alquiler => (
+          <Text truncate="end">{formatCurrency(alquiler.monto)}</Text>
         )
       },
       {
@@ -75,11 +76,11 @@ export function ModelosTable() {
         title: "Acciones",
         textAlign: "right",
         width: 100,
-        render: modelo => (
+        render: alquiler => (
           <DataTable.Actions
-            onView={() => navigate(paths.dashboard.management.modelos.view(modelo.id))}
-            onEdit={() => navigate(paths.dashboard.management.modelos.edit(modelo.id))}
-            onDelete={() => handleDelete(modelo)}
+            onView={() => navigate(paths.dashboard.management.alquileres.view(alquiler.id))}
+            onEdit={() => navigate(paths.dashboard.management.alquileres.edit(alquiler.id))}
+            onDelete={() => handleDelete(alquiler)}
           />
         ),
       }
@@ -87,28 +88,28 @@ export function ModelosTable() {
     []
   )
 
-  const handleDelete = modelo => {
+  const handleDelete = alquiler => {
     modals.openConfirmModal({
       title: "Confirmar borrado",
-      children: <Text>¿Está seguro de que desea borrar el modelo?</Text>,
+      children: <Text>¿Está seguro de que desea borrar el alquiler?</Text>,
       labels: { confirm: "Delete", cancel: "Cancel" },
       confirmProps: { color: "red" },
       onConfirm: () => {
         deleteMutation.mutate({
-          model: modelo,
-          route: { id: modelo.id }
+          model: alquiler,
+          route: { id: alquiler.id }
         }, {
           onSuccess: () => {
             notifications.show({
               title: 'Borrado',
-              message: 'El modelo fue borrado con éxito',
+              message: 'El alquiler fue borrado con éxito',
               color: 'green',
             });
           },
           onFailure: (error) => {
             notifications.show({
               title: 'Error',
-              message: error.message || 'No se pudo borrar el modelo',
+              message: error.message || 'No se pudo borrar el alquiler',
               color: 'red',
             });
           }
@@ -118,7 +119,7 @@ export function ModelosTable() {
   }
   const handleDownloadPdf = async () => {
     try {
-      const response = await client.get("http://localhost:8080/api/v1/reportes/modelos", {
+      const response = await client.get("http://localhost:8080/api/v1/auth/alquileres", {
         responseType: "blob",
         headers: { Accept: "application/pdf" },
       });
@@ -126,42 +127,31 @@ export function ModelosTable() {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "modelos_autos.pdf");
+      link.setAttribute("download", "alquileres_autos.pdf");
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error al generar PDF:", error);
-      alert("No se pudo generar el reporte de modelos");
+      alert("No se pudo generar el reporte de alquileres");
     }
   };
 
   return (
     <DataTable.Container>
       <DataTable.Title
-        title="Modelos"
-        description="Lista de modelos"
+        title="Alquileres"
+        description="Lista de alquileres"
         actions={
-          <Group>
-            <Button
-              variant="filled"
-              size="xs"
-              color="blue"
-              onClick={handleDownloadPdf}
-              style={{ marginRight: "8px" }}
-            >
-              📄 Reporte PDF
-            </Button>
-            <AddButton
-              variant="default"
-              size="xs"
-              component={NavLink}
-              to={paths.dashboard.management.modelos.add}
-            >
-              Agregar modelo
-            </AddButton>
-          </Group>
+          <AddButton
+            variant="default"
+            size="xs"
+            component={NavLink}
+            to={paths.dashboard.management.alquileres.add.root}
+          >
+            Agregar alquiler
+          </AddButton>
         }
       />
 
@@ -170,9 +160,9 @@ export function ModelosTable() {
       <DataTable.Content>
         <DataTable.Table
           minHeight={240}
-          noRecordsText={DataTable.noRecordsText("modelo")}
-          recordsPerPageLabel={DataTable.recordsPerPageLabel("modelos")}
-          paginationText={DataTable.paginationText("modelos")}
+          noRecordsText={DataTable.noRecordsText("alquiler")}
+          recordsPerPageLabel={DataTable.recordsPerPageLabel("alquileres")}
+          paginationText={DataTable.paginationText("alquileres")}
           page={page + 1}
           records={data?.data ?? []}
           fetching={isLoading}

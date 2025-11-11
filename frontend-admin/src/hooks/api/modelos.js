@@ -15,6 +15,11 @@ export const useGetModelos = createPaginationQueryHook({
   queryKey: QUERY_KEY,
 });
 
+export const useGetModelosDisponibles = createPaginationQueryHook({
+  endpoint: BASE_ENDPOINT + '/available',
+  queryKey: QUERY_KEY + '/available',
+});
+
 export const useCreateModelo = createPostMutationHook({
   endpoint: BASE_ENDPOINT,
   queryKey: QUERY_KEY,
@@ -22,5 +27,10 @@ export const useCreateModelo = createPostMutationHook({
 
 export const useDeleteModelo = createDeleteMutationHook({
   endpoint: `${BASE_ENDPOINT}/:id`,
+  queryKey: QUERY_KEY,
+});
+
+export const useGetModeloDisponible = createGetQueryHook({
+  endpoint: `modelos/:id/available`,
   queryKey: QUERY_KEY,
 });

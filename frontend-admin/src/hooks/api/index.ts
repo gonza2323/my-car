@@ -10,3 +10,4 @@ export * from './modelos.js';
 export * from './clientes.js';
 export * from './nacionalidades.js';
 export * from './vehiculos.js';
+export * from './alquileres.js';

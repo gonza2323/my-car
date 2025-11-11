@@ -1,5 +1,6 @@
 package com.gpadilla.mycar.service;
 
+import com.gpadilla.mycar.dtos.alquiler.AlquilerSummaryDto;
 import com.gpadilla.mycar.entity.Alquiler;
 import com.gpadilla.mycar.entity.Auto;
 import com.gpadilla.mycar.entity.Cliente;
@@ -7,6 +8,8 @@ import com.gpadilla.mycar.enums.EstadoPagoAlquiler;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.repository.AlquilerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,5 +53,9 @@ public class AlquilerService {
     private void validarFechas(LocalDate fechaDesde, LocalDate fechaHasta) {
         if (fechaHasta.isBefore(fechaDesde))
             throw new BusinessException("La fecha de finalización debe ser igual o posterior a la de inicio");
+    }
+
+    public Page<AlquilerSummaryDto> findDtos(Pageable pageable) {
+        return alquilerRepository.findAllByEliminadoFalse(pageable);
     }
 }

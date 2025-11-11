@@ -5,6 +5,7 @@ import com.gpadilla.mycar.entity.CaracteristicasAuto;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.CaracteristicasAutoMapper;
 import com.gpadilla.mycar.repository.CaracteristicasAutoRepository;
+import com.gpadilla.mycar.repository.CostoAutoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 @Service
-@Transactional
 public class CaracteristicasAutoService extends BaseService<
         CaracteristicasAuto,
         Long,
@@ -25,8 +25,11 @@ public class CaracteristicasAutoService extends BaseService<
         CaracteristicasAutoUpdateDto,
         CaracteristicasAutoMapper> {
 
-    public CaracteristicasAutoService(CaracteristicasAutoRepository repository, CaracteristicasAutoMapper mapper) {
+    private final CostoAutoRepository costoAutoRepository;
+
+    public CaracteristicasAutoService(CaracteristicasAutoRepository repository, CaracteristicasAutoMapper mapper, CostoAutoRepository costoAutoRepository) {
         super("CaracteristicasAuto", repository, mapper);
+        this.costoAutoRepository = costoAutoRepository;
     }
 
     @Override
@@ -52,6 +55,27 @@ public class CaracteristicasAutoService extends BaseService<
             LocalDate fechaHasta) {
         Long cantDias = ChronoUnit.DAYS.between(fechaDesde, fechaHasta) + 1;
         return repository.encontrarModelosDisponiblesParaAlquiler(pageable, fechaDesde, fechaHasta, cantDias);
+    }
+
+    @Transactional(readOnly = true)
+    public CaracteristicasAutoDisponible consultarModeloDisponible(Long modeloId, LocalDate fechaDesde, LocalDate fechaHasta) {
+        // todo no verifica si está disponible, solo devuelve los datos, en teoría el front nunca llega mal acá, pero bueno está mal
+        CaracteristicasAuto modelo = this.find(modeloId);
+
+        Double costoPorDia = costoAutoRepository.buscarCostoDeModeloEnFecha(modeloId, fechaDesde)
+                .orElseThrow(() -> new BusinessException("El modelo no tiene precio en esa fecha")).getCostoTotal();
+        Long cantidadDias = ChronoUnit.DAYS.between(fechaDesde, fechaHasta) + 1;
+
+        return CaracteristicasAutoDisponible.builder()
+                .id(modeloId)
+                .marca(modelo.getMarca())
+                .modelo(modelo.getModelo())
+                .anio(modelo.getAnio())
+                .cantidadAsientos(modelo.getCantidadAsientos())
+                .cantidadPuertas(modelo.getCantidadPuertas())
+                .precioPorDia(costoPorDia)
+                .precioTotal(costoPorDia * cantidadDias)
+                .build();
     }
 }
 
