@@ -1,6 +1,7 @@
 package com.gpadilla.mycar.controller;
 
-import com.gpadilla.mycar.dtos.alquiler.AlquilerCreateDto;
+import com.gpadilla.mycar.dtos.alquiler.AlquilerCreateRequestDto;
+import com.gpadilla.mycar.facade.AlquilerFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableMethodSecurity(prePostEnabled = true)
 public class AlquilerController {
 
+    private final AlquilerFacade alquilerFacade;
+
     @PostMapping()
     @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
-    public ResponseEntity<?> registrarAlquiler(@Valid @RequestBody AlquilerCreateDto dto) {
-        // TODO: REGISTRAR ALQUILER
+    public ResponseEntity<?> registrarAlquiler(@Valid @RequestBody AlquilerCreateRequestDto dto) {
         // TODO: FALTA DOCUMENTACION
-        // alquilerService.registrarAlquiler(dto, documentoDni, documentoLicencia);
+        alquilerFacade.registrarAlquiler(dto);
         return ResponseEntity.noContent().build();
     }
 }

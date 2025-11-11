@@ -11,6 +11,8 @@ import com.gpadilla.mycar.repository.CostoAutoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Service
 @Transactional
 public class CostoAutoService extends BaseService<
@@ -51,6 +53,11 @@ public class CostoAutoService extends BaseService<
     protected void preCreate(CostoAutoCreateDto dto, CostoAuto entity) {
         CaracteristicasAuto modelo = caracteristicasAutoService.find(dto.getCaracteristicasAutoId());
         entity.setCaracteristicasAuto(modelo);
+    }
+
+    public CostoAuto buscarCostoDeModeloEnFecha(Long modeloId, LocalDate fecha) {
+        return repository.buscarCostoDeModeloEnFecha(modeloId, fecha)
+                .orElseThrow(() -> new BusinessException("El modelo no tiene precio en esa fecha"));
     }
 }
 

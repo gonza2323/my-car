@@ -66,4 +66,14 @@ public class CaracteristicasAutoController {
         var modelosDisponibles = service.encontrarModelosDisponiblesParaAlquiler(pageable, fechaDesde, fechaHasta);
         return ResponseEntity.ok(modelosDisponibles);
     }
+
+    @GetMapping("/{id}/available")
+    public ResponseEntity<CaracteristicasAutoDisponible> buscarModelosDisponiblesPorFecha(
+            @Param("modeloId") Long modeloId,
+            @Param("fechaDesde") LocalDate fechaDesde,
+            @Param("fechaHasta") LocalDate fechaHasta) {
+
+//        var detallesModeloDisponible = service.consultarModeloDisponible(modeloId, fechaDesde, fechaHasta);
+        return ResponseEntity.ok(null);
+    }
 }

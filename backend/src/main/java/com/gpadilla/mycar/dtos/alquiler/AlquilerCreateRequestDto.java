@@ -1,5 +1,6 @@
 package com.gpadilla.mycar.dtos.alquiler;
 
+import com.gpadilla.mycar.enums.TipoDePago;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,9 +12,11 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AlquilerCreateDto {
+public class AlquilerCreateRequestDto {
     private LocalDate fechaDesde;
     private LocalDate fechaHasta;
     private Long clienteId;
     private Long caracteristicaAutoId;
+    private String codigoDescuento;
+    private TipoDePago formaDePago;
 }

@@ -1,5 +1,6 @@
 package com.gpadilla.mycar.service.pagos;
 
+import com.gpadilla.mycar.config.AppProperties;
 import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.preference.*;
@@ -19,17 +20,19 @@ import java.util.List;
 public class MercadoPagoService {
 
     private final PaymentClient paymentClient;
+    private final AppProperties appProperties;
 
-    public MercadoPagoService(@Value("${app.mercadopago.access-token}") String accessToken) {
+    public MercadoPagoService(@Value("${app.mercadopago.access-token}") String accessToken, AppProperties appProperties) {
         MercadoPagoConfig.setAccessToken(accessToken);
         this.paymentClient = new PaymentClient();
+        this.appProperties = appProperties;
     }
 
-    public String createPreference(Long alquilerId, Double monto, String descripcion) throws MPException, MPApiException {
+    public String createPreference(Long alquilerId, Double monto) throws MPException, MPApiException {
+
         PreferenceItemRequest item = PreferenceItemRequest.builder()
                     .id(alquilerId.toString())
                     .title("Alquiler de vehículo")
-                    .description(descripcion)
                     .categoryId("services")
                     .quantity(1)
                     .currencyId("ARS")
@@ -37,9 +40,9 @@ public class MercadoPagoService {
                     .build();
 
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                .success("https://mycar.gpadilla.com/success")
-                .pending("https://mycar.gpadilla.com/pending")
-                .failure("https://mycar.gpadilla.com/failure")
+                .success(appProperties.frontendUrl() + "/success")
+                .pending(appProperties.frontendUrl() + "/pending")
+                .failure(appProperties.frontendUrl() + "/failure")
                 .build();
 
         // No permitimos pagar en efectivo, así no queda pendiente el pago
@@ -56,9 +59,9 @@ public class MercadoPagoService {
                 .paymentMethods(paymentMethods)
                 .backUrls(backUrls)
                 .autoReturn("approved")
-                .notificationUrl("https://api.mycar.gpadilla.com/webhook/mercadopago")
+                .notificationUrl(appProperties.baseUrl() + "/api/v1/webhook/mercadopago")
                 .externalReference(LocalDateTime.now().toString())
-                .statementDescriptor("Gimnasio Sport")
+                .statementDescriptor("My Car")
                 .build();
 
         PreferenceClient client = new PreferenceClient();

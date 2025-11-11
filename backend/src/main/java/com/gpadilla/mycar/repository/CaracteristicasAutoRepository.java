@@ -57,8 +57,8 @@ public interface CaracteristicasAutoRepository
            FROM Alquiler al
            WHERE al.auto = a
              AND al.eliminado = false
-             AND :startDate < al.fechaHasta
-             AND :endDate > al.fechaDesde
+             AND :startDate <= al.fechaHasta
+             AND :endDate >= al.fechaDesde
        )
 """)
     Page<CaracteristicasAutoDisponible> encontrarModelosDisponiblesParaAlquiler(
@@ -67,4 +67,11 @@ public interface CaracteristicasAutoRepository
             @Param("endDate") LocalDate endDate,
             @Param("cantDias") Long cantDias
      );
+
+
+//    CaracteristicasAutoDisponible consultarDisponibilidadModelo(
+//            @Param("modeloId") Long modeloId,
+//            @Param("startDate") LocalDate fechaDesde,
+//            @Param("endDate") LocalDate fechaHasta,
+//            @Param("cantDias") Long cantDias);
 }

@@ -2,10 +2,12 @@ package com.gpadilla.mycar.facade;
 
 import com.gpadilla.mycar.dtos.pagos.PaymentResponse;
 import com.gpadilla.mycar.entity.Alquiler;
+import com.gpadilla.mycar.entity.Factura;
+import com.gpadilla.mycar.enums.EstadoFactura;
 import com.gpadilla.mycar.enums.EstadoPagoAlquiler;
-import com.gpadilla.mycar.enums.TipoDePago;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.service.AlquilerService;
+import com.gpadilla.mycar.service.pagos.FacturaService;
 import com.gpadilla.mycar.service.pagos.MercadoPagoService;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
@@ -21,13 +23,19 @@ public class PagosFacade {
 
     private final AlquilerService alquilerService;
     private final MercadoPagoService mercadoPagoService;
+    private final FacturaService facturaService;
+    private final AlquilerFacade alquilerFacade;
 
     @Transactional
     public PaymentResponse generarLinkDePagoMPClientes(Long alquilerId, Long clienteId) throws MPException, MPApiException {
         Alquiler alquiler = alquilerService.find(alquilerId);
         validarAlquilerParaPagoCliente(alquiler, clienteId);
 
-        String urlDePago = mercadoPagoService.createPreference(alquilerId, alquiler.getMonto(), "Alquiler de vehículo");
+        Factura factura = facturaService.buscarFacturaDeAlquiler(alquilerId);
+        validarFacturaNoPagada(factura);
+
+        // todo usar promocion (buscar factura)
+        String urlDePago = mercadoPagoService.createPreference(alquilerId, alquiler.getMonto());
 
         return PaymentResponse.builder()
                 .alquilerId(alquilerId)
@@ -37,32 +45,17 @@ public class PagosFacade {
     }
 
     @Transactional
-    public PaymentResponse registrarPagoManual(Long alquilerId, TipoDePago metodo) {
-        Alquiler alquiler = alquilerService.find(alquilerId);
-        validarAlquilerNoPagado(alquiler);
-        alquiler.setEstado(EstadoPagoAlquiler.PAGADO);
-
-        finalizarPago(metodo);
-
-        return PaymentResponse.builder()
-                .alquilerId(alquilerId)
-                .status(EstadoPagoAlquiler.PAGADO)
-                .build();
-    }
-
-    @Transactional
     public void confirmarPagoMercadoPago(Long alquilerId) {
         Alquiler alquiler = alquilerService.find(alquilerId);
         validarAlquilerNoPagado(alquiler);
+
+        Factura factura = facturaService.buscarFacturaDeAlquiler(alquilerId);
+        validarFacturaNoPagada(factura);
+
         alquiler.setEstado(EstadoPagoAlquiler.PAGADO);
+        factura.setEstado(EstadoFactura.PAGADA);
 
-        finalizarPago(TipoDePago.BILLETERA_VIRTUAL);
-    }
-
-    @Transactional
-    public void finalizarPago(TipoDePago metodo) {
-        // todo: generar factura
-        // todo: generar pdf factura
+        // todo enviar factura por mail
     }
 
     private void validarAlquilerParaPagoCliente(Alquiler alquiler, Long clienteId) {
@@ -72,6 +65,11 @@ public class PagosFacade {
 
     private void validarAlquilerNoPagado(Alquiler alquiler) {
         if (alquiler.getEstado() == EstadoPagoAlquiler.PAGADO)
+            throw new BusinessException("Este alquiler ya fue pagado");
+    }
+
+    private void validarFacturaNoPagada(Factura factura) {
+        if (factura.getEstado() == EstadoFactura.PAGADA)
             throw new BusinessException("Este alquiler ya fue pagado");
     }
 

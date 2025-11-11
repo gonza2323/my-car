@@ -25,6 +25,9 @@ public class Alquiler extends BaseEntity<Long> {
     private LocalDate fechaHasta;
 
     @Column(nullable = false)
+    private Double costoPorDia;
+
+    @Column(nullable = false)
     private Double monto;
 
     @Column(nullable = false)
