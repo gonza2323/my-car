@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Transactional
@@ -49,7 +50,8 @@ public class CaracteristicasAutoService extends BaseService<
             Pageable pageable,
             LocalDate fechaDesde,
             LocalDate fechaHasta) {
-        return repository.encontrarModelosDisponiblesParaAlquiler(pageable, fechaDesde, fechaHasta);
+        Long cantDias = ChronoUnit.DAYS.between(fechaDesde, fechaHasta) + 1;
+        return repository.encontrarModelosDisponiblesParaAlquiler(pageable, fechaDesde, fechaHasta, cantDias);
     }
 }
 

@@ -21,9 +21,17 @@ public interface CaracteristicasAutoRepository
     List<CaracteristicasAuto> findAllByMarcaAndEliminadoFalse(String marca);
 
     @Query("""
-    SELECT new com.gpadilla.mycar.dtos.caracteristicasAuto.CaracteristicasAutoDisponible(
+    SELECT DISTINCT new com.gpadilla.mycar.dtos.caracteristicasAuto.CaracteristicasAutoDisponible(
          c.id, c.marca, c.modelo, c.anio, c.cantidadPuertas, c.cantidadAsientos,
          (SELECT co.costoTotal
+          FROM CostoAuto co
+          WHERE co.caracteristicasAuto = c
+            AND co.eliminado = false
+            AND co.fechaDesde <= :startDate
+            AND co.fechaHasta >= :startDate
+          ORDER BY co.fechaDesde DESC
+          LIMIT 1),
+          :cantDias * (SELECT co.costoTotal
           FROM CostoAuto co
           WHERE co.caracteristicasAuto = c
             AND co.eliminado = false
@@ -36,6 +44,14 @@ public interface CaracteristicasAutoRepository
      JOIN c.autos a
      WHERE c.eliminado = false
        AND a.eliminado = false
+       AND EXISTS (
+           SELECT co
+           FROM CostoAuto co
+           WHERE co.caracteristicasAuto = c
+             AND co.eliminado = false
+             AND co.fechaDesde <= :startDate
+             AND co.fechaHasta >= :startDate
+       )
        AND NOT EXISTS (
            SELECT al
            FROM Alquiler al
@@ -44,11 +60,11 @@ public interface CaracteristicasAutoRepository
              AND :startDate < al.fechaHasta
              AND :endDate > al.fechaDesde
        )
-     GROUP BY c.id, c.marca, c.modelo, c.anio, c.cantidadPuertas, c.cantidadAsientos
 """)
     Page<CaracteristicasAutoDisponible> encontrarModelosDisponiblesParaAlquiler(
             Pageable pageable,
             @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate
-    );
+            @Param("endDate") LocalDate endDate,
+            @Param("cantDias") Long cantDias
+     );
 }
