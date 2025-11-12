@@ -1,7 +1,6 @@
 import EmptyCart from "@/assets/images/empty-cart.png";
 import { Link } from "react-router-dom";
 import "./DeliveryEmpty.css";
-import { useGlobalContext } from "../../GlobalContext/GlobalContext";
 const DeliveryEmpty = () => {
   const { modal } = useGlobalContext();
   const handleLogin = () => {
