@@ -1,5 +1,4 @@
 import React from "react";
-import { useGlobalContext } from "../components/GlobalContext/GlobalContext";
 import { useEffect, useState } from "react";
 import DeliveryEmpty from "../components/Delivery/DeliveryEmpty/DeliveryEmpty";
 import DeliveryItem from "../components/Delivery/DeliveryItem/DeliveryItem";

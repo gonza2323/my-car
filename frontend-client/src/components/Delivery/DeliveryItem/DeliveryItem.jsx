@@ -1,7 +1,6 @@
 import "./DeliveryItem.css";
 import { useState } from "react";
 import { FaCaretUp } from "react-icons/fa";
-import { useGlobalContext } from "../../GlobalContext/GlobalContext";
 
 const DeliveryItem = ({ order }) => {
   const [expanded, setExpanded] = useState(false);

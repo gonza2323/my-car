@@ -1,7 +1,6 @@
 import OrderDetails from "./OrderDetails/OrderDetails";
 import OrderSummary from "./OrderSummary/OrderSummary";
 import EmptyState from "./EmptyState/EmptyState";
-import { useGlobalContext } from "@/components/GlobalContext/GlobalContext";
 
 import "./Order.css";
 

@@ -1,5 +1,4 @@
 import "./OrderSummary.css";
-import { useGlobalContext } from "@/components/GlobalContext/GlobalContext";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
