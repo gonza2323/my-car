@@ -1,16 +1,48 @@
-# React + Vite
+# React-e-commerce
+This is a customizable e-commerce frontend designed to make it easy for ***student developers*** to build on top of. <br> Built using Vite, The template features a clean and modern design, with a clear and consistent folder structure that makes it easy to navigate the project.
+<br>
+In addition to the frontend there's an even simpler ***backend-template*** to handle all your requests ([READ MORE](https://github.com/Mini-Sylar/react-e-commerce-backend))
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Getting Started
+- Clone this repo
+- run ```npm install```
+- run ```npm run dev```
 
-Currently, two official plugins are available:
+# Example Deployment
+<a href="https://react-e-commerce-sigma.vercel.app/" target="_blank">Simple React-E-Commerce Frontend</a>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Advantages
+- **Responsive design** :  Designed to be responsive on any device
+- **Customizable :** Easy to expand on and add your own features, no fancy libraries are used, everything is purely react and es6 functions
+- **Clean project structure** : Components are all seperated into their respective folders with their individual CSS files for easy styling
+- **Vite**: Get your server started in a matter of seconds using vite
 
-## React Compiler
+## What you get
+- A cart system: A store built using only ***useReducer***, no redux or any other fancy state management system
+- Cached cart: Cart data is cached using localforage
+- Checkout: Adjust cart details and place orders here
+- Routing: Page routing has been set up to easily navigate between pages
+- Auth🔥: JWT authentication allowing the user to login and logout
+- Modals🔥: Easy and customzizable modals
+- Orders🔥: View orders, get details on when your order will be processed, cancel or report order  
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## What it doesn't have 
+- SEO: This is primarily for educational purposes, if you need SEO, you would have to commit to that. 
 
-## Expanding the ESLint configuration
+<hr>
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**To see a stripped down version with no JWT see [NO JWT](https://github.com/Mini-Sylar/react-e-commerce/tree/main)**
+
+## Things to note
+- When running on localhost vite uses ```.env.development``` to connect to your backend (which must be running, more info here 👉 [React E-Commerce-Backend With JWT](https://github.com/Mini-Sylar/react-e-commerce/tree/main-jwt)) . Update it when needed
+- In production mode, ```.env.production``` will be used instead.
+
+# Contributions
+Contributions are always welcome,
+
+# Licence 
+This template is released under the MIT License. Feel free to use it for personal or commercial projects. 
+<br> You may credit me as well 😊
+
+
+
