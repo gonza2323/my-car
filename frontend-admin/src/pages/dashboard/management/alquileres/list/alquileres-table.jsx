@@ -10,6 +10,11 @@ import { useAuth, useDeleteAlquiler, useGetAlquileres } from "@/hooks";
 import { paths } from "@/routes";
 import { client } from "@/api/axios";
 import { formatCurrency } from "@/utilities/number";
+import { ReporteRecaudacionButton } from "@/components/ReporteRecaudacionButton";
+import { ReporteVehiculosButton } from "@/components/ReporteVehiculosButton";
+import dayjs from "dayjs";
+import minMax from "dayjs/plugin/minMax";
+dayjs.extend(minMax);
 
 
 export function AlquileresTable() {
@@ -136,7 +141,34 @@ export function AlquileresTable() {
       console.error("Error al generar PDF:", error);
       alert("No se pudo generar el reporte de alquileres");
     }
-  };
+
+  }
+  //Calcular fecha mínima y máxima de los alquileres actuales
+  const alquileres = Array.isArray(data?.data) ? data.data : [];
+
+  let fechaMin = null;
+  let fechaMax = null;
+
+  try {
+    if (alquileres.length > 0) {
+      const fechasValidas = alquileres
+        .filter(a => a.fechaDesde && a.fechaHasta)
+        .map(a => ({
+          desde: dayjs(a.fechaDesde),
+          hasta: dayjs(a.fechaHasta),
+        }));
+
+      if (fechasValidas.length > 0) {
+        const desdeArray = fechasValidas.map(f => f.desde.toDate());
+        const hastaArray = fechasValidas.map(f => f.hasta.toDate());
+
+        fechaMin = dayjs(Math.min(...desdeArray)).format("YYYY-MM-DD");
+        fechaMax = dayjs(Math.max(...hastaArray)).format("YYYY-MM-DD");
+      }
+    }
+  } catch (e) {
+    console.error("Error calculando fechas:", e);
+  }
 
   return (
     <DataTable.Container>
@@ -144,6 +176,9 @@ export function AlquileresTable() {
         title="Alquileres"
         description="Lista de alquileres"
         actions={
+          <Group>
+            <ReporteRecaudacionButton fechaMin={fechaMin ?? ""} fechaMax={fechaMax ?? ""} />
+              <ReporteVehiculosButton fechaMin={fechaMin ?? ""} fechaMax={fechaMax ?? ""} />
           <AddButton
             variant="default"
             size="xs"
@@ -152,6 +187,7 @@ export function AlquileresTable() {
           >
             Agregar alquiler
           </AddButton>
+          </Group>
         }
       />
 

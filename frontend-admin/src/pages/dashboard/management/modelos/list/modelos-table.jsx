@@ -116,26 +116,7 @@ export function ModelosTable() {
       }
     })
   }
-  const handleDownloadPdf = async () => {
-    try {
-      const response = await client.get("http://localhost:8080/api/v1/reportes/modelos", {
-        responseType: "blob",
-        headers: { Accept: "application/pdf" },
-      });
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "modelos_autos.pdf");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error al generar PDF:", error);
-      alert("No se pudo generar el reporte de modelos");
-    }
-  };
 
   return (
     <DataTable.Container>
@@ -144,15 +125,7 @@ export function ModelosTable() {
         description="Lista de modelos"
         actions={
           <Group>
-            <Button
-              variant="filled"
-              size="xs"
-              color="blue"
-              onClick={handleDownloadPdf}
-              style={{ marginRight: "8px" }}
-            >
-              📄 Reporte PDF
-            </Button>
+
             <AddButton
               variant="default"
               size="xs"

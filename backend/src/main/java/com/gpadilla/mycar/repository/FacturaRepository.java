@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface FacturaRepository extends JpaRepository<Factura,Long> {
+public interface FacturaRepository extends JpaRepository<Factura, Long>, BaseRepository<Factura, Long> {
 
     Optional<Factura> findByIdAndEliminadoFalse(Long id);
     List<Factura> findAllByEliminadoFalseOrderByFechaFacturaDescNumeroFacturaDesc();

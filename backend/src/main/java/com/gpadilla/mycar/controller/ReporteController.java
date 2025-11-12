@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
 
@@ -28,11 +29,26 @@ public class ReporteController {
     private final PdfGenerator  pdfGenerator;
     private final CaracteristicasAutoRepository caracteristicasAutoRepository;
 
+    @GetMapping("/vehiculos")
+    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
+    public ResponseEntity<byte[]> generarReporteVehiculos(
+            @RequestParam LocalDate fechaInicio,
+            @RequestParam LocalDate fechaFin
+    ) {
+        byte[] pdf = reporteService.generarReporteVehiculos(fechaInicio, fechaFin);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_vehiculos.pdf")
+                .body(pdf);
+    }
+
+
     @GetMapping("/recaudacion")
-    @PreAuthorize("hasRole('JEFE')")
+    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')") //solo jefe, ahora asi para probar
     public ResponseEntity<byte[]> generarReporte(
-            @RequestParam String fechaInicio,
-            @RequestParam String fechaFin
+            @RequestParam LocalDate fechaInicio,
+            @RequestParam LocalDate fechaFin
     ) {
         byte[] pdfBytes = reporteService.generarReporteRecaudacion(fechaInicio, fechaFin);
 
@@ -43,7 +59,8 @@ public class ReporteController {
     }
 
     @GetMapping("/modelos")
-    @PreAuthorize("hasRole('JEFE')")
+    //@PreAuthorize("hasRole('JEFE')")
+    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
     public ResponseEntity<byte[]> generarReporteModelos() {
         var modelos = caracteristicasAutoRepository.findAll();
         System.out.println("Cantidad de modelos encontrados: " + modelos.size());
