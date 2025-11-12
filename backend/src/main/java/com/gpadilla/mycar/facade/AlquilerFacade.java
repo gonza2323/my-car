@@ -6,6 +6,7 @@ import com.gpadilla.mycar.enums.EstadoFactura;
 import com.gpadilla.mycar.enums.EstadoPagoAlquiler;
 import com.gpadilla.mycar.enums.TipoDePago;
 import com.gpadilla.mycar.error.BusinessException;
+import com.gpadilla.mycar.pdf.PdfGenerator;
 import com.gpadilla.mycar.service.*;
 import com.gpadilla.mycar.service.pagos.FacturaService;
 import lombok.RequiredArgsConstructor;
@@ -75,6 +76,8 @@ public class AlquilerFacade {
 
         if (estadoFactura == EstadoFactura.PAGADA) {
             // todo enviar pdf por mail si está pagada, si no, recién cuando la pague por MP
+
+            //byte[] pdf = facturaService.generarFacturaPdf ACA VOY A COMPLETAR ESTA PARTE
         }
 
         // todo configurar recordario por mail y wp

@@ -91,4 +91,13 @@ public class FacturaService extends BaseService<
         return repository.buscarFacturaDeAlquiler(alquilerId)
                 .orElseThrow(() -> new BusinessException("Factura no encontrada"));
     }
+
+//    public byte[] generarFacturaPdf(Long facturaId) {
+//        Factura factura = repository.findById(facturaId)
+//                .orElseThrow(() -> new BusinessException("Factura no encontrada"));
+//
+//        FacturaDto dto = facturaMapper.toDto(factura);
+//
+//        return pdfGenerator.generarFacturaPdf(dto);
+//    }
 }

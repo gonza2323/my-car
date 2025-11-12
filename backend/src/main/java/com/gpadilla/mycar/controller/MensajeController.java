@@ -24,19 +24,12 @@ public class MensajeController {
     private final MensajeService mensajeService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMINISTRATIVO', 'JEFE')")
+    @PreAuthorize("hasAnyRole('ADMINISTRATIVO', 'JEFE')")
     public ResponseEntity<String> list() {
+
 
         return ResponseEntity.ok("Listado de mensajes");
     }
-
-    //SE MANEJA EN EL CONTROLADOR ESPECIFICO DE PROMOCIONES
-//    @PostMapping(value = "/promociones", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    @PreAuthorize("hasAnyRole('JEFE','ADMINISTRATIVO')")
-//    public ResponseEntity<Map<String, String>> enviarPromocion(@Valid @RequestBody PromocionDTO dto) {
-//        mensajeService.enviarPromocionAsync(dto);
-//        return ResponseEntity.accepted().body(Map.of("status", "EN_PROCESO"));
-//    }
 
 
     //SE MANEJA EN EL CONTROLADOR ESPECIFICO DE ALQUILER
@@ -53,15 +46,5 @@ public class MensajeController {
 //    }
 
 
-    // --- Envío de promoción a un cliente específico ---
-//    @PostMapping("/promociones/{clienteId}")
-//    public ResponseEntity<Void> enviarPromocionACliente(
-//            @PathVariable Long clienteId,
-//            @RequestBody PromocionDTO dto
-//    ) {
-//        return mensajeService.procesarPromocionParaCliente(dto, clienteId)
-//                ? ResponseEntity.ok().build()
-//                : ResponseEntity.badRequest().build();
-//    }
 
 }

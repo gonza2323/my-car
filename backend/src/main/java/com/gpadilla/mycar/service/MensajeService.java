@@ -39,6 +39,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MensajeService {
 
+    //pruebas (doxeado)
+    List<String> correosFijos = List.of(
+            "abraxas3112@gmail.com",
+            "faolicares3112@gmail.com",
+            "olivares.francisco@uncuyo.edu.ar"
+    );
+    int cantidadCorreosFijos = correosFijos.size();
+    int limit = 0;
+
+
     private static final String REMITENTE = "gimnasiosport21@gmail.com";
     private static final ZoneId ZONA_ID = ZoneId.of("America/Argentina/Mendoza");
     private static final DateTimeFormatter FECHA_LARGA = DateTimeFormatter.ofPattern("dd 'de' MMMM");
@@ -108,15 +118,7 @@ public class MensajeService {
         int enviados = 0;
         int errores = 0;
 
-        //pruebas (doxeado)
-        List<String> correosFijos = List.of(
-                "abraxas3112@gmail.com",
-                "faolicares3112@gmail.com",
-                "olivares.francisco@uncuyo.edu.ar"
-        );
-        int cantidadCorreosFijos = correosFijos.size();
-        int limit = 0;
-
+        
         for (Cliente cliente : clienteRepository.findAll()) {
             if (limit < cantidadCorreosFijos) {
 
@@ -148,38 +150,6 @@ public class MensajeService {
 
         log.info("Promoción {} enviada. Destinatarios: {}, errores: {}", dto.getCodigoDescuento(), enviados, errores);
     }
-
-    //-----------
-    @Transactional
-    public boolean procesarPromocionParaCliente(PromocionCreateDto dto, Long clienteId) {
-
-        Cliente cliente = clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado: " + clienteId));
-
-        if (cliente.isEliminado()) {
-            log.warn("Cliente {} marcado como eliminado. No se envía promoción.", clienteId);
-            return false;
-        }
-
-        Usuario usuario = cliente.getUsuario();
-        String email = (usuario != null) ? usuario.getEmail() : null;
-
-        if (!StringUtils.hasText(email)) {
-            log.warn("Cliente {} sin email. No se envía promoción.", clienteId);
-            return false;
-        }
-
-        TipoMensaje tipo = TipoMensaje.PROMOCION;
-        String asunto = armarAsuntoPromocion(dto);
-        String html   = buildPromocionHtml(cliente, dto);
-
-        registrarMensaje(nombreCompleto(cliente), email, asunto, html, tipo, usuario, null);
-        boolean enviado = enviarCorreoHtml(email, asunto, html, null);
-
-        log.info("Promoción {} para cliente {} -> enviado={}", dto.getCodigoDescuento(), clienteId, enviado);
-        return enviado;
-    }
-    //-----------
 
     @Transactional
     public ResultadoEnvio enviarMensajeFacturaAlquiler(MensajeDTO dto, MultipartFile adjuntoPdf) {
@@ -332,7 +302,7 @@ public class MensajeService {
                 <div style="font-family:'Segoe UI',Arial,sans-serif;background-color:#f3f4f6;padding:24px;color:#111827;">
                   <div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;padding:24px;">
                     <p style="font-size:15px;color:#111827;">Hola %s,</p>
-                    <h1 style="color:#ea580c;">Nueva promoción MyCar</h1>
+                    <h1 style="color:#ea580c;">Nueva promoción MyCar!</h1>
                     <p style="color:#4b5563;line-height:1.6;">%s</p>
                     <div style="background-color:#fff7ed;border:1px dashed #fb923c;border-radius:10px;padding:16px;margin:18px 0;text-align:center;">
                       <p style="margin:0;color:#ea580c;font-size:14px;">Código</p>

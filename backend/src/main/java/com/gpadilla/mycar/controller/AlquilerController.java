@@ -36,4 +36,18 @@ public class AlquilerController {
         alquilerFacade.registrarAlquiler(dto);
         return ResponseEntity.noContent().build();
     }
+
+    // DESCARGAR FACTURA, SUPONEMOS QUE EXISTE EL METODO
+//    @GetMapping("/{alquilerId}/factura")
+//    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
+//    public ResponseEntity<byte[]> descargarFactura(@PathVariable Long alquilerId) {
+//
+//        byte[] pdf = alquilerFacade.generarFacturaPdf(alquilerId);
+//
+//        return ResponseEntity.ok()
+//                .header("Content-Disposition", "attachment; filename=factura-" + alquilerId + ".pdf")
+//                .header("Content-Type", "application/pdf")
+//                .body(pdf);
+//    }
+
 }
