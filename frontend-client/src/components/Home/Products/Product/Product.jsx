@@ -1,16 +1,10 @@
 import "./Product.css";
 import headphones_pink from "@/assets/images/airpods_max_pink.jpg";
 import { FaStar } from "react-icons/fa";
-import { useGlobalContext } from "@/components/GlobalContext/GlobalContext";
 import { toast } from "react-toastify";
 
 const Product = ({ product }) => {
-  let {store} = useGlobalContext();
-  let stars = [];
-  for (let i = 0; i < product?.rating; i++) {
-    stars.push(<FaStar key={i} />);
-  }
-  const isInCart = product?.addedToCart;
+  
   return (
     <div className="product-container">
       <div className="image">
@@ -31,34 +25,15 @@ const Product = ({ product }) => {
           </div>
           <h5>{product?.description}</h5>
           <div className="star-rating">
-            <div className="star">{stars}</div>
             <span>({parseInt(Math.random() * 100)} Reviews)</span>
           </div>
         </div>
         <div>
-          {isInCart == false ? (
-            <button
-              className="add-to-cart"
-              onClick={() => {
-                if (store.state.cartQuantity > 10) {
-                  toast.warning("You can only add 10 items to cart");
-                  return;
-                }
-                store.addToCart(product?._id);
-              }}
-            >
-              Add to Cart
-            </button>
-          ) : (
-            <button
-              className="add-to-cart"
-              onClick={() => {
-                store.removeFromCart(product?._id);
-              }}
-            >
-              Remove from cart
-            </button>
-          )}
+          <button
+            className="add-to-cart"
+          >
+            Add to Cart
+          </button>
         </div>
       </div>
       <div className="heart"></div>

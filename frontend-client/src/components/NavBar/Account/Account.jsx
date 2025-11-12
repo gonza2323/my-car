@@ -1,16 +1,14 @@
 import { FaShoppingCart } from "react-icons/fa";
 
-import { useGlobalContext } from "@/components/GlobalContext/GlobalContext";
 import { Link } from "react-router-dom";
 import "./Account.css";
 
 const Account = () => {
-  // let { store } = useGlobalContext();
-  let { auth, store, modal } = useGlobalContext();
-  const cartTotal = store.state.cartQuantity;
+  const auth = { state: { user: null, username: "gonza" }};
+  const cartTotal = 10;
 
   const handleShowModal = () => {
-    modal.openModal(false);
+    // modal.openModal(false);
   };
 
   const handleLogout = () => {

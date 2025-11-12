@@ -75,6 +75,7 @@ public class AlquilerFacade {
         Factura factura = facturaService.crearFacturaDeAlquiler(alquiler, estadoFactura, request.getFormaDePago(), promocion);
 
         if (estadoFactura == EstadoFactura.PAGADA) {
+            // todo llamado a factura o pdf service (lo que sea) que devuelva la factura en memoria
             // todo enviar pdf por mail si está pagada, si no, recién cuando la pague por MP
 
             //byte[] pdf = facturaService.generarFacturaPdf ACA VOY A COMPLETAR ESTA PARTE

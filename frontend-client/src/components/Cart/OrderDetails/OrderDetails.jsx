@@ -1,7 +1,5 @@
 import "./OrderDetails.css";
 
-import { useGlobalContext } from "@/components/GlobalContext/GlobalContext";
-
 const OrderDetails = ({ product }) => {
   const {store} = useGlobalContext();
   return (
