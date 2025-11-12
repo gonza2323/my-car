@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +31,7 @@ public class ReporteService {
 
     public byte[] generarReporteRecaudacion(LocalDate fechaInicio, LocalDate fechaFin) {
 
-        List<Object[]> resultados = reporteRepository.findByFechas(fechaInicio, fechaFin);
+        List<Object[]> resultados = reporteRepository.reporteRecaudacion(fechaInicio, fechaFin);
 
         List<ReporteRecaudacionDto> reportes = resultados.stream()
                 .map(r -> new ReporteRecaudacionDto(
@@ -67,8 +66,5 @@ public class ReporteService {
                 fechaInicio, fechaFin, cerrados, abiertos, totalCerrados, totalAbiertos
         );
     }
-
-
-
 }
 

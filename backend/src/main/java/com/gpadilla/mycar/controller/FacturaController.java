@@ -1,11 +1,9 @@
 package com.gpadilla.mycar.controller;
 
-import com.gpadilla.mycar.dtos.factura.FacturaDto;
 import com.gpadilla.mycar.pdf.PdfGenerator;
-import com.gpadilla.mycar.service.FacturaService;
+import com.gpadilla.mycar.service.pagos.FacturaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

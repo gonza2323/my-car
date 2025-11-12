@@ -2,7 +2,6 @@ package com.gpadilla.mycar.service;
 
 import com.gpadilla.mycar.dtos.cliente.ClienteCreateDto;
 import com.gpadilla.mycar.dtos.cliente.ClienteSummaryDto;
-import com.gpadilla.mycar.entity.Empleado;
 import com.gpadilla.mycar.entity.geo.Direccion;
 import com.gpadilla.mycar.entity.Cliente;
 import com.gpadilla.mycar.entity.geo.Nacionalidad;
@@ -38,7 +37,7 @@ public class ClienteService {
 
     @Transactional(readOnly = true)
     public Page<ClienteSummaryDto> findDtos(Pageable pageable) {
-        return clienteRepository.findAllByEliminadoFalse(pageable);
+        return clienteRepository.buscarResumenClientes(pageable);
     }
 
     @Transactional(readOnly = true)

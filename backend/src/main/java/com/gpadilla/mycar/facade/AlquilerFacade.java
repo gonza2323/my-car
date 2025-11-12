@@ -7,6 +7,7 @@ import com.gpadilla.mycar.enums.EstadoPagoAlquiler;
 import com.gpadilla.mycar.enums.TipoDePago;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.service.*;
+import com.gpadilla.mycar.service.pagos.FacturaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
