@@ -49,10 +49,11 @@ public class ContactoTelefonicoService {
                 .map(mapper::toDto);
     }
 
+    //para obtener telefono de empresa
     @Transactional(readOnly = true)
     public Optional<ContactoTelefonicoDetailDto> findActivoPorEmpresa() {
-        return empresaRepository.findFirstByEliminadoFalseOrderByIdAsc()
-                .flatMap(empresa -> repository.findTelefonoVigenteByEmpresaId(empresa.getId()))
+        Empresa empresa = obtenerEmpresaObligatoria();
+        return repository.findTelefonoVigenteByEmpresaId(empresa.getId())
                 .map(mapper::toDto);
     }
 

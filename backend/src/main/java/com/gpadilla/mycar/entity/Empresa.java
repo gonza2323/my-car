@@ -21,7 +21,6 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "empresas")
 public class Empresa extends BaseEntity<Long> {
 
-    @NotEmpty(message = "La razon social no puede estar vacío")
     @Size(max = 50, message = "La razon social no puede superar los 50 caracteres")
     private String nombre;
 
@@ -29,12 +28,12 @@ public class Empresa extends BaseEntity<Long> {
     @JoinColumn(name = "id_direccion", nullable = false, foreignKey = @ForeignKey(name = "fk_empresa_direccion"))
     private Direccion direccion;
 
-    @NotEmpty(message = "El teléfono de contacto no puede estar vacío")
-    @Size(max = 20, message = "El teléfono de contacto no puede superar los 20 caracteres")
-    private String telefonoPrincipal;
 
-    @NotEmpty(message = "El email de contacto no puede estar vacío")
-    @Size(max = 100, message = "El email de contacto no puede superar los 100 caracteres")
-    @Email(message = "El email de contacto no tiene un formato válido")
-    private String emailPrincipal;
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, optional = false)
+    @JoinColumn(name = "telefono_principal_id", nullable = false)
+    private ContactoTelefonico telefonoPrincipal;
+
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, optional = false)
+    @JoinColumn(name = "email_principal_id", nullable = false)
+    private ContactoCorreoElectronico emailPrincipal;
 }

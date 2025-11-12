@@ -49,10 +49,11 @@ public class ContactoCorreoService {
                 .map(mapper::toDto);
     }
 
+    // para obtener correo de empresa
     @Transactional(readOnly = true)
     public Optional<ContactoCorreoDetailDto> findActivoPorEmpresa() {
-        return empresaRepository.findFirstByEliminadoFalseOrderByIdAsc()
-                .flatMap(empresa -> repository.findCorreoVigenteByEmpresaId(empresa.getId()))
+        Empresa empresa = obtenerEmpresaObligatoria();
+        return repository.findCorreoVigenteByEmpresaId(empresa.getId())
                 .map(mapper::toDto);
     }
 

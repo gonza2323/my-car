@@ -9,13 +9,11 @@ import com.gpadilla.mycar.dtos.empleado.EmpleadoCreateRequestDto;
 import com.gpadilla.mycar.dtos.geo.direccion.DireccionCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.geo.nacionalidad.NacionalidadCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.geo.pais.PaisCreateOrUpdateDto;
-import com.gpadilla.mycar.entity.Auto;
-import com.gpadilla.mycar.entity.CaracteristicasAuto;
-import com.gpadilla.mycar.entity.ContactoTelefonico;
-import com.gpadilla.mycar.entity.Empresa;
+import com.gpadilla.mycar.entity.*;
 import com.gpadilla.mycar.entity.geo.*;
 import com.gpadilla.mycar.enums.TipoDocumento;
 import com.gpadilla.mycar.enums.TipoEmpleado;
+import com.gpadilla.mycar.enums.TipoTelefono;
 import com.gpadilla.mycar.facade.ClienteFacade;
 import com.gpadilla.mycar.facade.EmpleadoFacade;
 import com.gpadilla.mycar.init.geo.*;
@@ -106,7 +104,8 @@ public class DataInitialization implements CommandLineRunner {
         cargarUbicacionesArgentina(paises.getFirst());
         crearEmpleados();
         List<Long> clienteIds = crearClientes(nacionalidades);
-
+        System.out.println("creando empresa");
+        crearEmpresaInicial();
         System.out.println("Datos iniciales creados.");
     }
 
@@ -372,13 +371,26 @@ public class DataInitialization implements CommandLineRunner {
                         .build()
         );
 
+        ContactoTelefonico contactoT = new ContactoTelefonico();
+        contactoT.setTelefono("+54 261 555 0000");
+        contactoT.setTipoTelefono(TipoTelefono.CELULAR);
+
+        ContactoCorreoElectronico contactoC = new ContactoCorreoElectronico();
+        contactoC.setEmail("gimnasiosport21@gmail.com");
+
         Empresa empresa = Empresa.builder()
                 .nombre("MyCar S.A.")
-                .telefonoPrincipal("+54 261 555 0000")
-                .emailPrincipal("gimnasiosport21@gmail.com")
+                .telefonoPrincipal(contactoT)
+                .emailPrincipal(contactoC)
                 .direccion(direccion)
                 .eliminado(false)
                 .build();
+
+        contactoT.setEmpresa(empresa);
+        contactoT.setEliminado(false);
+
+        contactoC.setEmpresa(empresa);
+        contactoC.setEliminado(false);
 
         empresaRepository.save(empresa);
     }

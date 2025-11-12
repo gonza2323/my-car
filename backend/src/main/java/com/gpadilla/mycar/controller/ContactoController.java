@@ -4,6 +4,7 @@ import com.gpadilla.mycar.auth.CurrentUser;
 import com.gpadilla.mycar.dtos.contacto.ContactoCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.contacto.ContactoCorreoDetailDto;
 import com.gpadilla.mycar.dtos.contacto.ContactoTelefonicoDetailDto;
+import com.gpadilla.mycar.dtos.contacto.ContactosDetalleDto;
 import com.gpadilla.mycar.enums.UserRole;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.facade.ContactoFacade;
@@ -35,7 +36,7 @@ public class ContactoController {
 
     @GetMapping("/mis-datos")
     @PreAuthorize("hasAnyRole('CLIENTE','JEFE','ADMINISTRATIVO')")
-    public ResponseEntity<ContactoFacade.ContactosDetalleDto> obtenerMisContactos(
+    public ResponseEntity<ContactosDetalleDto> obtenerMisContactos(
             @AuthenticationPrincipal CurrentUser user
     ) {
         return ResponseEntity.ok(facade.contactosDeUsuario(user.getId()));
@@ -43,7 +44,7 @@ public class ContactoController {
 
     @PutMapping("/mis-datos")
     @PreAuthorize("hasAnyRole('CLIENTE','JEFE','ADMINISTRATIVO')")
-    public ResponseEntity<ContactoFacade.ContactosDetalleDto> actualizarMisContactos(
+    public ResponseEntity<ContactosDetalleDto> actualizarMisContactos(
             @AuthenticationPrincipal CurrentUser user,
             @Valid @RequestBody ContactoCreateOrUpdateDto dto
     ) {
@@ -54,33 +55,16 @@ public class ContactoController {
 
     @GetMapping("/empresa")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ContactoFacade.ContactosDetalleDto> obtenerContactosEmpresa() {
+    public ResponseEntity<ContactosDetalleDto> obtenerContactosEmpresa() {
         return ResponseEntity.ok(facade.contactosDeEmpresa());
     }
 
-    @PutMapping("/empresa")
+    @PostMapping("/empresa/contactos")
     @PreAuthorize("hasRole('JEFE')")
-    public ResponseEntity<ContactoFacade.ContactosDetalleDto> actualizarContactosEmpresa(
+    public ResponseEntity<ContactosDetalleDto> upsertContactosEmpresa(
             @Valid @RequestBody ContactoCreateOrUpdateDto dto
     ) {
-        return ResponseEntity.ok(facade.actualizarContactosDeEmpresa(dto));
-    }
-
-    @PostMapping("/empresa/correo")
-    @PreAuthorize("hasRole('JEFE')")
-    public ResponseEntity<ContactoCorreoDetailDto> crearCorreoEmpresa(
-            @Valid @RequestBody ContactoCreateOrUpdateDto dto
-    ) {
-        ContactoCorreoDetailDto detalle = facade.crearCorreoParaEmpresa(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(detalle);
-    }
-
-    @PostMapping("/empresa/telefonico")
-    @PreAuthorize("hasRole('JEFE')")
-    public ResponseEntity<ContactoTelefonicoDetailDto> crearTelefonoEmpresa(
-            @Valid @RequestBody ContactoCreateOrUpdateDto dto
-    ) {
-        ContactoTelefonicoDetailDto detalle = facade.crearTelefonoParaEmpresa(dto);
+        ContactosDetalleDto detalle = facade.actualizarContactosDeEmpresa(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(detalle);
     }
 
@@ -88,7 +72,7 @@ public class ContactoController {
 
     @GetMapping("/usuario/{usuarioId}")
     @PreAuthorize("hasAnyRole('JEFE','ADMINISTRATIVO')")
-    public ResponseEntity<ContactoFacade.ContactosDetalleDto> contactosDeUsuario(
+    public ResponseEntity<ContactosDetalleDto> contactosDeUsuario(
             @PathVariable Long usuarioId
     ) {
         return ResponseEntity.ok(facade.contactosDeUsuario(usuarioId));
@@ -96,12 +80,13 @@ public class ContactoController {
 
     @PutMapping("/usuario/{usuarioId}")
     @PreAuthorize("hasAnyRole('JEFE','ADMINISTRATIVO')")
-    public ResponseEntity<ContactoFacade.ContactosDetalleDto> actualizarContactosDeUsuario(
+    public ResponseEntity<ContactosDetalleDto> actualizarContactosDeUsuario(
             @PathVariable Long usuarioId,
             @Valid @RequestBody ContactoCreateOrUpdateDto dto
     ) {
         return ResponseEntity.ok(facade.actualizarContactosDeUsuario(usuarioId, dto));
     }
+
 
     @PostMapping("/usuario/{usuarioId}/correo")
     @PreAuthorize("hasAnyRole('JEFE','ADMINISTRATIVO')")
@@ -131,11 +116,11 @@ public class ContactoController {
             @PathVariable Long id,
             @AuthenticationPrincipal CurrentUser user
     ) {
-        ContactoFacade.ContactoDetalleWrapper detalle = facade.obtenerDetalle(id);
-        if (!puedeVer(user, detalle)) {
+        Object dto = facade.obtenerDetalle(id); // Tel o Correo (DTO concreto)
+        if (!puedeVer(user, dto)) {
             throw new BusinessException("No tiene permisos para ver este contacto");
         }
-        return ResponseEntity.ok(detalle.payload());
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/{id}")
@@ -144,8 +129,8 @@ public class ContactoController {
             @PathVariable Long id,
             @AuthenticationPrincipal CurrentUser user
     ) {
-        ContactoFacade.ContactoDetalleWrapper detalle = facade.obtenerDetalle(id);
-        if (!puedeModificar(user, detalle)) {
+        Object dto = facade.obtenerDetalle(id);
+        if (!puedeModificar(user, dto)) {
             throw new BusinessException("No tiene permisos para eliminar este contacto");
         }
         facade.eliminar(id);
@@ -154,32 +139,34 @@ public class ContactoController {
 
     /* =================== Helpers =================== */
 
-    private boolean puedeVer(CurrentUser user, ContactoFacade.ContactoDetalleWrapper detalle) {
-        if (detalle.esDeEmpresa()) {
-            return true;
-        }
-        if (user == null) {
-            return false;
-        }
-        return detalle.perteneceAUsuario(user.getId()) || esJefeOAdmin(user);
-    }
-
-    private boolean puedeModificar(CurrentUser user, ContactoFacade.ContactoDetalleWrapper detalle) {
-        if (detalle.esDeEmpresa()) {
-            return esJefe(user);
-        }
-        if (user == null) {
-            return false;
-        }
-        return detalle.perteneceAUsuario(user.getId()) || esJefeOAdmin(user);
-    }
-
     private boolean esJefeOAdmin(CurrentUser user) {
         return user != null && user.getRoles().stream()
-                .anyMatch(rol -> rol == UserRole.JEFE || rol == UserRole.ADMINISTRATIVO);
+                .anyMatch(r -> r == UserRole.JEFE || r == UserRole.ADMINISTRATIVO);
     }
-
     private boolean esJefe(CurrentUser user) {
         return user != null && user.getRoles().contains(UserRole.JEFE);
+    }
+
+    private Long empresaId(Object dto) {
+        if (dto instanceof ContactoTelefonicoDetailDto t) return t.getEmpresaId();
+        if (dto instanceof ContactoCorreoDetailDto c)    return c.getEmpresaId();
+        return null;
+    }
+    private Long usuarioId(Object dto) {
+        if (dto instanceof ContactoTelefonicoDetailDto t) return t.getUsuarioId();
+        if (dto instanceof ContactoCorreoDetailDto c)    return c.getUsuarioId();
+        return null;
+    }
+
+    private boolean puedeVer(CurrentUser user, Object dto) {
+        if (empresaId(dto) != null) return true; // empresa: visible autenticados
+        Long owner = usuarioId(dto);
+        return user != null && (owner != null && owner.equals(user.getId()) || esJefeOAdmin(user));
+    }
+
+    private boolean puedeModificar(CurrentUser user, Object dto) {
+        if (empresaId(dto) != null) return esJefe(user); // empresa: solo JEFE
+        Long owner = usuarioId(dto);
+        return user != null && (owner != null && owner.equals(user.getId()) || esJefeOAdmin(user));
     }
 }
