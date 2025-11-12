@@ -44,18 +44,30 @@ public class EmpresaService extends BaseService<
     }
 
 
-    /** Devuelve el detalle de la única empresa. */
     public EmpresaDetailDto findSingletonDto() {
-        Empresa e = findSingletonEntity()
+        return findSingletonEntity()
+                .map(this::toDetailDto)
                 .orElseThrow(() -> new RuntimeException("La empresa aún no fue inicializada."));
-        return toDetailDto(e);
     }
 
     /** Actualiza únicamente los datos de contacto principales. */
     public EmpresaDetailDto updateContacto(EmpresaCreateOrUpdateDto dto) {
         Empresa e = findSingletonEntity()
                 .orElseThrow(() -> new RuntimeException("La empresa aún no fue inicializada."));
-        Empresa actualizada = update(e.getId(), dto); // usa BaseService.update(...)
+
+        EmpresaCreateOrUpdateDto cambios = EmpresaCreateOrUpdateDto.builder()
+                .nombre(e.getNombre())
+                .direccionId(e.getDireccion() != null ? e.getDireccion().getId() : null) // preservar
+                .telefonoPrincipal(dto.getTelefonoPrincipal() != null
+                        ? dto.getTelefonoPrincipal()
+                        : e.getTelefonoPrincipal().getTelefono())
+                .emailPrincipal(dto.getEmailPrincipal() != null
+                        ? dto.getEmailPrincipal()
+                        : e.getEmailPrincipal().getEmail())
+                .build();
+
+        Empresa actualizada = update(e.getId(), cambios); // usa BaseService.update(...)
+
         return toDetailDto(actualizada);
     }
 
@@ -64,12 +76,5 @@ public class EmpresaService extends BaseService<
     /** Obtiene la “única” empresa activa: el primer registro no eliminado. */
     private Optional<Empresa> findSingletonEntity() {
         return repository.findFirstByEliminadoFalseOrderByIdAsc();
-    }
-
-    /* ==================== Opcional: sin eliminación en singleton ==================== */
-
-    @Override
-    public Empresa delete(Long id) {
-        throw new UnsupportedOperationException("No se permite eliminar la empresa en este modo singleton.");
     }
 }

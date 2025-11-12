@@ -4,16 +4,20 @@ import com.gpadilla.mycar.dtos.geo.direccion.DireccionViewDto;
 import lombok.*;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class EmpresaDetailDto {
 
     private Long id;
+
     private String nombre;
 
-    private String telefonoPrincipal;
-    private String emailPrincipal;
+    private String telefonoPrincipal; // se obtiene del contacto
+
+    private String emailPrincipal; // se obtiene del contacto
 
     private DireccionViewDto direccion;
+
+    private boolean eliminado;
 }

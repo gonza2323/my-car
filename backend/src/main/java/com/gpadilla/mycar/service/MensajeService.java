@@ -44,6 +44,7 @@ public class MensajeService {
 
     private final MensajeRepository mensajeRepository;
     private final ClienteRepository clienteRepository;
+
     private final AlquilerRepository alquilerRepository;
     private final JavaMailSender mailSender;
     private final PromotionSchedulerService promotionSchedulerService;
@@ -129,6 +130,37 @@ public class MensajeService {
 
         log.info("Promoción {} enviada. Destinatarios: {}, errores: {}", dto.getCodigoDescuento(), enviados, errores);
     }
+
+    //-----------
+    @Transactional
+    public boolean procesarPromocionParaCliente(PromocionDTO dto, Long clienteId) {
+        //Usuario cliente = usuarioService
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado: " + clienteId));
+
+        if (cliente.isEliminado()) {
+            log.warn("Cliente {} marcado como eliminado. No se envía promoción.", clienteId);
+            return false;
+        }
+
+        Usuario usuario = cliente.getUsuario();
+        String email = (usuario != null) ? usuario.getEmail() : null;
+        if (!StringUtils.hasText(email)) {
+            log.warn("Cliente {} sin email. No se envía promoción.", clienteId);
+            return false;
+        }
+
+        TipoMensaje tipo = (dto.getTipo() != null) ? dto.getTipo() : TipoMensaje.PROMOCION;
+        String asunto = armarAsuntoPromocion(dto);
+        String html   = buildPromocionHtml(cliente, dto);
+
+        registrarMensaje(nombreCompleto(cliente), email, asunto, html, tipo, usuario, null);
+        boolean enviado = enviarCorreoHtml(email, asunto, html, null);
+
+        log.info("Promoción {} para cliente {} -> enviado={}", dto.getCodigoDescuento(), clienteId, enviado);
+        return enviado;
+    }
+    //-----------
 
     @Transactional
     public ResultadoEnvio enviarMensajeFacturaAlquiler(MensajeDTO dto, MultipartFile adjuntoPdf) {

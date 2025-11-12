@@ -3,11 +3,13 @@ package com.gpadilla.mycar.facade;
 import com.gpadilla.mycar.dtos.contacto.ContactoCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.contacto.ContactoCorreoDetailDto;
 import com.gpadilla.mycar.dtos.contacto.ContactoTelefonicoDetailDto;
+import com.gpadilla.mycar.dtos.contacto.ContactosDetalleDto;
 import com.gpadilla.mycar.entity.Contacto;
 import com.gpadilla.mycar.entity.ContactoCorreoElectronico;
 import com.gpadilla.mycar.entity.ContactoTelefonico;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.repository.ContactoRepository;
+import com.gpadilla.mycar.repository.UsuarioRepository;
 import com.gpadilla.mycar.service.ContactoCorreoService;
 import com.gpadilla.mycar.service.ContactoTelefonicoService;
 import lombok.Getter;
@@ -22,62 +24,86 @@ public class ContactoFacade {
     private final ContactoTelefonicoService telefonoService;
     private final ContactoCorreoService correoService;
     private final ContactoRepository contactoRepository;
+    private final UsuarioRepository usuarioRepository;
 
     /* =================== Consultas =================== */
 
     @Transactional(readOnly = true)
     public ContactosDetalleDto contactosDeUsuario(Long usuarioId) {
-        return ContactosDetalleDto.of(
-                telefonoService.findActivoPorUsuario(usuarioId).orElse(null),
-                correoService.findActivoPorUsuario(usuarioId).orElse(null)
-        );
+
+        if (!usuarioRepository.existsById(usuarioId)) {
+            throw new BusinessException("Usuario no encontrado");
+        }
+        var telefono = telefonoService.findActivoPorUsuario(usuarioId).orElse(null);
+        var correo   = correoService.findActivoPorUsuario(usuarioId).orElse(null);
+        ContactosDetalleDto dto = new ContactosDetalleDto();
+        dto.setTelefono(telefono);
+        dto.setCorreo(correo);
+        return dto;
     }
+
 
     @Transactional(readOnly = true)
     public ContactosDetalleDto contactosDeEmpresa() {
-        return ContactosDetalleDto.of(
-                telefonoService.findActivoPorEmpresa().orElse(null),
-                correoService.findActivoPorEmpresa().orElse(null)
-        );
+        System.out.println("trayendo telefono");
+        var telefono = telefonoService.findActivoPorEmpresa().orElse(null);
+        System.out.println("trayendo correo");
+        var correo   = correoService.findActivoPorEmpresa().orElse(null);
+
+        ContactosDetalleDto dto = new ContactosDetalleDto();
+        dto.setTelefono(telefono);
+        dto.setCorreo(correo);
+        return dto;
     }
 
+
+
     @Transactional(readOnly = true)
-    public ContactoDetalleWrapper obtenerDetalle(Long contactoId) {
+    public Object obtenerDetalle(Long contactoId) {
         Contacto contacto = contactoRepository.findByIdAndEliminadoFalse(contactoId)
                 .orElseThrow(() -> new BusinessException("Contacto no encontrado"));
+
         if (contacto instanceof ContactoTelefonico) {
-            return ContactoDetalleWrapper.telefono(telefonoService.findDto(contactoId));
+            return telefonoService.findDto(contactoId);
         }
         if (contacto instanceof ContactoCorreoElectronico) {
-            return ContactoDetalleWrapper.correo(correoService.findDto(contactoId));
+            return correoService.findDto(contactoId);
         }
+
         throw new BusinessException("Tipo de contacto no soportado");
     }
+
 
     /* =================== Actualizaciones idempotentes =================== */
 
     @Transactional
     public ContactosDetalleDto actualizarContactosDeUsuario(Long usuarioId, ContactoCreateOrUpdateDto dto) {
         validarContenido(dto);
+
         ContactoTelefonicoDetailDto telefono = tieneTelefono(dto)
                 ? telefonoService.upsertParaUsuario(usuarioId, dto)
                 : telefonoService.findActivoPorUsuario(usuarioId).orElse(null);
+
         ContactoCorreoDetailDto correo = tieneEmail(dto)
                 ? correoService.upsertParaUsuario(usuarioId, dto)
                 : correoService.findActivoPorUsuario(usuarioId).orElse(null);
-        return ContactosDetalleDto.of(telefono, correo);
+
+        return new ContactosDetalleDto(telefono, correo);
     }
 
     @Transactional
     public ContactosDetalleDto actualizarContactosDeEmpresa(ContactoCreateOrUpdateDto dto) {
         validarContenido(dto);
+
         ContactoTelefonicoDetailDto telefono = tieneTelefono(dto)
                 ? telefonoService.upsertParaEmpresa(dto)
                 : telefonoService.findActivoPorEmpresa().orElse(null);
+
         ContactoCorreoDetailDto correo = tieneEmail(dto)
                 ? correoService.upsertParaEmpresa(dto)
                 : correoService.findActivoPorEmpresa().orElse(null);
-        return ContactosDetalleDto.of(telefono, correo);
+
+        return new ContactosDetalleDto(telefono, correo);
     }
 
     /* =================== Creaciones explícitas =================== */
@@ -98,30 +124,13 @@ public class ContactoFacade {
         return telefonoService.crearParaUsuario(usuarioId, dto);
     }
 
-    @Transactional
-    public ContactoCorreoDetailDto crearCorreoParaEmpresa(ContactoCreateOrUpdateDto dto) {
-        if (!tieneEmail(dto)) {
-            throw new BusinessException("El email es obligatorio");
-        }
-        return correoService.crearParaEmpresa(dto);
-    }
-
-    @Transactional
-    public ContactoTelefonicoDetailDto crearTelefonoParaEmpresa(ContactoCreateOrUpdateDto dto) {
-        if (!tieneTelefono(dto)) {
-            throw new BusinessException("El teléfono es obligatorio");
-        }
-        return telefonoService.crearParaEmpresa(dto);
-    }
-
     /* =================== Eliminación (soft delete) =================== */
 
     @Transactional
     public void eliminar(Long contactoId) {
-        ContactoDetalleWrapper detalle = obtenerDetalle(contactoId);
-        if (detalle.esTelefonico()) {
+        try {
             telefonoService.delete(contactoId);
-        } else {
+        } catch (BusinessException e) {
             correoService.delete(contactoId);
         }
     }
@@ -142,68 +151,27 @@ public class ContactoFacade {
         return dto.getTelefono() != null && !dto.getTelefono().isBlank();
     }
 
-    /* =================== DTOs de respuesta =================== */
-
-    @Getter
-    public static class ContactosDetalleDto {
-        private final ContactoTelefonicoDetailDto telefono;
-        private final ContactoCorreoDetailDto correo;
-
-        private ContactosDetalleDto(ContactoTelefonicoDetailDto telefono, ContactoCorreoDetailDto correo) {
-            this.telefono = telefono;
-            this.correo = correo;
-        }
-
-        public static ContactosDetalleDto of(ContactoTelefonicoDetailDto telefono, ContactoCorreoDetailDto correo) {
-            return new ContactosDetalleDto(telefono, correo);
-        }
+    @Transactional(readOnly = true)
+    public ContactoTelefonicoDetailDto getTelefonoDto(Long id) {
+        return telefonoService.findDto(id);
     }
 
-    @Getter
-    public static class ContactoDetalleWrapper {
-        private final ContactoTelefonicoDetailDto telefonico;
-        private final ContactoCorreoDetailDto correo;
-
-        private ContactoDetalleWrapper(ContactoTelefonicoDetailDto telefonico, ContactoCorreoDetailDto correo) {
-            this.telefonico = telefonico;
-            this.correo = correo;
-        }
-
-        public static ContactoDetalleWrapper telefono(ContactoTelefonicoDetailDto dto) {
-            return new ContactoDetalleWrapper(dto, null);
-        }
-
-        public static ContactoDetalleWrapper correo(ContactoCorreoDetailDto dto) {
-            return new ContactoDetalleWrapper(null, dto);
-        }
-
-        public Object payload() {
-            return telefonico != null ? telefonico : correo;
-        }
-
-        public boolean esTelefonico() {
-            return telefonico != null;
-        }
-
-        public Long usuarioId() {
-            return telefonico != null
-                    ? telefonico.getUsuarioId()
-                    : correo != null ? correo.getUsuarioId() : null;
-        }
-
-        public Long empresaId() {
-            return telefonico != null
-                    ? telefonico.getEmpresaId()
-                    : correo != null ? correo.getEmpresaId() : null;
-        }
-
-        public boolean perteneceAUsuario(Long usuarioId) {
-            Long ownerId = usuarioId();
-            return ownerId != null && ownerId.equals(usuarioId);
-        }
-
-        public boolean esDeEmpresa() {
-            return empresaId() != null;
-        }
+    @Transactional(readOnly = true)
+    public ContactoCorreoDetailDto getCorreoDto(Long id) {
+        return correoService.findDto(id);
     }
+
+    @Transactional(readOnly = true)
+    public Object getContactoDto(Long id) {
+        try { return getTelefonoDto(id); }
+        catch (BusinessException e) { return getCorreoDto(id); }
+    }
+
+    @Transactional
+    public void eliminarContacto(Long id) {
+        try { telefonoService.delete(id); }
+        catch (BusinessException e) { correoService.delete(id); }
+    }
+
+
 }

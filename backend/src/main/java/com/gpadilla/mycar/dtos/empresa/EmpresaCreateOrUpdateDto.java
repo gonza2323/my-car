@@ -3,6 +3,7 @@ package com.gpadilla.mycar.dtos.empresa;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,14 +14,18 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmpresaCreateOrUpdateDto{
+public class EmpresaCreateOrUpdateDto {
 
-    @NotBlank
-    @Size(max = 20)
+    @NotBlank @Size(max = 120)
+    private String nombre;
+
+    // El service resolverá la Dirección con este id
+    @NotNull
+    private Long direccionId;
+
+    @NotBlank @Size(max = 20)
     private String telefonoPrincipal;
 
-    @NotBlank
-    @Email
-    @Size(max = 100)
+    @NotBlank @Email @Size(max = 100)
     private String emailPrincipal;
 }
