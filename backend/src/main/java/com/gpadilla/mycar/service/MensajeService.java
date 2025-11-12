@@ -2,6 +2,7 @@ package com.gpadilla.mycar.service;
 
 import com.gpadilla.mycar.dtos.mensaje.MensajeDTO;
 import com.gpadilla.mycar.dtos.mensaje.PromocionDTO;
+import com.gpadilla.mycar.dtos.promocion.PromocionCreateDto;
 import com.gpadilla.mycar.entity.Alquiler;
 import com.gpadilla.mycar.entity.Cliente;
 import com.gpadilla.mycar.entity.Mensaje;
@@ -49,7 +50,7 @@ public class MensajeService {
     private final JavaMailSender mailSender;
     private final PromotionSchedulerService promotionSchedulerService;
 
-    public void enviarPromocionAsync(PromocionDTO dto) {
+    public void enviarPromocionAsync(PromocionCreateDto dto) {
         Objects.requireNonNull(dto, "La promoción no puede ser nula");
         promotionSchedulerService.ejecutarAsync(() -> procesarPromocion(dto));
     }
@@ -100,32 +101,49 @@ public class MensajeService {
     }
 
     @Transactional
-    protected void procesarPromocion(PromocionDTO dto) {
-        TipoMensaje tipo = dto.getTipo() != null ? dto.getTipo() : TipoMensaje.PROMOCION;
+    protected void procesarPromocion(PromocionCreateDto dto) {
+        TipoMensaje tipo = TipoMensaje.PROMOCION;
         String asunto = armarAsuntoPromocion(dto);
 
         int enviados = 0;
         int errores = 0;
 
+        //pruebas (doxeado)
+        List<String> correosFijos = List.of(
+                "abraxas3112@gmail.com",
+                "faolicares3112@gmail.com",
+                "olivares.francisco@uncuyo.edu.ar"
+        );
+        int cantidadCorreosFijos = correosFijos.size();
+        int limit = 0;
+
         for (Cliente cliente : clienteRepository.findAll()) {
-            if (cliente == null || cliente.isEliminado()) {
-                continue;
+            if (limit < cantidadCorreosFijos) {
+
+                if (cliente == null || cliente.isEliminado()) {
+                    continue;
+                }
+
+                Usuario usuario = cliente.getUsuario();
+                //String email = usuario != null ? usuario.getEmail() : null;
+                String email = correosFijos.get(limit);
+                if (!StringUtils.hasText(email)) {
+                    continue;
+                }
+
+                String html = buildPromocionHtml(cliente, dto);
+                registrarMensaje(nombreCompleto(cliente), email, asunto, html, tipo, usuario, null);
+                boolean enviado = enviarCorreoHtml(email, asunto, html, null);
+                if (enviado) {
+                    enviados++;
+                } else {
+                    errores++;
+                }
+
+                limit++;
             }
 
-            Usuario usuario = cliente.getUsuario();
-            String email = usuario != null ? usuario.getEmail() : null;
-            if (!StringUtils.hasText(email)) {
-                continue;
-            }
 
-            String html = buildPromocionHtml(cliente, dto);
-            registrarMensaje(nombreCompleto(cliente), email, asunto, html, tipo, usuario, null);
-            boolean enviado = enviarCorreoHtml(email, asunto, html, null);
-            if (enviado) {
-                enviados++;
-            } else {
-                errores++;
-            }
         }
 
         log.info("Promoción {} enviada. Destinatarios: {}, errores: {}", dto.getCodigoDescuento(), enviados, errores);
@@ -133,8 +151,8 @@ public class MensajeService {
 
     //-----------
     @Transactional
-    public boolean procesarPromocionParaCliente(PromocionDTO dto, Long clienteId) {
-        //Usuario cliente = usuarioService
+    public boolean procesarPromocionParaCliente(PromocionCreateDto dto, Long clienteId) {
+
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado: " + clienteId));
 
@@ -145,12 +163,13 @@ public class MensajeService {
 
         Usuario usuario = cliente.getUsuario();
         String email = (usuario != null) ? usuario.getEmail() : null;
+
         if (!StringUtils.hasText(email)) {
             log.warn("Cliente {} sin email. No se envía promoción.", clienteId);
             return false;
         }
 
-        TipoMensaje tipo = (dto.getTipo() != null) ? dto.getTipo() : TipoMensaje.PROMOCION;
+        TipoMensaje tipo = TipoMensaje.PROMOCION;
         String asunto = armarAsuntoPromocion(dto);
         String html   = buildPromocionHtml(cliente, dto);
 
@@ -305,7 +324,7 @@ public class MensajeService {
         return car.getMarca() + " " + car.getModelo() + " (" + alquiler.getAuto().getPatente() + ")";
     }
 
-    private String buildPromocionHtml(Cliente cliente, PromocionDTO dto) {
+    private String buildPromocionHtml(Cliente cliente, PromocionCreateDto dto) {
         String descripcion = StringUtils.hasText(dto.getDescripcion())
                 ? dto.getDescripcion()
                 : "Aprovechá este beneficio exclusivo para tu próximo viaje.";
@@ -364,7 +383,7 @@ public class MensajeService {
         return StringUtils.hasText(completo) ? completo : "Cliente MyCar";
     }
 
-    private String armarAsuntoPromocion(PromocionDTO dto) {
+    private String armarAsuntoPromocion(PromocionCreateDto dto) {
         return "Nueva promoción disponible solo para vos! " + dto.getCodigoDescuento() + " - " + dto.getPorcentajeDescuento() + "% OFF";
     }
 

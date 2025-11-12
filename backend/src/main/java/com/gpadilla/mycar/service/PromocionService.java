@@ -6,6 +6,7 @@ import com.gpadilla.mycar.entity.Promocion;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.PromocionMapper;
 import com.gpadilla.mycar.repository.PromocionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +27,19 @@ public class PromocionService extends BaseService<
         super("Promoción", repository, mapper);
     }
 
+    @Autowired
+    private MensajeService mensajesService;
+
     @Override
     protected void preCreate(PromocionCreateDto dto, Promocion entity) {
         if (repository.existsByCodigoDescuentoAndEliminadoFalse(dto.getCodigoDescuento()))
             throw new BusinessException("Ya existe una promoción con ese código");
+    }
+
+    @Override
+    protected void postCreate(PromocionCreateDto dto, Promocion entity) {
+        //crear aca la logica para el envio de los mails
+        mensajesService.enviarPromocionAsync(dto);
     }
 
     @Transactional(readOnly = true)
@@ -47,4 +57,6 @@ public class PromocionService extends BaseService<
 
         return promocion;
     }
+
+
 }
