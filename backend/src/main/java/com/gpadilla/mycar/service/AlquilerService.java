@@ -63,4 +63,8 @@ public class AlquilerService {
     public Page<AlquilerDetalleDto> listarAlquileresDeUsuario(Pageable pageable, Long userId) {
         return alquilerRepository.listarAlquileresDeUsuario(pageable, userId);
     }
+
+    public Page<AlquilerDetalleDto> listarAlquileres(Pageable pageable) {
+        return alquilerRepository.listarAlquileres(pageable);
+    }
 }

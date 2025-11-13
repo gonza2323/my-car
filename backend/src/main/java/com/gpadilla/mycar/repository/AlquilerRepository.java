@@ -54,4 +54,41 @@ SELECT new com.gpadilla.mycar.dtos.alquiler.AlquilerDetalleDto(
        AND al.eliminado = false
 """)
     Page<AlquilerDetalleDto> listarAlquileresDeUsuario(Pageable pageable, Long userId);
+
+@Query("""
+SELECT new com.gpadilla.mycar.dtos.alquiler.AlquilerDetalleDto(
+         al.id, al.estado, al.fechaDesde, al.fechaHasta, al.costoPorDia, al.monto,
+         p.porcentajeDescuento, al.monto * p.porcentajeDescuento, f.totalPagado,
+         new com.gpadilla.mycar.dtos.auto.AutoDetailDto(
+            v.id,
+            v.patente,
+            v.estadoAuto,
+            m.id,
+            m.marca,
+            m.modelo,
+            m.cantidadPuertas,
+            m.cantidadAsientos,
+            m.anio,
+            m.cantTotalAutos
+         ),
+         new com.gpadilla.mycar.dtos.cliente.ClienteSummaryDto(
+            c.id,
+            c.nombre,
+            c.apellido,
+            c.tipoDocumento,
+            c.numeroDocumento,
+            c.nacionalidad.nombre,
+            c.usuario.email
+         )
+     )
+     FROM Alquiler al
+     LEFT JOIN al.cliente c
+     LEFT JOIN al.auto v
+     LEFT JOIN v.caracteristicasAuto m
+     LEFT JOIN DetalleFactura df ON df.alquiler = al
+     LEFT JOIN df.factura f
+     LEFT JOIN df.promocion p
+     WHERE al.eliminado = false
+""")
+    Page<AlquilerDetalleDto> listarAlquileres(Pageable pageable);
 }

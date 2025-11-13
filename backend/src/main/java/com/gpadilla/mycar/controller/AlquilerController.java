@@ -27,8 +27,8 @@ public class AlquilerController {
 
     @GetMapping("/alquileres")
     @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
-    public ResponseEntity<Page<AlquilerSummaryDto>> listarAlquileres(Pageable pageable) {
-        Page<AlquilerSummaryDto> alquileres = alquilerService.findDtos(pageable);
+    public ResponseEntity<Page<AlquilerDetalleDto>> listarAlquileres(Pageable pageable) {
+        Page<AlquilerDetalleDto> alquileres = alquilerService.listarAlquileres(pageable);
         return ResponseEntity.ok(alquileres);
     }
 

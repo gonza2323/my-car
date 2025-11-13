@@ -146,12 +146,14 @@ export default function ModeloRentForm() {
             label="Desde"
             valueFormat="YYYY-MM-DD"
             readOnly
+            maxDate={fechaHasta ?? undefined}
             {...form.getInputProps('fechaDesde')}
           />
           <DateInput
             label="Hasta"
             valueFormat="YYYY-MM-DD"
             readOnly
+            minDate={fechaDesde ?? undefined}
             {...form.getInputProps('fechaHasta')}
           />
         </Group>

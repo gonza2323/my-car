@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Button, Group, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
@@ -14,6 +14,8 @@ import { ReporteRecaudacionButton } from "@/components/ReporteRecaudacionButton"
 import { ReporteVehiculosButton } from "@/components/ReporteVehiculosButton";
 import dayjs from "dayjs";
 import minMax from "dayjs/plugin/minMax";
+import { DateInput, DatePickerInput } from "@mantine/dates";
+import { app } from "@/config";
 dayjs.extend(minMax);
 
 
@@ -30,12 +32,20 @@ export function AlquileresTable() {
     }
   })
 
+  const [fechaDesde, setFechaDesde] = useState(new Date());
+  const [fechaHasta, setFechaHasta] = useState(dayjs().add(4, "day").toDate());
+
+  const fechaDesdeFormatted = dayjs(fechaDesde).format("YYYY-MM-DD");
+  const fechaHastaFormatted = dayjs(fechaHasta).format("YYYY-MM-DD");
+
   const { data, isLoading } = useGetAlquileres({
     query: {
       page,
       size,
       // status: tabs.value as Alquiler['status'],
-      sort: sort.query
+      sort: sort.query,
+      fechaDesde: fechaDesde,
+      fechaHasta: fechaHasta
     }
   })
 
@@ -69,11 +79,49 @@ export function AlquileresTable() {
         )
       },
       {
-        accessor: "monto",
-        title: "Subtotal",
+        accessor: "subtotal",
+        title: "Total",
         sortable: true,
         render: alquiler => (
-          <Text truncate="end">{formatCurrency(alquiler.monto)}</Text>
+          <Text truncate="end">{formatCurrency(alquiler.subtotal)}</Text>
+        )
+      },
+      {
+        accessor: "cliente.apellido",
+        title: "Total",
+        sortable: true,
+        render: alquiler => (
+          <Text truncate="end">{alquiler.cliente.nombre + ' ' + alquiler.cliente.apellido}</Text>
+        )
+      },
+      {
+        accessor: "vehiculo.marca",
+        title: "Total",
+        sortable: true,
+        render: alquiler => (
+          <Text truncate="end">{alquiler.vehiculo.marca + ' ' + alquiler.vehiculo.modelo}</Text>
+        )
+      },
+      {
+        accessor: "cantidadDescuento",
+        title: "Descuento",
+        sortable: true,
+        render: alquiler => (
+          alquiler.cantidadDescuento ? (
+            <Text truncate="end">
+              {formatCurrency(alquiler.cantidadDescuento)} ({alquiler.porcentajeDescuento * 100}%)
+            </Text>
+          ) : (
+            <Text>Sin Descuento</Text>
+          )
+        )
+      },
+      {
+        accessor: "total",
+        title: "Total",
+        sortable: true,
+        render: alquiler => (
+          <Text truncate="end">{formatCurrency(alquiler.total)}</Text>
         )
       },
       {
@@ -122,52 +170,26 @@ export function AlquileresTable() {
       }
     })
   }
-  const handleDownloadPdf = async () => {
+
+  const handleDownloadReport = async (formato) => {
     try {
-      const response = await client.get("http://localhost:8080/api/v1/auth/alquileres", {
+      const response = await client.get(`${app.apiBaseUrl}/reportes/recaudacion/${formato}?fechaInicio=${fechaDesdeFormatted}&fechaFin=${fechaHastaFormatted}`, {
         responseType: "blob",
-        headers: { Accept: "application/pdf" },
+        headers: { Accept: `application/${formato}` },
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "alquileres_autos.pdf");
+      link.setAttribute("download", `alquileres_autos.${formato}`);
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("Error al generar PDF:", error);
+      console.error(`Error al generar ${formato}:`, error);
       alert("No se pudo generar el reporte de alquileres");
     }
-
-  }
-  //Calcular fecha mínima y máxima de los alquileres actuales
-  const alquileres = Array.isArray(data?.data) ? data.data : [];
-
-  let fechaMin = null;
-  let fechaMax = null;
-
-  try {
-    if (alquileres.length > 0) {
-      const fechasValidas = alquileres
-        .filter(a => a.fechaDesde && a.fechaHasta)
-        .map(a => ({
-          desde: dayjs(a.fechaDesde),
-          hasta: dayjs(a.fechaHasta),
-        }));
-
-      if (fechasValidas.length > 0) {
-        const desdeArray = fechasValidas.map(f => f.desde.toDate());
-        const hastaArray = fechasValidas.map(f => f.hasta.toDate());
-
-        fechaMin = dayjs(Math.min(...desdeArray)).format("YYYY-MM-DD");
-        fechaMax = dayjs(Math.max(...hastaArray)).format("YYYY-MM-DD");
-      }
-    }
-  } catch (e) {
-    console.error("Error calculando fechas:", e);
   }
 
   return (
@@ -177,16 +199,32 @@ export function AlquileresTable() {
         description="Lista de alquileres"
         actions={
           <Group>
-            <ReporteRecaudacionButton fechaMin={fechaMin ?? ""} fechaMax={fechaMax ?? ""} />
-              <ReporteVehiculosButton fechaMin={fechaMin ?? ""} fechaMax={fechaMax ?? ""} />
-          <AddButton
-            variant="default"
-            size="xs"
-            component={NavLink}
-            to={paths.dashboard.management.alquileres.add.root}
-          >
-            Agregar alquiler
-          </AddButton>
+            <Group mb="xl">
+              <DateInput
+                label="Desde"
+                valueFormat="YYYY-MM-DD"
+                value={fechaDesde}
+                onChange={setFechaDesde}
+                maxDate={fechaHasta ?? undefined}
+              />
+              <DateInput
+                label="Hasta"
+                valueFormat="YYYY-MM-DD"
+                value={fechaHasta}
+                onChange={setFechaHasta}
+                minDate={fechaDesde ?? undefined}
+              />
+            </Group>
+            <Button onClick={() => handleDownloadReport('pdf')}>PDF</Button>
+            <Button onClick={() => handleDownloadReport('xlsx')}>Excel</Button>
+            <AddButton
+              variant="default"
+              size="xs"
+              component={NavLink}
+              to={paths.dashboard.management.alquileres.add.root}
+            >
+              Agregar alquiler
+            </AddButton>
           </Group>
         }
       />

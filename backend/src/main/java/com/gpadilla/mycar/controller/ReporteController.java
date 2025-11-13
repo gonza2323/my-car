@@ -32,7 +32,7 @@ public class ReporteController {
     private final ExcelGenerator excelGenerator;
 
     @GetMapping("/vehiculos")
-    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
+    @PreAuthorize("hasAnyRole('JEFE')")
     public ResponseEntity<byte[]> generarReporteVehiculos(
             @RequestParam LocalDate fechaInicio,
             @RequestParam LocalDate fechaFin
@@ -46,8 +46,8 @@ public class ReporteController {
     }
 
 
-    @GetMapping("/recaudacion")
-    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')") //solo jefe, ahora asi para probar
+    @GetMapping(value = "/recaudacion/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    @PreAuthorize("hasAnyRole('JEFE')") //solo jefe, ahora asi para probar
     public ResponseEntity<byte[]> generarReporte(
             @RequestParam LocalDate fechaInicio,
             @RequestParam LocalDate fechaFin
@@ -60,8 +60,8 @@ public class ReporteController {
                 .body(pdfBytes);
     }
 
-    @GetMapping("/recaudacion/excel")
-    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
+    @GetMapping("/recaudacion/xlsx")
+    @PreAuthorize("hasAnyRole('JEFE')")
     public ResponseEntity<byte[]> generarReporteRecaudacionExcel(
             @RequestParam LocalDate fechaInicio,
             @RequestParam LocalDate fechaFin
@@ -76,9 +76,9 @@ public class ReporteController {
                 .body(excel);
     }
 
-    @GetMapping("/modelos")
+    @GetMapping("/modelos/pdf")
     //@PreAuthorize("hasRole('JEFE')")
-    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
+    @PreAuthorize("hasAnyRole('JEFE')")
     public ResponseEntity<byte[]> generarReporteModelos() {
         var modelos = caracteristicasAutoRepository.findAll();
         System.out.println("Cantidad de modelos encontrados: " + modelos.size());
@@ -108,8 +108,8 @@ public class ReporteController {
         }
     }
 
-    @GetMapping("/modelos/excel")
-    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
+    @GetMapping("/modelos/xlsx")
+    @PreAuthorize("hasAnyRole('JEFE')")
     public ResponseEntity<byte[]> generarReporteModelosExcel() {
         var modelos = caracteristicasAutoRepository.findAll();
 
