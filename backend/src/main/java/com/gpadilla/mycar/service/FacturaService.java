@@ -56,15 +56,12 @@ public class FacturaService extends BaseService<
 
     @Transactional(readOnly = true)
     public byte[] generarFacturaPdfEnMemoria(Long facturaId) {
-        // 1️⃣ Buscar la factura en BD
-        //Factura factura = repository.findByIdAndEliminadoFalse(facturaId)
+        // Buscar la factura en BD
         Factura factura = repository.findFacturaCompletaPorId(facturaId)
                 .orElseThrow(() -> new BusinessException("Factura no encontrada"));
-
-        // 2️⃣ Convertir a DTO
+        // Convertir a DTO
         FacturaDto dto = mapper.toDto(factura);
-
-        // 3️⃣ Generar PDF en memoria
+        // Generar PDF en memoria
         return pdfGenerator.generarFacturaPdf(dto);
     }
 

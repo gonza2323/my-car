@@ -120,9 +120,10 @@ public class PdfGenerator {
                 AutoSummaryDto auto = alquiler.getAuto();
                 PromocionViewDto promo = det.getPromocion();
 
-                System.out.println(auto.getMarca() + " " + auto.getModelo() + " (" + auto.getPatente());
+                //System.out.println(auto.getMarca() + " " + auto.getModelo() + " (" + auto.getPatente());
 
-                String descripcion = auto.getMarca() + " " + auto.getModelo() + " (" + auto.getPatente() + ")";
+                String descripcion = auto.getPatente();
+                //String descripcion = auto.getMarca() + " " + auto.getModelo() + " (" + auto.getPatente() + ")";
                 String periodo = alquiler.getFechaDesde().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) +
                         " a " + alquiler.getFechaHasta().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                 double subtotal = det.getSubtotal() != null ? det.getSubtotal() : 0.0;

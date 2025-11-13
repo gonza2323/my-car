@@ -28,7 +28,7 @@ public class ReporteService {
         List<ReporteVehiculosDto> vehiculosRaw =
                 reporteRepository.findVehiculosAlquiladosPorFechas(fechaInicio, fechaFin);
 
-        // ✅ Calcular los días alquilados en Java (portátil y sin errores)
+        // Calcular los días alquilados en Java
         List<ReporteVehiculosDto> vehiculos = vehiculosRaw.stream()
                 .peek(v -> {
                     long dias = ChronoUnit.DAYS.between(v.getFechaDesde(), v.getFechaHasta()) + 1;
