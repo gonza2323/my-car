@@ -130,7 +130,7 @@ export function ModelosTable() {
 
   const handleDownloadReport = async (formato) => {
     try {
-      const response = await client.get(`${app.apiBaseUrl}/reportes/vehiculos/${formato}?fechaInicio=${fechaDesdeFormatted}&fechaFin=${fechaHastaFormatted}`, {
+      const response = await client.get(`${app.apiBaseUrl}/reportes/modelos/${formato}?fechaInicio=${fechaDesdeFormatted}&fechaFin=${fechaHastaFormatted}`, {
         responseType: "blob",
         headers: { Accept: `application/${formato}` },
       });
