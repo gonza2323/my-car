@@ -3,6 +3,8 @@ import { PageHeader } from "@/components/page-header"
 import { paths } from "@/routes"
 import ModeloDetalle from "./modelo-detalle"
 import { useParams } from "react-router-dom"
+import { ModeloCostosTable } from "./costos-table"
+import { Stack } from "@mantine/core"
 
 const breadcrumbs = [
   { label: "Dashboard", href: paths.dashboard.root },
@@ -17,7 +19,10 @@ export default function ModeloDetailPage() {
   return (
     <Page title="Detalle Modelo">
       <PageHeader title="Detalle Modelo" breadcrumbs={breadcrumbs} />
-      <ModeloDetalle modeloId={modeloId} />
+      <Stack>
+        <ModeloDetalle modeloId={modeloId} />
+        <ModeloCostosTable modeloId={modeloId} />
+      </Stack>
     </Page>
   )
 }

@@ -1,15 +1,17 @@
 import { useEffect, useMemo } from "react"
-import { Text } from "@mantine/core"
+import { Group, Text } from "@mantine/core"
 import { usePagination } from "@/api/helpers"
 import { AddButton } from "@/components/add-button"
 import { DataTable } from "@/components/data-table"
-import { useGetModelos, useDeleteModelo, useAuth } from "@/hooks"
+import { useGetCostos, useDeleteCosto, useAuth } from "@/hooks"
 import { paths } from "@/routes"
 import { Link, NavLink, useNavigate } from "react-router-dom"
 import { modals } from "@mantine/modals"
 import { notifications } from "@mantine/notifications"
+import { useDisclosure } from "@mantine/hooks"
+import { openCreateCostoModal } from "./add-costo-modal"
 
-export function ModelosTable() {
+export function ModeloCostosTable({ modeloId }) {
   const { roles } = useAuth();
   const isJefe = roles.includes('JEFE');
   const navigate = useNavigate()
@@ -18,16 +20,17 @@ export function ModelosTable() {
   const { sort } = DataTable.useDataTable({
     sortConfig: {
       direction: "asc",
-      column: "marca"
+      column: "fechaDesde"
     }
   })
 
-  const { data, isLoading } = useGetModelos({
+  const { data, isLoading } = useGetCostos({
     query: {
       page,
       size,
-      // status: tabs.value as Modelo['status'],
-      sort: sort.query
+      // status: tabs.value as Costo['status'],
+      sort: sort.query,
+      modeloId: modeloId
     }
   })
 
@@ -40,32 +43,32 @@ export function ModelosTable() {
     }
   }, [data, page, setPage])
 
-  const deleteMutation = useDeleteModelo()
+  const deleteMutation = useDeleteCosto()
 
   const columns = useMemo(
     () => [
       {
-        accessor: "marca",
-        title: "Marca",
+        accessor: "fechaDesde",
+        title: "Desde",
         sortable: true,
-        render: modelo => (
-          <Text truncate="end">{modelo.marca}</Text>
+        render: costo => (
+          <Text truncate="end">{costo.fechaDesde}</Text>
         )
       },
       {
-        accessor: "modelo",
-        title: "Modelo",
+        accessor: "fechaHasta",
+        title: "Hasta",
         sortable: true,
-        render: modelo => (
-          <Text truncate="end">{modelo.modelo}</Text>
+        render: costo => (
+          <Text truncate="end">{costo.fechaHasta}</Text>
         )
       },
       {
-        accessor: "anio",
-        title: "Año",
+        accessor: "costoTotal",
+        title: "Precio",
         sortable: true,
-        render: modelo => (
-          <Text truncate="end">{modelo.anio}</Text>
+        render: costo => (
+          <Text truncate="end">{costo.costoTotal}</Text>
         )
       },
       {
@@ -73,11 +76,11 @@ export function ModelosTable() {
         title: "Acciones",
         textAlign: "right",
         width: 100,
-        render: modelo => (
+        render: costo => (
           <DataTable.Actions
-            onView={() => navigate(paths.dashboard.management.modelos.view(modelo.id))}
-            onEdit={() => navigate(paths.dashboard.management.modelos.edit(modelo.id))}
-            onDelete={() => handleDelete(modelo)}
+            onView={() => navigate(paths.dashboard.management.costos.view(costo.id))}
+            onEdit={() => navigate(paths.dashboard.management.costos.edit(costo.id))}
+            onDelete={() => handleDelete(costo)}
           />
         ),
       }
@@ -85,28 +88,28 @@ export function ModelosTable() {
     []
   )
 
-  const handleDelete = modelo => {
+  const handleDelete = costo => {
     modals.openConfirmModal({
       title: "Confirmar borrado",
-      children: <Text>¿Está seguro de que desea borrar el modelo?</Text>,
+      children: <Text>¿Está seguro de que desea borrar el costo?</Text>,
       labels: { confirm: "Delete", cancel: "Cancel" },
       confirmProps: { color: "red" },
       onConfirm: () => {
         deleteMutation.mutate({
-          model: modelo,
-          route: { id: modelo.id }
+          model: costo,
+          route: { id: costo.id }
         }, {
           onSuccess: () => {
             notifications.show({
               title: 'Borrado',
-              message: 'El modelo fue borrado con éxito',
+              message: 'El costo fue borrado con éxito',
               color: 'green',
             });
           },
           onFailure: (error) => {
             notifications.show({
               title: 'Error',
-              message: error.message || 'No se pudo borrar el modelo',
+              message: error.message || 'No se pudo borrar este precio',
               color: 'red',
             });
           }
@@ -118,16 +121,15 @@ export function ModelosTable() {
   return (
     <DataTable.Container>
       <DataTable.Title
-        title="Modelos"
-        description="Lista de modelos"
+        title="Costos"
+        description="Lista de costos"
         actions={
           <AddButton
             variant="default"
             size="xs"
-            component={NavLink}
-            to={paths.dashboard.management.modelos.add}
+            onClick={() => openCreateCostoModal(modeloId)}
           >
-            Agregar modelo
+            Agregar precio
           </AddButton>
         }
       />
@@ -137,9 +139,9 @@ export function ModelosTable() {
       <DataTable.Content>
         <DataTable.Table
           minHeight={240}
-          noRecordsText={DataTable.noRecordsText("modelo")}
-          recordsPerPageLabel={DataTable.recordsPerPageLabel("modelos")}
-          paginationText={DataTable.paginationText("modelos")}
+          noRecordsText={DataTable.noRecordsText("costo")}
+          recordsPerPageLabel={DataTable.recordsPerPageLabel("costos")}
+          paginationText={DataTable.paginationText("costos")}
           page={page + 1}
           records={data?.data ?? []}
           fetching={isLoading}

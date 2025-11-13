@@ -6,3 +6,4 @@ export * from './modelo';
 export * from './cliente';
 export * from './vehiculo';
 export * from './promocion';
+export * from './costo';

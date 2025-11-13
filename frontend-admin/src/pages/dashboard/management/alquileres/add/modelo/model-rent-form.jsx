@@ -18,6 +18,7 @@ import { useState } from 'react';
 import { PiDoor, PiSeatDuotone } from 'react-icons/pi';
 import { formatCurrency } from '@/utilities/number';
 import { RegistrarAlquilerDto } from '@/api/dtos/alquiler';
+import { app } from '@/config';
 
 export default function ModeloRentForm() {
   const navigate = useNavigate();
@@ -135,6 +136,8 @@ export default function ModeloRentForm() {
     );
   });
 
+  console.log(modelo)
+
   const totalPrice = modelo?.precioTotal ?? 0;
   const discountedPrice = discount ? totalPrice * (1 - discount) : totalPrice;
 
@@ -210,7 +213,7 @@ export default function ModeloRentForm() {
       <Card shadow="sm" radius="md" withBorder>
         <CardSection>
           <Image
-            src={`https://example.com/images/cars/${modelId}.jpg`}
+            src={`${app.apiBaseUrl}/vehiculos/${modelId}/imagen`}
             height={160}
             fit="cover"
           />

@@ -51,6 +51,7 @@ export function ModelosList() {
 
   const cars = data?.data ?? [];
   const meta = data?.meta ?? {};
+  console.log(cars)
 
   return (
     <Container size="lg" py="xl">
@@ -83,7 +84,7 @@ export function ModelosList() {
             >
             <CardSection>
               <Image
-                src={`${app.apiBaseUrl}/vehiculos/${car.caracteristicaAutoId}/imagen`}
+                src={`${app.apiBaseUrl}/vehiculos/${car.id}/imagen`}
                 alt={`${car.marca} ${car.modelo}`}
                 height={160}
                 fit="cover"
