@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Button, Group, Text } from "@mantine/core";
+import { ActionIcon, Button, Group, Text, Tooltip } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { usePagination } from "@/api/helpers";
@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import minMax from "dayjs/plugin/minMax";
 import { DateInput, DatePickerInput } from "@mantine/dates";
 import { app } from "@/config";
+import { PiInvoiceDuotone } from "react-icons/pi";
 dayjs.extend(minMax);
 
 
@@ -77,14 +78,6 @@ export function AlquileresTable() {
         )
       },
       {
-        accessor: "subtotal",
-        title: "Total",
-        sortable: true,
-        render: alquiler => (
-          <Text truncate="end">{formatCurrency(alquiler.subtotal)}</Text>
-        )
-      },
-      {
         accessor: "cliente.apellido",
         title: "Total",
         sortable: true,
@@ -94,10 +87,18 @@ export function AlquileresTable() {
       },
       {
         accessor: "vehiculo.marca",
-        title: "Total",
+        title: "Modelo",
         sortable: true,
         render: alquiler => (
           <Text truncate="end">{alquiler.vehiculo.marca + ' ' + alquiler.vehiculo.modelo}</Text>
+        )
+      },
+      {
+        accessor: "subtotal",
+        title: "Subtotal",
+        sortable: true,
+        render: alquiler => (
+          <Text truncate="end">{formatCurrency(alquiler.subtotal)}</Text>
         )
       },
       {
@@ -129,10 +130,16 @@ export function AlquileresTable() {
         width: 100,
         render: alquiler => (
           <DataTable.Actions
-            onView={() => navigate(paths.dashboard.management.alquileres.view(alquiler.id))}
-            onEdit={() => navigate(paths.dashboard.management.alquileres.edit(alquiler.id))}
             onDelete={() => handleDelete(alquiler)}
-          />
+          >
+            <Tooltip label="Factura">
+              <ActionIcon
+                onClick={() => handleDownloadFactura(alquiler.id)}
+                variant="default">
+                <PiInvoiceDuotone size="1rem" />
+              </ActionIcon>
+            </Tooltip>
+          </DataTable.Actions>
         ),
       }
     ],
@@ -187,6 +194,27 @@ export function AlquileresTable() {
     } catch (error) {
       console.error(`Error al generar ${formato}:`, error);
       alert("No se pudo generar el reporte de alquileres");
+    }
+  }
+
+  const handleDownloadFactura = async (id) => {
+    try {
+      const response = await client.get(`${app.apiBaseUrl}/alquileres/${id}/factura`, {
+        responseType: "blob",
+        headers: { Accept: "application/pdf" },
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "factura.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error al generar PDF:", error);
+      alert("No se pudo generar la factura");
     }
   }
 
