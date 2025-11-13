@@ -2,6 +2,7 @@ package com.gpadilla.mycar.facade;
 
 import com.gpadilla.mycar.dtos.cliente.ClienteCompleteProfileDto;
 import com.gpadilla.mycar.dtos.cliente.ClienteCreateDto;
+import com.gpadilla.mycar.dtos.contacto.ContactoCreateOrUpdateDto;
 import com.gpadilla.mycar.dtos.cliente.ClienteCreateRequestDto;
 import com.gpadilla.mycar.dtos.cliente.SignUpFormDto;
 import com.gpadilla.mycar.entity.Cliente;
@@ -24,6 +25,7 @@ public class ClienteFacade {
     private final UsuarioService usuarioService;
     private final ClienteService clienteService;
     private final ClienteMapper clienteMapper;
+    private final ContactoFacade contactoFacade;
 
     @Transactional
     public Usuario registrarClientePorFormularioRegistro(SignUpFormDto request) {
@@ -36,6 +38,11 @@ public class ClienteFacade {
         // todo falta contacto
 
         Usuario usuario = usuarioService.createUserNoPassword(request.getEmail(), UserRole.CLIENTE);
+
+//        ContactoCreateOrUpdateDto contactoDto = new ContactoCreateOrUpdateDto();
+//        contactoDto.setEmail(request.getEmail());
+//        contactoDto.setTelefono(null);
+//        contactoFacade.actualizarContactosDeUsuario(usuario.getId(), contactoDto);
 
         Direccion direccion = direccionService.create(request.getDireccion());
 
@@ -54,6 +61,7 @@ public class ClienteFacade {
         Direccion direccion = direccionService.create(dto.getDireccion());
 
         ClienteCreateDto clienteDto = clienteMapper.toDto(dto);
+
         clienteService.create(clienteDto, usuario, direccion);
 
         usuario.setHasCompletedProfile(true);

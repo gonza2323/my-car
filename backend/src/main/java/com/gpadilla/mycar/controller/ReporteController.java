@@ -1,6 +1,7 @@
 package com.gpadilla.mycar.controller;
 
 import com.gpadilla.mycar.entity.CaracteristicasAuto;
+import com.gpadilla.mycar.excel.ExcelGenerator;
 import com.gpadilla.mycar.pdf.PdfGenerator;
 import com.gpadilla.mycar.repository.CaracteristicasAutoRepository;
 import com.gpadilla.mycar.service.ReporteService;
@@ -28,6 +29,7 @@ public class ReporteController {
     private final ReporteService reporteService;
     private final PdfGenerator  pdfGenerator;
     private final CaracteristicasAutoRepository caracteristicasAutoRepository;
+    private final ExcelGenerator excelGenerator;
 
     @GetMapping("/vehiculos")
     @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
@@ -56,6 +58,22 @@ public class ReporteController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_recaudacion.pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdfBytes);
+    }
+
+    @GetMapping("/recaudacion/excel")
+    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
+    public ResponseEntity<byte[]> generarReporteRecaudacionExcel(
+            @RequestParam LocalDate fechaInicio,
+            @RequestParam LocalDate fechaFin
+    ) {
+        byte[] excel = reporteService.generarReporteRecaudacionExcel(fechaInicio, fechaFin);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_recaudacion.xlsx")
+                .contentType(MediaType.parseMediaType(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                ))
+                .body(excel);
     }
 
     @GetMapping("/modelos")
@@ -89,6 +107,32 @@ public class ReporteController {
             throw new RuntimeException("Error generando el PDF", e);
         }
     }
+
+    @GetMapping("/modelos/excel")
+    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
+    public ResponseEntity<byte[]> generarReporteModelosExcel() {
+        var modelos = caracteristicasAutoRepository.findAll();
+
+        var headers = List.of("Modelo");
+        var extractors = List.of(
+                (Function<CaracteristicasAuto, String>) CaracteristicasAuto::getModelo
+        );
+
+        byte[] excel = excelGenerator.generarExcelEnMemoria(
+                "Listado de Modelos de Autos",
+                headers,
+                modelos,
+                extractors
+        );
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=modelos_autos.xlsx")
+                .contentType(MediaType.parseMediaType(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                ))
+                .body(excel);
+    }
+
 
 }
 
