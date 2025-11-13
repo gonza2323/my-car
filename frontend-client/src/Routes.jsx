@@ -5,6 +5,7 @@ import ShopFooter from "@/components/Footer/ShopFooter";
 import ErrorView from "./views/ErrorView";
 import CartView from "./views/CartView";
 import AlquileresList from "./views/AlquileresPage";
+import VehiculosPage from "./views/VehiculosPage";
 
 export default function AppRoutes() {
     return (
@@ -14,8 +15,8 @@ export default function AppRoutes() {
             </header>
             <Routes>
                 <Route path="/" element={<HomeView />} />
-                <Route path="/cart" element={<CartView />} />
                 <Route path="/alquileres" element={<AlquileresList />} />
+                <Route path="/vehiculos" element={<VehiculosPage />} />
                 <Route path="*" element={<ErrorView />} />
             </Routes>
             <footer>

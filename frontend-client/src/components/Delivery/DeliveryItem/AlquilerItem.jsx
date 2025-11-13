@@ -18,6 +18,7 @@ import { TbUsers, TbArmchair, TbCalendar, TbDiscount, TbCurrencyDollar, TbCheck,
 import { useGetAlquileres } from '@/hooks';
 import { app } from '@/config';
 import { client } from '@/api/axios';
+import { formatCurrency } from '@/utilities/number';
 
 const getCarImageUrl = (carId) =>
   `https://example.com/api/cars/${carId}/image`; // adjust this
@@ -161,8 +162,7 @@ const AlquilerItem = ({ alquiler }) => {
               Precio por día
             </Text>
             <Group gap={4}>
-              <TbCurrencyDollar size={14} />
-              <Text size="sm">{costoPorDia.toFixed(2)}</Text>
+              <Text size="sm">{formatCurrency(costoPorDia)}</Text>
             </Group>
           </Group>
 
@@ -172,14 +172,14 @@ const AlquilerItem = ({ alquiler }) => {
                 <Text size="sm" c="dimmed">
                   Subtotal
                 </Text>
-                <Text size="sm">{subtotal.toFixed(2)}</Text>
+                <Text size="sm">{formatCurrency(subtotal)}</Text>
               </Group>
               <Group justify="space-between" c="green">
                 <Group gap={4}>
                   <TbDiscount size={14} />
-                  <Text size="sm">Descuento ({(porcentajeDescuento * 100).toFixed(2)}%)</Text>
+                  <Text size="sm">Descuento ({formatCurrency(porcentajeDescuento * 100)}%)</Text>
                 </Group>
-                <Text size="sm">- {cantidadDescuento.toFixed(2)}</Text>
+                <Text size="sm">- {formatCurrency(cantidadDescuento)}</Text>
               </Group>
             </>
           ) : null}
@@ -188,7 +188,7 @@ const AlquilerItem = ({ alquiler }) => {
 
           <Group justify="space-between">
             <Text fw={600}>Total</Text>
-            <Text fw={600}>{total.toFixed(2)}</Text>
+            <Text fw={600}>{formatCurrency(total)}</Text>
           </Group>
         </Stack>
       </Stack>

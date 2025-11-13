@@ -2,33 +2,19 @@ import { useAuth } from "@/hooks";
 import { Link, useLocation } from "react-router-dom";
 const Links = () => {
   const { isAuthenticated } = useAuth();
-  const location = useLocation();
-  const isHomePage = location.pathname === "/";
-
-  const scrollToProducts = () => {
-    if (!isHomePage) return;
-    const products = document.getElementById("products");
-    products.scrollIntoView({ behavior: "smooth" });
-    removeExpandedClass();
-  };
-
-  const removeExpandedClass = () => {
-    let mobileExpandedMenu = document.querySelector(".mobile-expanded-menu");
-    mobileExpandedMenu.classList.remove("mobile-expanded");
-  };
 
   return (
     <div className="links">
-      <Link to={"/"} onClick={removeExpandedClass}>
+      <Link to={"/"}>
         Inicio
       </Link>
-      <Link to={"/modelos"} onClick={scrollToProducts}>
-        Vehículos
-      </Link>
-      <Link to={"/alquileres"} onClick={scrollToProducts}>
+      <Link to={"/about"} to={"/about"}>
         Acerca de
       </Link>
-      { isAuthenticated && <Link to={"/delivery"} onClick={removeExpandedClass}>
+      <Link to={"/vehiculos"} to={"/vehiculos"}>
+        Vehículos
+      </Link>
+      { isAuthenticated && <Link to={"/alquileres"}>
         Mis alquileres
       </Link>}
     </div>

@@ -3,7 +3,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { modals } from '@mantine/modals';
 import { z } from 'zod';
 import { FcGoogle } from 'react-icons/fc';
-import { SiMicrosoft } from 'react-icons/si';
+import { SiGoogle, SiMicrosoft } from 'react-icons/si';
 import { app } from '@/config';
 
 // OAuth URLs
