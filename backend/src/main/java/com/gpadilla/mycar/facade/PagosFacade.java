@@ -8,6 +8,7 @@ import com.gpadilla.mycar.enums.EstadoPagoAlquiler;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.service.AlquilerService;
 import com.gpadilla.mycar.service.FacturaService;
+import com.gpadilla.mycar.service.MensajeService;
 import com.gpadilla.mycar.service.pagos.MercadoPagoService;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
@@ -24,6 +25,7 @@ public class PagosFacade {
     private final AlquilerService alquilerService;
     private final MercadoPagoService mercadoPagoService;
     private final FacturaService facturaService;
+    private final MensajeService mensajeService;
 
     @Transactional
     public PaymentResponse generarLinkDePagoMPClientes(Long alquilerId, Long clienteId) throws MPException, MPApiException {
@@ -50,6 +52,8 @@ public class PagosFacade {
         alquiler.setEstado(EstadoPagoAlquiler.PAGADO);
         factura.setEstado(EstadoFactura.PAGADA);
 
+        byte[] pdfFactura = facturaService.generarFacturaPdfEnMemoria(factura.getId());
+        mensajeService.enviarMensajeFacturaAlquiler(alquiler, pdfFactura);
         // todo enviar factura por mail
     }
 
