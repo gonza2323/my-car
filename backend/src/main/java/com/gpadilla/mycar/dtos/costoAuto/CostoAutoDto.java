@@ -16,8 +16,6 @@ public class CostoAutoDto {
     private LocalDate fechaDesde;
     private LocalDate fechaHasta;
     private double costoTotal;
-    private boolean eliminado;
-
     private Long caracteristicasAutoId;
 }
 

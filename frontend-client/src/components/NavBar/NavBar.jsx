@@ -4,6 +4,7 @@ import Logo from "./Logo/Logo";
 import Search from "./Search/Search";
 import Hamburger from "hamburger-react";
 import "./NavBar.css";
+import { WeatherWidget } from "../WeatherWidget/WeatherWidget";
 
 const NavBar = () => {
   const handleHamClick = () => {
@@ -31,10 +32,12 @@ const NavBar = () => {
             rounded
           ></Hamburger>
         </button>
+        
         <span className="desktop-links">
           <Links></Links>
         </span>
-        {/* <Search></Search> */}
+
+        <WeatherWidget />
         <Account></Account>
       </div>
       <div className="nav-mobile">

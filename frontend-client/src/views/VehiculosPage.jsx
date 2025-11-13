@@ -11,6 +11,7 @@ import dayjs from "dayjs";
 import { DatePickerInput } from "@mantine/dates";
 import { TbArmchair, TbCar } from "react-icons/tb";
 import { formatCurrency } from "@/utilities/number";
+import { app } from "@/config";
 
 
 const VehiculosPage = () => {
@@ -75,7 +76,7 @@ const VehiculosPage = () => {
             >
             <CardSection>
               <Image
-                src={`https://example.com/images/cars/${car.id}.jpg`}
+                src={`${app.apiBaseUrl}/vehiculos/${car.id}/imagen`}
                 alt={`${car.marca} ${car.modelo}`}
                 height={160}
                 fit="cover"

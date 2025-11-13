@@ -7,6 +7,7 @@ import com.gpadilla.mycar.service.CostoAutoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -47,7 +48,7 @@ public class CostoAutoController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMINISTRATIVO', 'JEFE')")
-    public ResponseEntity<Page<CostoAutoDto>> findAll(Pageable pageable) {
-        return ResponseEntity.ok(service.findDtos(pageable));
+    public ResponseEntity<Page<CostoAutoDto>> listarCostosDeModelo(Pageable pageable, @Param("modeloId") Long modeloId) {
+        return ResponseEntity.ok(service.findDtosDeModelo(pageable, modeloId));
     }
 }

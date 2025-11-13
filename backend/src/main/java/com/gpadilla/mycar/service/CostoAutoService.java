@@ -8,6 +8,8 @@ import com.gpadilla.mycar.entity.CostoAuto;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.CostoAutoMapper;
 import com.gpadilla.mycar.repository.CostoAutoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +60,10 @@ public class CostoAutoService extends BaseService<
     public CostoAuto buscarCostoDeModeloEnFecha(Long modeloId, LocalDate fecha) {
         return repository.buscarCostoDeModeloEnFecha(modeloId, fecha)
                 .orElseThrow(() -> new BusinessException("El modelo no tiene precio en esa fecha"));
+    }
+
+    public Page<CostoAutoDto> findDtosDeModelo(Pageable pageable, Long modeloId) {
+        return repository.findByCaracteristicasAutoId(pageable, modeloId);
     }
 }
 

@@ -26,7 +26,7 @@ const AlquileresList = () => {
   }
 
   return (
-    <Container>
+    <Container py="lg">
       <Stack>
       <Title>Mis alquileres</Title>
         {(alquileres.length > 0 &&
