@@ -1,11 +1,15 @@
 package com.gpadilla.mycar.service;
 
 import com.gpadilla.mycar.dtos.caracteristicasAuto.*;
+import com.gpadilla.mycar.dtos.imagen.ImagenCreateDto;
 import com.gpadilla.mycar.entity.CaracteristicasAuto;
+import com.gpadilla.mycar.entity.Imagen;
+import com.gpadilla.mycar.enums.TipoImagen;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.mapper.CaracteristicasAutoMapper;
 import com.gpadilla.mycar.repository.CaracteristicasAutoRepository;
 import com.gpadilla.mycar.repository.CostoAutoRepository;
+import com.gpadilla.mycar.repository.ImagenRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,17 +30,39 @@ public class CaracteristicasAutoService extends BaseService<
         CaracteristicasAutoMapper> {
 
     private final CostoAutoRepository costoAutoRepository;
+    private final ImagenService imagenService;
+    private final ImagenRepository imagenRepository;
 
-    public CaracteristicasAutoService(CaracteristicasAutoRepository repository, CaracteristicasAutoMapper mapper, CostoAutoRepository costoAutoRepository) {
+    public CaracteristicasAutoService(CaracteristicasAutoRepository repository,
+                                      CaracteristicasAutoMapper mapper,
+                                      CostoAutoRepository costoAutoRepository,
+                                      ImagenService imagenService, ImagenRepository imagenRepository) {
         super("CaracteristicasAuto", repository, mapper);
         this.costoAutoRepository = costoAutoRepository;
+        this.imagenService = imagenService;
+        this.imagenRepository = imagenRepository;
     }
 
     @Override
     protected void preCreate(CaracteristicasAutoCreateDto dto, CaracteristicasAuto entity) {
         entity.setCantTotalAutos(0);
+    }
 
-        // todo foto
+    @Override
+    protected void postCreate(CaracteristicasAutoCreateDto dto, CaracteristicasAuto entity) {
+        ImagenCreateDto imagenDto = dto.getImagen();
+
+        if (imagenDto == null)
+            return;
+
+        Imagen imagen = Imagen.builder()
+                .nombre(imagenDto.getNombre())
+                .mime(imagenDto.getMime())
+                .tipoImagen(TipoImagen.VEHICULO)
+                .contenido(imagenDto.getContenido())
+                .caracteristicasAuto(entity).build();
+
+        imagenRepository.save(imagen);
     }
 
     @Override

@@ -2,6 +2,7 @@ import { Alert, Button, Card, Group, Image, Loader, Stack, Text } from "@mantine
 import { paths } from "@/routes"
 import { NavLink } from "react-router-dom"
 import { useGetModelo } from "@/hooks"
+import { app } from "@/config"
 
 export default function ModeloDetalle({ modeloId }) {
   const { data: modelo, isLoading, error } = useGetModelo({
@@ -16,18 +17,17 @@ export default function ModeloDetalle({ modeloId }) {
       </Alert>
     )
 
-    console.log(modelo)
 
   return (
     <Card shadow="sm" padding="lg" maw={500}>
       <Card.Section>
         <Image
-          src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"
-          height={160}
+          src={`${app.apiBaseUrl}/vehiculos/${modelo.id}/imagen`}
+          height={280}
           alt="Norway"
         />
       </Card.Section>
-      
+
       <Stack gap="sm" mt="md">
         <Group>
           <Text color="dimmed">Marca:</Text>

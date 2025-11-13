@@ -1,6 +1,8 @@
 package com.gpadilla.mycar.controller;
 
 import com.gpadilla.mycar.dtos.caracteristicasAuto.*;
+import com.gpadilla.mycar.dtos.imagen.ImagenCreateDto;
+import com.gpadilla.mycar.enums.TipoImagen;
 import com.gpadilla.mycar.service.CaracteristicasAutoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -10,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 @RestController
@@ -21,11 +25,20 @@ public class CaracteristicasAutoController {
 
     private final CaracteristicasAutoService service;
 
-    // 🔹 Crear modelo
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMINISTRATIVO', 'JEFE')")
-    public ResponseEntity<CaracteristicasAutoDetailDto> create(@RequestBody CaracteristicasAutoCreateDto dto) {
-        return ResponseEntity.ok(service.createAndReturnDto(dto));
+    public ResponseEntity<Void> create(
+            @RequestPart("dto") CaracteristicasAutoCreateDto dto,
+            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
+
+        ImagenCreateDto imagenDto = new ImagenCreateDto();
+        imagenDto.setNombre(image.getOriginalFilename());
+        imagenDto.setMime(image.getContentType());
+        imagenDto.setContenido(image.getBytes());
+        imagenDto.setTipo(TipoImagen.VEHICULO);
+        dto.setImagen(imagenDto);
+
+        return ResponseEntity.ok().build();
     }
 
     // 🔹 Actualizar modelo

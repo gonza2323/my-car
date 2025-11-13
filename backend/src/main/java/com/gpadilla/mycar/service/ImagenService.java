@@ -36,5 +36,18 @@ public class ImagenService extends BaseService<
         if (dto.getMime() == null || !permitidos.contains(dto.getMime()))
             throw new BusinessException("Tipo MIME no permitido: " + dto.getMime());
     }
+
+    @Transactional(readOnly = true)
+    public ImagenDetailDto findByVehicleId(Long vehicleId) {
+        Imagen imagen = repository.findByCaracteristicasAutoIdAndEliminadoFalse(vehicleId)
+                .orElseThrow();
+
+        return ImagenDetailDto.builder()
+                .id(imagen.getId())
+                .mime(imagen.getMime())
+                .tipo(imagen.getTipoImagen())
+                .nombre(imagen.getNombre())
+                .contenido(imagen.getContenido()).build();
+    }
 }
 

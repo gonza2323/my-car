@@ -20,6 +20,7 @@ import { formatCurrency } from "@/utilities/number";
 import { DatePickerInput } from "@mantine/dates";
 import { Link } from "react-router-dom";
 import { paths } from "@/routes";
+import { app } from "@/config";
 
 export function ModelosList() {
   const { page, size, setPage, setSize } = usePagination();
@@ -82,7 +83,7 @@ export function ModelosList() {
             >
             <CardSection>
               <Image
-                src={`https://example.com/images/cars/${car.id}.jpg`}
+                src={`${app.apiBaseUrl}/vehiculos/${car.caracteristicaAutoId}/imagen`}
                 alt={`${car.marca} ${car.modelo}`}
                 height={160}
                 fit="cover"

@@ -6,6 +6,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { SiGoogle, SiMicrosoft } from 'react-icons/si';
 import { app } from '@/config';
 import { useSignUp } from '@/hooks';
+import { notifications } from '@mantine/notifications';
 
 // OAuth URLs
 const GOOGLE_URL = `${app.baseUrl}/oauth2/authorization/auth0?connection=google-oauth2`;

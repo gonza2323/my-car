@@ -1,4 +1,5 @@
 package com.gpadilla.mycar.dtos.caracteristicasAuto;
+import com.gpadilla.mycar.dtos.imagen.ImagenCreateDto;
 import lombok.*;
 
 @Data
@@ -11,4 +12,5 @@ public class CaracteristicasAutoCreateDto {
     private int cantidadPuertas;
     private int cantidadAsientos;
     private int anio;
+    private ImagenCreateDto imagen;
 }

@@ -23,6 +23,11 @@ export const useGetModelosDisponibles = createPaginationQueryHook({
 export const useCreateModelo = createPostMutationHook({
   endpoint: BASE_ENDPOINT,
   queryKey: QUERY_KEY,
+  axiosOptions: {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  }
 });
 
 export const useDeleteModelo = createDeleteMutationHook({

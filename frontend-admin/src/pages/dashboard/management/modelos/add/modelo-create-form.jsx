@@ -1,21 +1,17 @@
-import { Box, Button, Grid, Group, Select, Stack, TextInput, NumberInput, Loader } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
-import { notifications } from '@mantine/notifications';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { Stack, TextInput, NumberInput, Group, Button, FileInput, Notification } from '@mantine/core';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { z } from 'zod';
+import { useCreateModelo } from '@/hooks';
 import { paths } from '@/routes';
-import {
-  useCreateModelo,
-  useGetPaises,
-  useGetProvincias,
-  useGetDepartamentos,
-  useGetLocalidades,
-} from '@/hooks';
-import { DateInput, DatePicker, DatePickerInput } from '@mantine/dates';
-import { ModeloCreateDto } from '@/api/dtos';
-import { useEffect, useMemo, useState } from 'react';
-import { queryOptions } from '@tanstack/react-query';
 
+export const ModeloCreateDto = z.object({
+  marca: z.string().nonempty('Debe indicar la marca').max(50),
+  modelo: z.string().nonempty('Debe indicar el modelo').max(50),
+  anio: z.coerce.number('Debe indicar el modelo').int().min(1960).max(2030),
+  cantidadPuertas: z.coerce.number('Debe indicar la cantidad de puertas').int().min(0).max(10),
+  cantidadAsientos: z.coerce.number('Debe indicar la cantidad de asientos').int().min(0).max(10),
+});
 
 export default function ModeloCreateForm() {
   const navigate = useNavigate();
@@ -30,12 +26,27 @@ export default function ModeloCreateForm() {
       anio: '',
       cantidadPuertas: '',
       cantidadAsientos: '',
+      image: null, // optional image
     },
   });
 
   const handleSubmit = form.onSubmit((values) => {
+    // create FormData to send as multipart/form-data
+    const formData = new FormData();
+    formData.append('dto', new Blob([JSON.stringify({
+      marca: values.marca,
+      modelo: values.modelo,
+      anio: values.anio,
+      cantidadPuertas: values.cantidadPuertas,
+      cantidadAsientos: values.cantidadAsientos,
+    })], { type: 'application/json' }));
+
+    if (values.image) {
+      formData.append('image', values.image);
+    }
+
     createModelo.mutate(
-      { variables: values },
+      formData,
       {
         onSuccess: () => {
           notifications.show({
@@ -57,12 +68,19 @@ export default function ModeloCreateForm() {
 
   return (
     <Stack component="form" onSubmit={handleSubmit} maw={400}>
-
       <TextInput label="Marca" {...form.getInputProps('marca')} />
       <TextInput label="Modelo" {...form.getInputProps('modelo')} />
       <NumberInput label="Año" min={1960} max={2030} allowDecimal={false} {...form.getInputProps('anio')} />
       <NumberInput label="Cantidad de puertas" min={0} max={10} allowDecimal={false} {...form.getInputProps('cantidadPuertas')} />
-      <NumberInput label="Cantidad de asientos" mih={0} max={10} allowDecimal={false} {...form.getInputProps('cantidadAsientos')} />
+      <NumberInput label="Cantidad de asientos" min={0} max={10} allowDecimal={false} {...form.getInputProps('cantidadAsientos')} />
+
+      {/* File picker for optional image */}
+      <FileInput
+        label="Imagen (opcional)"
+        placeholder="Seleccione una imagen"
+        accept="image/*"
+        {...form.getInputProps('image')}
+      />
 
       <Group position="right" mt="md">
         <Button variant="outline" component={NavLink} to={paths.dashboard.management.modelos.list}>

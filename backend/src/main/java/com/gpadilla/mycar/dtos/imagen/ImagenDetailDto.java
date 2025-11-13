@@ -12,7 +12,7 @@ public class ImagenDetailDto {
     private Long id;
     private String nombre;
     private String mime;
-    private boolean eliminada;
     private TipoImagen tipo;
+    private byte[] contenido;
 }
 
