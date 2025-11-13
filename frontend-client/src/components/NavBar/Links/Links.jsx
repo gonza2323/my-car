@@ -1,5 +1,7 @@
+import { useAuth } from "@/hooks";
 import { Link, useLocation } from "react-router-dom";
 const Links = () => {
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
   const isHomePage = location.pathname === "/";
 
@@ -18,14 +20,17 @@ const Links = () => {
   return (
     <div className="links">
       <Link to={"/"} onClick={removeExpandedClass}>
-        Deals
+        Inicio
       </Link>
-      <Link to={"/#products"} onClick={scrollToProducts}>
-        What's New
+      <Link to={"/modelos"} onClick={scrollToProducts}>
+        Vehículos
       </Link>
-      <Link to={"/delivery"} onClick={removeExpandedClass}>
-        Delivery
+      <Link to={"/alquileres"} onClick={scrollToProducts}>
+        Acerca de
       </Link>
+      { isAuthenticated && <Link to={"/delivery"} onClick={removeExpandedClass}>
+        Mis alquileres
+      </Link>}
     </div>
   );
 };

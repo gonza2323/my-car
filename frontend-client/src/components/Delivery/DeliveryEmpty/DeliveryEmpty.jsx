@@ -2,10 +2,6 @@ import EmptyCart from "@/assets/images/empty-cart.png";
 import { Link } from "react-router-dom";
 import "./DeliveryEmpty.css";
 const DeliveryEmpty = () => {
-  const { modal } = useGlobalContext();
-  const handleLogin = () => {
-    modal.openModal(false);
-  };
   return (
     <div className="empty-cart-state no-delivery-container">
       <div className="empty-cart-image">
@@ -22,7 +18,7 @@ const DeliveryEmpty = () => {
             Place an order
           </Link>
           <span>or</span>
-          <button className="btn-rounded login-bg" onClick={handleLogin}>
+          <button className="btn-rounded login-bg">
             Login
           </button>
         </div>

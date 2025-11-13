@@ -1,5 +1,6 @@
 package com.gpadilla.mycar.service;
 
+import com.gpadilla.mycar.dtos.alquiler.AlquilerDetalleDto;
 import com.gpadilla.mycar.dtos.alquiler.AlquilerSummaryDto;
 import com.gpadilla.mycar.entity.Alquiler;
 import com.gpadilla.mycar.entity.Auto;
@@ -57,5 +58,9 @@ public class AlquilerService {
 
     public Page<AlquilerSummaryDto> findDtos(Pageable pageable) {
         return alquilerRepository.findAllByEliminadoFalse(pageable);
+    }
+
+    public Page<AlquilerDetalleDto> listarAlquileresDeUsuario(Pageable pageable, Long userId) {
+        return alquilerRepository.listarAlquileresDeUsuario(pageable, userId);
     }
 }
