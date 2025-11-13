@@ -3,14 +3,18 @@ package com.gpadilla.mycar.pdf;
 import com.gpadilla.mycar.dtos.alquiler.AlquilerDto;
 import com.gpadilla.mycar.dtos.auto.AutoSummaryDto;
 import com.gpadilla.mycar.dtos.cliente.ClienteSummaryDto;
+import com.gpadilla.mycar.dtos.empresa.EmpresaDetailDto;
 import com.gpadilla.mycar.dtos.factura.DetalleFacturaDto;
 import com.gpadilla.mycar.dtos.factura.FacturaDto;
 import com.gpadilla.mycar.dtos.promocion.PromocionViewDto;
 import com.gpadilla.mycar.dtos.reportes.ReporteRecaudacionDto;
 import com.gpadilla.mycar.dtos.reportes.ReporteVehiculosDto;
+import com.gpadilla.mycar.entity.Empresa;
+import com.gpadilla.mycar.service.EmpresaService;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
@@ -24,10 +28,22 @@ import java.util.stream.Stream;
 @Component
 public class PdfGenerator {
 
+    @Autowired
+    EmpresaService empresaService;
+
     public byte[] generarFacturaPdf(FacturaDto factura) {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Document document = new Document(PageSize.A4, 40, 40, 40, 40);
             PdfWriter.getInstance(document, out);
+
+            //trae los datos de la entidad empresa
+            EmpresaDetailDto empresa = empresaService.findSingletonDto();
+            String calle = empresa.getDireccion().getCalle();
+            String numeracion = empresa.getDireccion().getNumeracion();
+            //String provincia = empresa.getDireccion().getProvinciaNombre(); el repositorio de direccion no trae la provincia
+            String provincia = "Mendoza";
+            String direccion = calle + " " + numeracion + ", " + provincia;
+            //
             document.open();
 
             // ========================
@@ -42,7 +58,8 @@ public class PdfGenerator {
             document.add(titulo);
 
             document.add(new Paragraph("CUIT: 30-12345678-9", normalFont));
-            document.add(new Paragraph("Dirección: Av. Las Heras 450, Mendoza", normalFont));
+            document.add(new Paragraph("Direccion: " + direccion, normalFont));
+            //document.add(new Paragraph("Dirección: Av. Las Heras 450, Mendoza", normalFont));
             document.add(new Paragraph("Teléfono: +54 261 555-1234", normalFont));
             document.add(Chunk.NEWLINE);
 

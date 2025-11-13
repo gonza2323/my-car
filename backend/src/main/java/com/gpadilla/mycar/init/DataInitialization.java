@@ -361,8 +361,8 @@ public class DataInitialization implements CommandLineRunner {
 
         Direccion direccion = direccionService.create(
                 DireccionCreateOrUpdateDto.builder()
-                        .calle("Av. San Martín")
-                        .numeracion("1450")
+                        .calle("Av. Las Heras")
+                        .numeracion("450")
                         .barrio("Centro")
                         .manzanaPiso(null)
                         .casaDepartamento(null)
