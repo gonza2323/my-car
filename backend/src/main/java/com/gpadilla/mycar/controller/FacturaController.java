@@ -1,25 +1,20 @@
 package com.gpadilla.mycar.controller;
 
 import com.gpadilla.mycar.entity.Factura;
-import com.gpadilla.mycar.entity.FacturaArchivo;
 import com.gpadilla.mycar.error.BusinessException;
-import com.gpadilla.mycar.pdf.PdfGenerator;
-import com.gpadilla.mycar.repository.FacturaArchivoRepository;
 import com.gpadilla.mycar.repository.FacturaRepository;
 import com.gpadilla.mycar.service.FacturaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/facturas")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class FacturaController {
 
@@ -27,7 +22,7 @@ public class FacturaController {
     private final FacturaRepository facturaRepository;
 
     // 👀 Descargar factura PDF asociada a un alquiler
-    @GetMapping("/alquiler/{alquilerId}/pdf")
+    @GetMapping("/alquileres/{alquilerId}/factura")
     public ResponseEntity<byte[]> descargarFacturaPorAlquiler(@PathVariable Long alquilerId) {
         // 1️⃣ Buscar la factura asociada al alquiler
         Factura factura = facturaRepository.buscarFacturaDeAlquiler(alquilerId)

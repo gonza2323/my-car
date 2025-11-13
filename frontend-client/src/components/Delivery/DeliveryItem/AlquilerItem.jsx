@@ -11,9 +11,13 @@ import {
   Loader,
   Skeleton,
   Divider,
+  Tooltip,
+  ActionIcon,
 } from '@mantine/core';
-import { TbUsers, TbArmchair, TbCalendar, TbDiscount, TbCurrencyDollar, TbCheck, TbDoor } from "react-icons/tb";
+import { TbUsers, TbArmchair, TbCalendar, TbDiscount, TbCurrencyDollar, TbCheck, TbDoor, TbInvoice } from "react-icons/tb";
 import { useGetAlquileres } from '@/hooks';
+import { app } from '@/config';
+import { client } from '@/api/axios';
 
 const getCarImageUrl = (carId) =>
   `https://example.com/api/cars/${carId}/image`; // adjust this
@@ -31,6 +35,48 @@ const AlquilerItem = ({ alquiler }) => {
     cantidadDescuento,
     total
   } = alquiler
+
+  const handleDownloadPdf = async () => {
+    try {
+      const response = await client.get(`${app.apiBaseUrl}/alquileres/${id}/factura`, {
+        responseType: "blob",
+        headers: { Accept: "application/pdf" },
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "factura.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error al generar PDF:", error);
+      alert("No se pudo generar la factura");
+    }
+  }
+
+  const handlePayButton = async () => {
+    try {
+      const response = await client.post(`${app.apiBaseUrl}/payments`, {
+          alquilerId: id,
+      });
+
+      const data = response.data;
+
+      if (data && data.urlDePago) {
+        window.location.href = data.urlDePago;
+      } else {
+        console.error("urlDePago not found in response:", data);
+        alert("No se pudo generar el link de pago");
+      }
+
+    } catch (error) {
+      console.error("Error al generar PDF:", error);
+      alert("No se pudo generar el link de pago");
+    }
+  }
 
   return (
     <Card
@@ -65,11 +111,21 @@ const AlquilerItem = ({ alquiler }) => {
             </Text>
           </Stack>
           {estado == 'PAGADO' ? (
-            <Badge color="teal" leftSection={<TbCheck size={14} />}>
-              Pagado
-            </Badge>
+            <Group>
+              <Tooltip label="Factura">
+                <ActionIcon
+                  onClick={handleDownloadPdf}
+                  variant="default"
+                  >
+                  <TbInvoice />
+                </ActionIcon>
+              </Tooltip>
+              <Badge color="teal" leftSection={<TbCheck size={14} />}>
+                Pagado
+              </Badge>
+            </Group>
           ) : (
-            <Button variant="filled">
+            <Button variant="filled" onClick={handlePayButton}>
               Pagar
             </Button>
           )}
