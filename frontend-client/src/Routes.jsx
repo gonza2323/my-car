@@ -1,5 +1,5 @@
 import HomeView from "./views/HomeView";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import NavBar from "@/components/NavBar/NavBar";
 import ShopFooter from "@/components/Footer/ShopFooter";
 import ErrorView from "./views/ErrorView";
@@ -32,6 +32,8 @@ export default function AppRoutes() {
                         </AuthGuard>
                     }
                 />
+
+                <Route path="/success" element={<Navigate to={"/alquileres"} />} />
 
                 {/* Complete profile route should be accessible even if profile is incomplete */}
                 <Route path="/complete-profile" element={<AuthGuard><CompleteProfilePage /></AuthGuard>} />

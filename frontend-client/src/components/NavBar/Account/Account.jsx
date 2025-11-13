@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import "./Account.css";
-import { useAuth, useLogout } from "@/hooks";
+import { useAuth, useGetAccountInfo, useLogout } from "@/hooks";
 import { openLoginModal } from "@/components/Modals/LoginModal";
 import { openSignUpModal } from "@/components/Modals/SignUpModal";
 import { notifications } from "@mantine/notifications";
 
 const Account = () => {
+  const { data: user } = useGetAccountInfo();
   const { isAuthenticated, userId } = useAuth();
   const { mutate: logout } = useLogout();
 
@@ -19,7 +20,7 @@ const Account = () => {
     <div className="account">
       <div className="cart">
         {isAuthenticated && (
-          <span className="account-user">{userId || 'User'}</span>
+          <span className="account-user">{user?.email || 'User'}</span>
         )}
       </div>
       <div className="login">
