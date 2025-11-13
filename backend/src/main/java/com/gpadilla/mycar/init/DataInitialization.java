@@ -14,6 +14,7 @@ import com.gpadilla.mycar.entity.geo.*;
 import com.gpadilla.mycar.enums.TipoDocumento;
 import com.gpadilla.mycar.enums.TipoEmpleado;
 import com.gpadilla.mycar.enums.TipoTelefono;
+import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.facade.ClienteFacade;
 import com.gpadilla.mycar.facade.EmpleadoFacade;
 import com.gpadilla.mycar.init.geo.*;

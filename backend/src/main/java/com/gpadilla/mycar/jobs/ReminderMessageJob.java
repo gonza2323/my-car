@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class ReminderMessageJob {
 
     // segundos minutos horas dia-mes mes dia-semana
-    private static final String RECORDATORIO_CRON = "0 6 22 * * *";
+    private static final String RECORDATORIO_CRON = "0 0 9 * * *";
     private static final String RECORDATORIO_ZONE = "America/Argentina/Mendoza";
 
     @Autowired

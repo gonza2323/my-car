@@ -39,14 +39,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MensajeService {
 
-    //pruebas (doxeado)
+    //solo para testear
     List<String> correosFijos = List.of(
-            "abraxas3112@gmail.com",
-            "faolivares3112@gmail.com",
-            "olivares.francisco@uncuyo.edu.ar"
+            "example1@gmail.com",
+            "example2@gmail.com",
+            "example3@gmail.com"
     );
-    int cantidadCorreosFijos = correosFijos.size();
-    int limit = 0;
 
 
     private static final String REMITENTE = "gimnasiosport21@gmail.com";
@@ -65,18 +63,79 @@ public class MensajeService {
         promotionSchedulerService.ejecutarAsync(() -> procesarPromocion(dto));
     }
 
+//    @Transactional METODO PARA TESTEAR SOLAMENTE
+//    public int enviarRecordatoriosAlquileresParaManana() {
+//
+//        // Pruebas (correos fijos de test)
+//        List<String> correosFijos = List.of(
+//                "abraxas3112@gmail.com",
+//                "faolivares3112@gmail.com",
+//                "olivares.francisco@uncuyo.edu.ar"
+//        );
+//
+//        // Mañana (fecha de finalización objetivo)
+//        LocalDate fechaFinObjetivo = LocalDate.now(ZONA_ID).plusDays(1);
+//
+//        Map<Cliente, List<Alquiler>> alquileresPorCliente = alquilerRepository.findAll().stream()
+//                .filter(alquiler -> alquiler != null && !alquiler.isEliminado())
+//                // Solo pasan los alquileres que TERMINAN en la fechaFinObjetivo
+//                .filter(alquiler ->
+//                        alquiler.getFechaHasta() != null &&
+//                                alquiler.getFechaHasta().isEqual(fechaFinObjetivo)
+//                )
+//                .collect(Collectors.groupingBy(Alquiler::getCliente));
+//
+//        int enviados = 0;
+//
+//        for (Map.Entry<Cliente, List<Alquiler>> entry : alquileresPorCliente.entrySet()) {
+//            Cliente cliente = entry.getKey();
+//            if (cliente == null || cliente.isEliminado()) {
+//                continue;
+//            }
+//
+//            // EN IMPLEMENTACION REAL SE TOMA MAIL DEL USUARIO
+//            // Usuario usuario = cliente.getUsuario();
+//            // String emailReal = usuario != null ? usuario.getEmail() : null;
+//            // if (!StringUtils.hasText(emailReal)) {
+//            //     log.warn("El cliente {} no tiene email configurado para recordatorio", cliente.getId());
+//            //     continue;
+//            // }
+//
+//            // Lo seguimos usando solo para registrarMensaje (puede ser null sin problema)
+//            Usuario usuario = cliente.getUsuario();
+//
+//            String asunto = "Recordatorio de tu alquiler en MyCar";
+//            String html = buildRecordatorioHtml(cliente, entry.getValue(), fechaFinObjetivo);
+//
+//            // Elegimos un mail aleatorio de la lista de correos fijos
+//            String email = correosFijos.get(
+//                    ThreadLocalRandom.current().nextInt(correosFijos.size())
+//            );
+//
+//            registrarMensaje(
+//                    nombreCompleto(cliente),
+//                    email,
+//                    asunto,
+//                    html,
+//                    TipoMensaje.RECORDATORIO,
+//                    usuario,
+//                    null
+//            );
+//
+//            boolean enviado = enviarCorreoHtml(email, asunto, html, null);
+//            if (enviado) {
+//                enviados++;
+//            }
+//
+//        }
+//
+//        return enviados;
+//    }
+
     @Transactional
     public int enviarRecordatoriosAlquileresParaManana() {
 
-        // Pruebas (correos fijos de test)
-        List<String> correosFijos = List.of(
-                "abraxas3112@gmail.com",
-                "faolivares3112@gmail.com",
-                "olivares.francisco@uncuyo.edu.ar"
-        );
-
         // Mañana (fecha de finalización objetivo)
-        // Para test: +4 días
         LocalDate fechaFinObjetivo = LocalDate.now(ZONA_ID).plusDays(1);
 
         Map<Cliente, List<Alquiler>> alquileresPorCliente = alquilerRepository.findAll().stream()
@@ -96,24 +155,17 @@ public class MensajeService {
                 continue;
             }
 
-            // EN IMPLEMENTACION REAL SE TOMA MAIL DEL USUARIO
-            // Usuario usuario = cliente.getUsuario();
-            // String emailReal = usuario != null ? usuario.getEmail() : null;
-            // if (!StringUtils.hasText(emailReal)) {
-            //     log.warn("El cliente {} no tiene email configurado para recordatorio", cliente.getId());
-            //     continue;
-            // }
-
-            // Lo seguimos usando solo para registrarMensaje (puede ser null sin problema)
+            // Tomamos directamente el mail del Usuario (equivale a ClienteSummaryDto.usuarioEmail)
             Usuario usuario = cliente.getUsuario();
+            String email = (usuario != null) ? usuario.getEmail() : null;
+
+            if (!StringUtils.hasText(email)) {
+                log.warn("El cliente {} no tiene email configurado para recordatorio", cliente.getId());
+                continue;
+            }
 
             String asunto = "Recordatorio de tu alquiler en MyCar";
             String html = buildRecordatorioHtml(cliente, entry.getValue(), fechaFinObjetivo);
-
-            // Elegimos un mail aleatorio de la lista de correos fijos
-            String email = correosFijos.get(
-                    ThreadLocalRandom.current().nextInt(correosFijos.size())
-            );
 
             registrarMensaje(
                     nombreCompleto(cliente),
@@ -129,11 +181,11 @@ public class MensajeService {
             if (enviado) {
                 enviados++;
             }
-
         }
 
         return enviados;
     }
+
 
 
 
@@ -153,38 +205,50 @@ public class MensajeService {
         int enviados = 0;
         int errores = 0;
 
-        
         for (Cliente cliente : clienteRepository.findAll()) {
-            if (limit < cantidadCorreosFijos) {
 
-                if (cliente == null || cliente.isEliminado()) {
-                    continue;
-                }
+            System.out.println("envio");
 
-                Usuario usuario = cliente.getUsuario();
-                //String email = usuario != null ? usuario.getEmail() : null; CON LA IMPLEMENTACION REAL SEBERIA OBTENERSE ASI
-                String email = correosFijos.get(limit);
-                if (!StringUtils.hasText(email)) {
-                    continue;
-                }
-
-                String html = buildPromocionHtml(cliente, dto);
-                registrarMensaje(nombreCompleto(cliente), email, asunto, html, tipo, usuario, null);
-                boolean enviado = enviarCorreoHtml(email, asunto, html, null);
-                if (enviado) {
-                    enviados++;
-                } else {
-                    errores++;
-                }
-
-                limit++;
+            if (cliente == null || cliente.isEliminado()) {
+                continue;
             }
 
+            System.out.println("cliente: " + enviados);
 
+            Usuario usuario = cliente.getUsuario();
+            String email = (usuario != null) ? usuario.getEmail() : null;
+
+            if (!StringUtils.hasText(email)) {
+                log.warn("Cliente {} no tiene email cargado. No se envía promoción.",
+                        cliente.getId());
+                continue;
+            }
+
+            String html = buildPromocionHtml(cliente, dto);
+
+            registrarMensaje(
+                    nombreCompleto(cliente),
+                    email,
+                    asunto,
+                    html,
+                    tipo,
+                    usuario,
+                    null
+            );
+
+            boolean enviado = enviarCorreoHtml(email, asunto, html, null);
+
+            if (enviado) {
+                enviados++;
+            } else {
+                errores++;
+            }
         }
 
-        log.info("Promoción {} enviada. Destinatarios: {}, errores: {}", dto.getCodigoDescuento(), enviados, errores);
+        log.info("Promoción {} enviada. Enviados: {}, errores: {}",
+                dto.getCodigoDescuento(), enviados, errores);
     }
+
 
     @Transactional
     public ResultadoEnvio enviarMensajeFacturaAlquiler(Alquiler alquiler, byte[] pdfFactura) {
@@ -201,8 +265,7 @@ public class MensajeService {
         }
 
         Usuario usuario = cliente.getUsuario();
-        //String destinatario = (usuario != null) ? usuario.getEmail() : null;
-        String destinatario = correosFijos.get(ThreadLocalRandom.current().nextInt(correosFijos.size()));
+        String destinatario = (usuario != null) ? usuario.getEmail() : null;
         if (!StringUtils.hasText(destinatario)) {
             throw new BusinessException("El cliente no tiene un email registrado");
         }
@@ -210,7 +273,7 @@ public class MensajeService {
         String asunto = "Factura de tu alquiler en MyCar";
         String html = buildFacturaHtml(cliente, alquiler);
 
-        // Guardamos el mensaje (si querés, podés setear un nombre fijo de adjunto)
+        // Registramos el mensaje (sin guardar físicamente el PDF, solo el nombre si quisieras)
         registrarMensaje(
                 nombreCompleto(cliente),
                 destinatario,
@@ -218,7 +281,7 @@ public class MensajeService {
                 html,
                 TipoMensaje.FACTURA,
                 usuario,
-                null // no tenemos MultipartFile, solo el nombre se podría guardar si querés
+                null // no MultipartFile acá
         );
 
         boolean enviado = enviarCorreoHtmlConPdfBytes(
@@ -235,6 +298,7 @@ public class MensajeService {
 
         return new ResultadoEnvio(1, 0);
     }
+
 
     private void registrarMensaje(
             String nombre,
@@ -376,6 +440,7 @@ public class MensajeService {
     }
 
     private String buildPromocionHtml(Cliente cliente, PromocionCreateDto dto) {
+        int porcentaje = (int) Math.round(dto.getPorcentajeDescuento() * 100);
         String descripcion = StringUtils.hasText(dto.getDescripcion())
                 ? dto.getDescripcion()
                 : "Aprovechá este beneficio exclusivo para tu próximo viaje.";
@@ -398,7 +463,7 @@ public class MensajeService {
                 nombreCompleto(cliente),
                 descripcion,
                 dto.getCodigoDescuento(),
-                dto.getPorcentajeDescuento(),
+                porcentaje,
                 dto.getFechaInicio(),
                 dto.getFechaFin()
         );
