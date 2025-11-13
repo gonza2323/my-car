@@ -37,7 +37,7 @@ public class AlquilerController {
         return ResponseEntity.noContent().build();
     }
 
-    // DESCARGAR FACTURA, SUPONEMOS QUE EXISTE EL METODO
+//    // DESCARGAR FACTURA, SUPONEMOS QUE EXISTE EL METODO
 //    @GetMapping("/{alquilerId}/factura")
 //    @PreAuthorize("hasAnyRole('JEFE', 'ADMINISTRATIVO')")
 //    public ResponseEntity<byte[]> descargarFactura(@PathVariable Long alquilerId) {

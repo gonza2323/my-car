@@ -42,7 +42,7 @@ public class MensajeService {
     //pruebas (doxeado)
     List<String> correosFijos = List.of(
             "abraxas3112@gmail.com",
-            "faolicares3112@gmail.com",
+            "faolivares3112@gmail.com",
             "olivares.francisco@uncuyo.edu.ar"
     );
     int cantidadCorreosFijos = correosFijos.size();
@@ -71,7 +71,7 @@ public class MensajeService {
         // Pruebas (correos fijos de test)
         List<String> correosFijos = List.of(
                 "abraxas3112@gmail.com",
-                "faolicares3112@gmail.com",
+                "faolivares3112@gmail.com",
                 "olivares.francisco@uncuyo.edu.ar"
         );
 
@@ -187,44 +187,52 @@ public class MensajeService {
     }
 
     @Transactional
-    public ResultadoEnvio enviarMensajeFacturaAlquiler(MensajeDTO dto, MultipartFile adjuntoPdf) {
-        if (dto == null) {
-            throw new BusinessException("Los datos del mensaje son inválidos");
+    public ResultadoEnvio enviarMensajeFacturaAlquiler(Alquiler alquiler, byte[] pdfFactura) {
+        if (alquiler == null) {
+            throw new BusinessException("El alquiler es obligatorio");
         }
-        if (adjuntoPdf == null || adjuntoPdf.isEmpty()) {
-            throw new BusinessException("Debe adjuntar la factura en PDF");
-        }
-        Long alquilerId = dto.getEmpresaId();
-        if (alquilerId == null) {
-            throw new BusinessException("Debe indicar el alquiler");
+        if (pdfFactura == null || pdfFactura.length == 0) {
+            throw new BusinessException("La factura en PDF es obligatoria");
         }
 
-        Alquiler alquiler = alquilerRepository.findByIdAndEliminadoFalse(alquilerId)
-                .orElseThrow(() -> new BusinessException("Alquiler no encontrado"));
         Cliente cliente = alquiler.getCliente();
         if (cliente == null || cliente.isEliminado()) {
             throw new BusinessException("El alquiler no tiene un cliente válido");
         }
+
         Usuario usuario = cliente.getUsuario();
-        String destinatario = StringUtils.hasText(dto.getEmailDestino())
-                ? dto.getEmailDestino()
-                : usuario != null ? usuario.getEmail() : null;
+        //String destinatario = (usuario != null) ? usuario.getEmail() : null;
+        String destinatario = correosFijos.get(ThreadLocalRandom.current().nextInt(correosFijos.size()));
         if (!StringUtils.hasText(destinatario)) {
-            throw new BusinessException("El destinatario no tiene un email registrado");
+            throw new BusinessException("El cliente no tiene un email registrado");
         }
 
-        String asunto = StringUtils.hasText(dto.getAsunto())
-                ? dto.getAsunto()
-                : "Factura de tu alquiler en MyCar";
-        String html = StringUtils.hasText(dto.getHtml())
-                ? dto.getHtml()
-                : buildFacturaHtml(cliente, alquiler);
+        String asunto = "Factura de tu alquiler en MyCar";
+        String html = buildFacturaHtml(cliente, alquiler);
 
-        registrarMensaje(nombreCompleto(cliente), destinatario, asunto, html, TipoMensaje.FACTURA, usuario, adjuntoPdf);
-        boolean enviado = enviarCorreoHtml(destinatario, asunto, html, adjuntoPdf);
+        // Guardamos el mensaje (si querés, podés setear un nombre fijo de adjunto)
+        registrarMensaje(
+                nombreCompleto(cliente),
+                destinatario,
+                asunto,
+                html,
+                TipoMensaje.FACTURA,
+                usuario,
+                null // no tenemos MultipartFile, solo el nombre se podría guardar si querés
+        );
+
+        boolean enviado = enviarCorreoHtmlConPdfBytes(
+                destinatario,
+                asunto,
+                html,
+                pdfFactura,
+                "factura-alquiler-" + alquiler.getId() + ".pdf"
+        );
+
         if (!enviado) {
             throw new BusinessException("No se pudo enviar el correo de factura");
         }
+
         return new ResultadoEnvio(1, 0);
     }
 
@@ -254,6 +262,39 @@ public class MensajeService {
         mensajeRepository.save(mensaje);
     }
 
+    private boolean enviarCorreoHtmlConPdfBytes(String destino,
+                                                String asunto,
+                                                String html,
+                                                byte[] pdfBytes,
+                                                String nombreAdjunto) {
+        if (!StringUtils.hasText(destino)) {
+            return false;
+        }
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(
+                    mimeMessage,
+                    pdfBytes != null && pdfBytes.length > 0,
+                    StandardCharsets.UTF_8.name()
+            );
+
+            helper.setFrom(REMITENTE);
+            helper.setTo(destino);
+            helper.setSubject(asunto);
+            helper.setText(html, true);
+
+            if (pdfBytes != null && pdfBytes.length > 0) {
+                helper.addAttachment(nombreAdjunto, new ByteArrayResource(pdfBytes));
+            }
+
+            mailSender.send(mimeMessage);
+            return true;
+        } catch (Exception ex) {
+            log.warn("No se pudo enviar el correo a {}", destino, ex);
+            return false;
+        }
+    }
+
     private String obtenerNombreAdjunto(MultipartFile adjunto) {
         if (adjunto == null || adjunto.isEmpty()) {
             return null;
@@ -262,6 +303,7 @@ public class MensajeService {
                 ? adjunto.getOriginalFilename()
                 : "adjunto.pdf";
     }
+
 
     private boolean enviarCorreoHtml(String destino, String asunto, String html, MultipartFile adjunto) {
         if (!StringUtils.hasText(destino)) {

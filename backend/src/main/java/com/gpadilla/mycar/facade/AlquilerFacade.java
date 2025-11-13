@@ -9,6 +9,7 @@ import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.service.*;
 import com.gpadilla.mycar.service.FacturaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,8 @@ public class AlquilerFacade {
     private final CostoAutoService costoAutoService;
     private final FacturaService facturaService;
     private final PromocionService promocionService;
+    private final JavaMailSenderImpl mailSender;
+    private final MensajeService mensajeService;
 
     @Transactional
     public void registrarAlquiler(AlquilerCreateRequestDto request) {
@@ -80,9 +83,7 @@ public class AlquilerFacade {
 
             // Generar PDF en memoria desde la factura creada
             byte[] pdfFactura = facturaService.generarFacturaPdfEnMemoria(factura.getId());
-
-
-            //byte[] pdf = facturaService.generarFacturaPdf ACA VOY A COMPLETAR ESTA PARTE
+            mensajeService.enviarMensajeFacturaAlquiler(alquiler, pdfFactura);
         }
 
         // todo configurar recordario por mail y wp
