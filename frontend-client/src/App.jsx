@@ -13,14 +13,20 @@ import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import AppRoutes from "./Routes";
 
+
+const theme = {
+  primaryColor: 'orange', 
+}
+
+
 function App() {
 
   return (
     <div>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <MantineProvider>
-            <Notifications position="bottom-center" zIndex={2077} />
+          <MantineProvider theme={theme}>
+            <Notifications position="bottom-center" />
             <ModalsProvider>
               <AppRoutes />
             </ModalsProvider>

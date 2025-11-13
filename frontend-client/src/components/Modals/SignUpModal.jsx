@@ -48,7 +48,7 @@ export function SignUpForm() {
       <Divider label="O registrate con" labelPosition="center" my="sm" />
 
       <Group grow>
-        <Button leftSection={<FcGoogle />} component="a" href={GOOGLE_URL} variant="outline">
+        <Button leftSection={<SiGoogle />} component="a" href={GOOGLE_URL} variant="outline">
           Google
         </Button>
         <Button leftSection={<SiMicrosoft />} component="a" href={MICROSOFT_URL} variant="outline">

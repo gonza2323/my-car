@@ -1,7 +1,6 @@
 import "./OrderDetails.css";
 
 const OrderDetails = ({ product }) => {
-  const {store} = useGlobalContext();
   return (
     <div className="order-details">
       <div className="order-detail">
@@ -20,17 +19,11 @@ const OrderDetails = ({ product }) => {
         <p>Quantity</p>
         <div className="increase-quantity">
           <button
-            onClick={() => {
-              store.reduceQuantity(product._id);
-            }}
           >
             -
           </button>
           <p>{product.quantity}</p>
           <button
-            onClick={() => {
-              store.addQuantity(product._id);
-            }}
           >
             +
           </button>
@@ -38,9 +31,6 @@ const OrderDetails = ({ product }) => {
       </div>
       <div className="remove">
         <button
-          onClick={() => {
-            store.removeFromCart(product?._id);
-          }}
         >
           Remove
         </button>

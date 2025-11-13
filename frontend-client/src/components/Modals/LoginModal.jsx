@@ -2,7 +2,7 @@ import { modals } from '@mantine/modals';
 import { TextInput, PasswordInput, Button, Group, Divider, Stack, Title, Anchor, Checkbox } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { FcGoogle } from 'react-icons/fc';
-import { SiMicrosoft } from 'react-icons/si';
+import { SiGoogle, SiMicrosoft } from 'react-icons/si';
 import { z } from 'zod';
 import { useLogin } from '@/hooks';
 import { app } from '@/config';
@@ -60,7 +60,7 @@ function LoginForm({ modalId }) {
       <Divider label="O ingresa con" labelPosition="center" my="sm" />
 
       <Group grow>
-        <Button leftSection={<FcGoogle />} component="a" href={GOOGLE_URL} variant="outline">Google</Button>
+        <Button leftSection={<SiGoogle />} component="a" href={GOOGLE_URL} variant="outline">Google</Button>
         <Button leftSection={<SiMicrosoft />} component="a" href={MICROSOFT_URL} variant="outline">Microsoft</Button>
       </Group>
     </Stack>

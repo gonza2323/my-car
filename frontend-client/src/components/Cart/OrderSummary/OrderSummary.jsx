@@ -3,35 +3,16 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 const OrderSummary = () => {
-  const { store, modal, auth } = useGlobalContext();
   const [deliveryType, setDeliveryType] = useState("Standard");
   const [phone, setPhone] = useState("");
-  const setDelivery = (type) => {
-    setDeliveryType(type);
-  };
-  const checkOut = async () => {
-    let payload = {
-      DeliveryType: deliveryType,
-      DeliveryTypeCost: deliveryType == "Standard" ? 5 : 10,
-      costAfterDelieveryRate:
-        store.state.cartTotal + (deliveryType == "Standard" ? 5 : 10),
-      promoCode: "",
-      phoneNumber: phone,
-      user_id: auth.state.user?.id,
-    };
 
-    const response = await store.confirmOrder(payload);
-    if (response.showRegisterLogin) {
-      modal.openModal();
-    }
-  };
   return (
     <div className="is-order-summary">
       <div className="sub-container">
         <div className="contains-order">
           <div className="total-cost">
-            <h4>Total Items ({store.state.cartQuantity})</h4>
-            <h4>${store.state.cartTotal}</h4>
+            <h4>Total Items ({2})</h4>
+            <h4>${200}</h4>
           </div>
           <div className="shipping">
             <h4>Shipping</h4>
@@ -55,7 +36,7 @@ const OrderSummary = () => {
               <input className="select-dropdown" type="text" />
               <button
                 className="flat-button apply-promo"
-                disabled={store.state.cartQuantity > 0 ? false : true}
+                disabled={2 > 0 ? false : true}
               >
                 Apply
               </button>
@@ -80,8 +61,8 @@ const OrderSummary = () => {
             <h4>Total Cost</h4>
             <h4>
               ${" "}
-              {store.state.cart.length > 0
-                ? store.state.cartTotal + (deliveryType == "Standard" ? 5 : 10)
+              {2 > 0
+                ? 200 + (deliveryType == "Standard" ? 5 : 10)
                 : 0}
             </h4>
           </div>
@@ -90,13 +71,12 @@ const OrderSummary = () => {
               className="flat-button checkout"
               onClick={() => {
                 if (phone.length > 0) {
-                  checkOut();
                   toast.info("Your order is being processed");
                   return;
                 }
                 toast.error("Please enter your phone number");
               }}
-              disabled={store.state.cartQuantity > 0 ? false : true}
+              disabled={2 > 0 ? false : true}
             >
               Checkout
             </button>
