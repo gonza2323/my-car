@@ -7,16 +7,26 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Data
 @AllArgsConstructor
-@Getter
 @NoArgsConstructor
+@Data
 public class ReporteVehiculosDto {
     private String modelo;
     private String patente;
-    private String cliente;
+    private String clienteNombre;
     private LocalDate fechaDesde;
     private LocalDate fechaHasta;
     private Integer diasAlquilado;
-    private Double montoTotal;
+    private Double monto;
+
+    // 👇 Constructor usado por la query JPQL
+    public ReporteVehiculosDto(String modelo, String patente, String clienteNombre,
+                               LocalDate fechaDesde, LocalDate fechaHasta, Double monto) {
+        this.modelo = modelo;
+        this.patente = patente;
+        this.clienteNombre = clienteNombre;
+        this.fechaDesde = fechaDesde;
+        this.fechaHasta = fechaHasta;
+        this.monto = monto;
+    }
 }

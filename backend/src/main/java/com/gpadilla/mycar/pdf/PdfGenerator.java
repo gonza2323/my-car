@@ -182,17 +182,16 @@ public class PdfGenerator {
             for (ReporteVehiculosDto dto : vehiculos) {
                 table.addCell(new Phrase(dto.getModelo(), textFont));
                 table.addCell(new Phrase(dto.getPatente(), textFont));
-                table.addCell(new Phrase(dto.getCliente(), textFont));
+                table.addCell(new Phrase(dto.getClienteNombre(), textFont));
                 table.addCell(new Phrase(dto.getFechaDesde().toString(), textFont));
                 table.addCell(new Phrase(dto.getFechaHasta().toString(), textFont));
                 table.addCell(new Phrase(String.valueOf(dto.getDiasAlquilado()), textFont));
-                table.addCell(new Phrase(String.format("$ %.2f", dto.getMontoTotal()), textFont));
-            }
+                table.addCell(new Phrase(String.format("$ %.2f", dto.getMonto()), textFont));            }
 
             document.add(table);
 
             // 🔹 Total general
-            double total = vehiculos.stream().mapToDouble(v -> v.getMontoTotal() != null ? v.getMontoTotal() : 0).sum();
+            double total = vehiculos.stream().mapToDouble(v -> v.getMonto() != null ? v.getMonto() : 0).sum();
             Paragraph totalParagraph = new Paragraph(
                     String.format("\nTotal Recaudado: $ %.2f", total),
                     new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD)

@@ -1,6 +1,8 @@
 package com.gpadilla.mycar.repository;
 
 
+import com.gpadilla.mycar.dtos.reportes.RecaudacionAbiertosRow;
+import com.gpadilla.mycar.dtos.reportes.RecaudacionCerradosRow;
 import com.gpadilla.mycar.dtos.reportes.ReporteVehiculosDto;
 import com.gpadilla.mycar.entity.Factura;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,37 +16,79 @@ import java.util.List;
 @Repository
 public interface ReporteRepository extends JpaRepository<Factura, Long> {
 
-//    @Query("""
-//    SELECT new com.gpadilla.mycar.dtos.reportes.ReporteVehiculosDto(
-//        CONCAT(c.marca, ' ', c.modelo),
-//        v.patente,
-//        CONCAT(cli.nombre, ' ', cli.apellido),
-//        a.fechaDesde,
-//        a.fechaHasta,
-//        DATEDIFF(a.fechaHasta, a.fechaDesde) + 1,
-//        a.monto
-//    )
-//    FROM Alquiler a
-//    JOIN a.auto v
-//    JOIN v.caracteristicasAuto c
-//    JOIN a.cliente cli
-//    WHERE a.fechaHasta >= :fechaInicio AND a.fechaDesde <= :fechaFin
-//    ORDER BY a.fechaDesde ASC
-//""")
+    @Query("""
+    SELECT new com.gpadilla.mycar.dtos.reportes.RecaudacionCerradosRow(
+        CONCAT(c.marca, ' ', c.modelo),
+        COUNT(a.id),
+        CAST(COALESCE(SUM(a.monto), 0.0) AS double)
+    )
+    FROM Alquiler a
+    JOIN a.auto v
+    JOIN v.caracteristicasAuto c
+    WHERE a.fechaDesde >= :inicio AND a.fechaHasta <= :fin
+    GROUP BY c.marca, c.modelo
+""")
+    List<RecaudacionCerradosRow> recaudacionCerrados(
+            @Param("inicio") LocalDate inicio,
+            @Param("fin") LocalDate fin
+    );
 
-    // TODO: LA QUERY DE ARRIBA ES NO COMPILA, DATEDIFF ES DE POSTGRES
+
+    // Alquileres ABIERTOS que se solapan con el período (sin estar totalmente dentro)
+    @Query("""
+        SELECT new com.gpadilla.mycar.dtos.reportes.RecaudacionAbiertosRow(
+            CONCAT(c.marca, ' ', c.modelo),
+            a.fechaDesde,
+            a.fechaHasta,
+            a.costoPorDia
+        )
+        FROM Alquiler a
+        JOIN a.auto v
+        JOIN v.caracteristicasAuto c
+        WHERE a.fechaHasta >= :inicio AND a.fechaDesde <= :fin
+          AND NOT (a.fechaDesde >= :inicio AND a.fechaHasta <= :fin)
+    """)
+    List<RecaudacionAbiertosRow> recaudacionAbiertos(
+            @Param("inicio") LocalDate inicio,
+            @Param("fin") LocalDate fin
+    );
+
 
     @Query("""
     SELECT new com.gpadilla.mycar.dtos.reportes.ReporteVehiculosDto(
-        '', '', '', NULL, NULL, 0, 0.0
+        CONCAT(c.marca, ' ', c.modelo),
+        v.patente,
+        CONCAT(cli.nombre, ' ', cli.apellido),
+        a.fechaDesde,
+        a.fechaHasta,
+        a.monto
     )
     FROM Alquiler a
-    WHERE 1 = 0
+    JOIN a.auto v
+    JOIN v.caracteristicasAuto c
+    JOIN a.cliente cli
+    WHERE a.fechaHasta >= :fechaInicio AND a.fechaDesde <= :fechaFin
+    ORDER BY a.fechaDesde ASC
 """)
     List<ReporteVehiculosDto> findVehiculosAlquiladosPorFechas(
             @Param("fechaInicio") LocalDate fechaInicio,
             @Param("fechaFin") LocalDate fechaFin
     );
+
+
+    // TODO: LA QUERY DE ARRIBA ES NO COMPILA, DATEDIFF ES DE POSTGRES
+
+//    @Query("""
+//    SELECT new com.gpadilla.mycar.dtos.reportes.ReporteVehiculosDto(
+//        '', '', '', NULL, NULL, 0, 0.0
+//    )
+//    FROM Alquiler a
+//    WHERE 1 = 0
+//""")
+//    List<ReporteVehiculosDto> findVehiculosAlquiladosPorFechas(
+//            @Param("fechaInicio") LocalDate fechaInicio,
+//            @Param("fechaFin") LocalDate fechaFin
+//    );
 
 
 //    @Query(value = """
