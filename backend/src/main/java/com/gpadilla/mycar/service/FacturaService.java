@@ -50,58 +50,6 @@ public class FacturaService extends BaseService<
         private final byte[] pdfBytes;
     }
 
-    @Transactional
-    public FacturaConPdf generarFacturaParaAlquiler(
-            Alquiler alquiler,
-            TipoDePago tipoDePago,
-            Promocion promocion
-    ) {
-        // --- Calcular total con promoción si aplica ---
-        double total = alquiler.getMonto();
-        if (promocion != null && promocion.getPorcentajeDescuento() != null) {
-            total = total * (1 - promocion.getPorcentajeDescuento() / 100.0);
-        }
-
-        // --- Crear entidad Factura ---
-        Factura factura = Factura.builder()
-                .numeroFactura(generarSiguienteNumeroDeFactura())
-                .fechaFactura(LocalDate.now())
-                .totalPagado(total)
-                .estado(EstadoFactura.SIN_DEFINIR) // por defecto, luego el facade decidirá si cambiarlo
-                .formaDePago(FormaDePago.builder()
-                        .tipoDePago(tipoDePago)
-                        .observacion("")
-                        .build())
-                .eliminado(false)
-                .build();
-
-        // --- Crear DetalleFactura ---
-        DetalleFactura detalle = DetalleFactura.builder()
-                .factura(factura)
-                .alquiler(alquiler)
-                .subtotal(alquiler.getMonto())
-                .promocion(promocion)
-                .build();
-
-        factura.setDetalles(List.of(detalle));
-
-        // --- Persistir la factura ---
-        repository.save(factura);
-
-        // --- Generar PDF en memoria ---
-        FacturaDto dto = mapper.toDto(factura);
-        byte[] pdfBytes = pdfGenerator.generarFacturaPdf(dto);
-
-        // --- Devolver ambos ---
-        return new FacturaConPdf(factura, pdfBytes);
-    }
-
-
-    public FacturaDto buscarFacturaDto(Long id) {
-        // Usa findDto() del BaseService, que ya aplica eliminado = false
-        return findDto(id);
-    }
-
     @Transactional(readOnly = true)
     public byte[] generarFacturaPdfEnMemoria(Long facturaId) {
         // 1️⃣ Buscar la factura en BD

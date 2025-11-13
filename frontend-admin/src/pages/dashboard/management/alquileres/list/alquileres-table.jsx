@@ -15,7 +15,7 @@ import { ReporteVehiculosButton } from "@/components/ReporteVehiculosButton";
 import dayjs from "dayjs";
 import minMax from "dayjs/plugin/minMax";
 dayjs.extend(minMax);
-import BotonFactura from "@/components/BotonFactura.tsx";
+
 
 export function AlquileresTable() {
   const { roles } = useAuth();
@@ -74,15 +74,6 @@ export function AlquileresTable() {
         sortable: true,
         render: alquiler => (
           <Text truncate="end">{formatCurrency(alquiler.monto)}</Text>
-        )
-      },
-      {
-        accessor: "factura",
-        title: "Factura",
-        textAlign: "center",
-        width: 160,
-        render: alquiler => (
-          <BotonFactura alquilerId={alquiler.id} disabled={alquiler.estado !== "PAGADO"} />
         )
       },
       {
