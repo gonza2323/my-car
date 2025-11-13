@@ -60,7 +60,8 @@ public class ExcelGenerator {
             titleCell.setCellStyle(titleStyle);
 
             // combinamos desde la col 0 hasta la última de headers
-            if (!headers.isEmpty()) {
+            // solo si hay 2 o más columnas
+            if (headers.size() > 1) {
                 sheet.addMergedRegion(new CellRangeAddress(
                         0, 0, 0, headers.size() - 1
                 ));
