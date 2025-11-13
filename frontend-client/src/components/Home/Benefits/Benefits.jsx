@@ -7,20 +7,20 @@ const Benefits = () => {
   let benefits = [
     {
       icon: <FaRocket></FaRocket>,
-      title: "FAST DELIVERY",
-      text: "Deliveries in less than 2 days",
+      title: "ENTREGA EFICIENTE",
+      text: "Tu vehículo será entregado a tiempo",
       id: 1,
     },
     {
       icon: <AiFillSafetyCertificate></AiFillSafetyCertificate>,
-      title: "SAFE PAYMENT",
-      text: "All payments are 100% secure",
+      title: "PAGOS SEGUROS",
+      text: "Nuestros pagos son por MercadoPago",
       id: 2,
     },
     {
       icon: <FaSmileWink></FaSmileWink>,
-      title: "FRIENDLY SERVICES",
-      text: "Best customer care services",
+      title: "EL MEJOR SERVICIO",
+      text: "El mejor servicio de atención al cliente",
       id: 3,
     },
   ];
