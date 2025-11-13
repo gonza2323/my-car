@@ -10,8 +10,6 @@ import { useAuth, useDeleteAlquiler, useGetAlquileres } from "@/hooks";
 import { paths } from "@/routes";
 import { client } from "@/api/axios";
 import { formatCurrency } from "@/utilities/number";
-import { ReporteRecaudacionButton } from "@/components/ReporteRecaudacionButton";
-import { ReporteVehiculosButton } from "@/components/ReporteVehiculosButton";
 import dayjs from "dayjs";
 import minMax from "dayjs/plugin/minMax";
 import { DateInput, DatePickerInput } from "@mantine/dates";

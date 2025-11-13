@@ -6,6 +6,9 @@ import ErrorView from "./views/ErrorView";
 import CartView from "./views/CartView";
 import AlquileresList from "./views/AlquileresPage";
 import VehiculosPage from "./views/VehiculosPage";
+import { AuthGuard } from "./guards/auth-guard";
+import { CompleteProfileGuard } from "./guards/complete-profile-guard";
+import CompleteProfilePage from "./views/CompletarPerfil";
 
 export default function AppRoutes() {
     return (
@@ -14,9 +17,26 @@ export default function AppRoutes() {
                 <NavBar></NavBar>
             </header>
             <Routes>
+                {/* Public Routes */}
                 <Route path="/" element={<HomeView />} />
-                <Route path="/alquileres" element={<AlquileresList />} />
                 <Route path="/vehiculos" element={<VehiculosPage />} />
+
+                {/* Protected Routes with CompleteProfileGuard */}
+                <Route
+                    path="/alquileres"
+                    element={
+                        <AuthGuard>
+                            <CompleteProfileGuard>
+                                <AlquileresList />
+                            </CompleteProfileGuard>
+                        </AuthGuard>
+                    }
+                />
+
+                {/* Complete profile route should be accessible even if profile is incomplete */}
+                <Route path="/complete-profile" element={<CompleteProfilePage />} />
+
+                {/* Catch all */}
                 <Route path="*" element={<ErrorView />} />
             </Routes>
             <footer>

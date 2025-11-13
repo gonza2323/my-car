@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { FcGoogle } from 'react-icons/fc';
 import { SiGoogle, SiMicrosoft } from 'react-icons/si';
 import { app } from '@/config';
+import { useSignUp } from '@/hooks';
 
 // OAuth URLs
 const GOOGLE_URL = `${app.baseUrl}/oauth2/authorization/auth0?connection=google-oauth2`;
@@ -15,22 +16,40 @@ const signUpSchema = z
   .object({
     email: z.string().email({ message: 'Invalid email' }),
     password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
-    confirmPassword: z.string().min(6, { message: 'Confirm password must be at least 6 characters' }),
+    passwordConfirm: z.string().min(6, { message: 'Confirm password must be at least 6 characters' }),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((data) => data.password === data.passwordConfirm, {
     message: "Passwords don't match",
-    path: ['confirmPassword'],
+    path: ['passwordConfirm'],
   });
 
 export function SignUpForm() {
+  const { mutate: signup, isPending } = useSignUp();
+
+
   const form = useForm({
     schema: zodResolver(signUpSchema),
-    initialValues: { email: '', password: '', confirmPassword: '' },
+    initialValues: { email: '', password: '', passwordConfirm: '' },
   });
+
+    const handleSubmit = form.onSubmit(variables => {
+      signup(
+        { variables },
+        {
+          onSuccess: () => {
+            modals.closeAll();
+            notifications.show({ title: 'Registro exitoso', message: 'Ahora debe completar su perfil' });
+          },
+          onError: error => {
+            notifications.show({ message: error.message, color: 'red' });
+          }
+        }
+      )
+    })
 
   return (
     <Stack>
-      <form onSubmit={form.onSubmit((values) => console.log('Sign Up values:', values))}>
+      <form onSubmit={handleSubmit}>
         <TextInput label="Email" placeholder="you@example.com" required {...form.getInputProps('email')} />
         <PasswordInput label="Contraseña" placeholder="Contraseña" required mt="sm" {...form.getInputProps('password')} />
         <PasswordInput
@@ -38,7 +57,7 @@ export function SignUpForm() {
           placeholder="Confirma la contraseña"
           required
           mt="sm"
-          {...form.getInputProps('confirmPassword')}
+          {...form.getInputProps('passwordConfirm')}
         />
         <Group justify="end" mt="md">
           <Button type="submit">Registrarse</Button>

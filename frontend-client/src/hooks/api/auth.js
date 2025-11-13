@@ -35,6 +35,29 @@ export const useLogin = () => {
   });
 };
 
+export const useSignUp = () => {
+  const { setAuth } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ variables }) => {
+      const res = await client.post('/auth/signup', variables);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      setAccessToken(data.token.value, new Date(data.token.expiryDate));
+      setAuth({
+        isAuthenticated: true,
+        userId: data.user.userId,
+        roles: data.user.roles || []
+      });
+      queryClient.invalidateQueries(['auth-status'], { refetchActive: true });
+    },
+    onError: (err) => {
+    },
+  });
+};
+
 export const useLogout = () => {
   const { setAuth } = useAuth();
   const queryClient = useQueryClient();

@@ -31,21 +31,6 @@ public class ReporteController {
     private final CaracteristicasAutoRepository caracteristicasAutoRepository;
     private final ExcelGenerator excelGenerator;
 
-    @GetMapping("/vehiculos")
-    @PreAuthorize("hasAnyRole('JEFE')")
-    public ResponseEntity<byte[]> generarReporteVehiculos(
-            @RequestParam LocalDate fechaInicio,
-            @RequestParam LocalDate fechaFin
-    ) {
-        byte[] pdf = reporteService.generarReporteVehiculos(fechaInicio, fechaFin);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_vehiculos.pdf")
-                .body(pdf);
-    }
-
-
     @GetMapping(value = "/recaudacion/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     @PreAuthorize("hasAnyRole('JEFE')") //solo jefe, ahora asi para probar
     public ResponseEntity<byte[]> generarReporte(
@@ -76,38 +61,53 @@ public class ReporteController {
                 .body(excel);
     }
 
+    // todo falta descuentos no mas
     @GetMapping("/modelos/pdf")
-    //@PreAuthorize("hasRole('JEFE')")
     @PreAuthorize("hasAnyRole('JEFE')")
-    public ResponseEntity<byte[]> generarReporteModelos() {
-        var modelos = caracteristicasAutoRepository.findAll();
-        System.out.println("Cantidad de modelos encontrados: " + modelos.size());
-        modelos.forEach(m -> System.out.println(m.getModelo()));
+    public ResponseEntity<byte[]> generarReporteVehiculos(
+            @RequestParam LocalDate fechaInicio,
+            @RequestParam LocalDate fechaFin
+    ) {
+        byte[] pdf = reporteService.generarReporteVehiculos(fechaInicio, fechaFin);
 
-        var headers = List.of("Modelo");
-        var extractors = List.of(
-                (Function<CaracteristicasAuto, String>) CaracteristicasAuto::getModelo
-        );
-
-        try {
-            byte[] pdf = pdfGenerator.generarPdfEnMemoria(
-                    "Listado de Modelos de Autos",
-                    headers,
-                    modelos,
-                    extractors
-            );
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=modelos_autos.pdf")
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .body(pdf);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error generando el PDF", e);
-        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_vehiculos.pdf")
+                .body(pdf);
     }
 
+//    @GetMapping("/vehiculos/pdf")
+//    @PreAuthorize("hasAnyRole('JEFE')")
+//    public ResponseEntity<byte[]> generarReporteModelos() {
+//        var modelos = caracteristicasAutoRepository.findAll();
+//        System.out.println("Cantidad de modelos encontrados: " + modelos.size());
+//        modelos.forEach(m -> System.out.println(m.getModelo()));
+//
+//        var headers = List.of("Modelo");
+//        var extractors = List.of(
+//                (Function<CaracteristicasAuto, String>) CaracteristicasAuto::getModelo
+//        );
+//
+//        try {
+//            byte[] pdf = pdfGenerator.generarPdfEnMemoria(
+//                    "Listado de Modelos de Autos",
+//                    headers,
+//                    modelos,
+//                    extractors
+//            );
+//
+//            return ResponseEntity.ok()
+//                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=modelos_autos.pdf")
+//                    .contentType(MediaType.APPLICATION_PDF)
+//                    .body(pdf);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            throw new RuntimeException("Error generando el PDF", e);
+//        }
+//    }
+
+    // todo no funciona
     @GetMapping("/modelos/xlsx")
     @PreAuthorize("hasAnyRole('JEFE')")
     public ResponseEntity<byte[]> generarReporteModelosExcel() {

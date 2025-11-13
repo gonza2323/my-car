@@ -9,7 +9,10 @@ export function AuthProvider({ children }) {
     isAuthenticated: false,
     userId: null,
     roles: [],
+    hasCompletedProfile: true,
+    mustChangePassword: false,
   });
+
 
   useEffect(() => {
     if (data) {
@@ -17,6 +20,8 @@ export function AuthProvider({ children }) {
         isAuthenticated: true,
         userId: data.userId,
         roles: data.roles || [],
+        hasCompletedProfile: data.hasCompletedProfile,
+        mustChangePassword: data.mustChangePassword,
       });
     }
   }, [isLoading]);

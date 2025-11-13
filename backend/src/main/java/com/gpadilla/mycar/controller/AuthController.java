@@ -48,7 +48,7 @@ public class AuthController {
 
         LoginResponseDto response = LoginResponseDto.builder()
                 .token(accessToken)
-                .user(new AuthUserDto(user.getId(), user.getRoles()))
+                .user(new AuthUserDto(user.getId(), user.getRoles(), usuario.getHasCompletedProfile(), usuario.getMustChangePassword()))
                 .build();
 
         return ResponseEntity.ok()
@@ -58,7 +58,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<LoginResponseDto> singup(@RequestBody SignUpFormDto loginRequest) {
+    public ResponseEntity<LoginResponseDto> signup(@RequestBody SignUpFormDto loginRequest) {
         CurrentUser user = authService.registerUserWithEmailAndPassword(loginRequest);
 
         Usuario usuario = usuarioService.find(user.getId());
@@ -68,7 +68,7 @@ public class AuthController {
 
         LoginResponseDto response = LoginResponseDto.builder()
                 .token(accessToken)
-                .user(new AuthUserDto(user.getId(), user.getRoles()))
+                .user(new AuthUserDto(user.getId(), user.getRoles(), usuario.getHasCompletedProfile(), usuario.getMustChangePassword()))
                 .build();
 
         return ResponseEntity.ok()
@@ -96,7 +96,9 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        return ResponseEntity.ok(new AuthUserDto(user.getId(), user.getRoles()));
+        Usuario usuario = usuarioService.find(user.getId());
+
+        return ResponseEntity.ok(new AuthUserDto(user.getId(), user.getRoles(), usuario.getHasCompletedProfile(), usuario.getMustChangePassword()));
     }
 
     @PostMapping("/refresh")

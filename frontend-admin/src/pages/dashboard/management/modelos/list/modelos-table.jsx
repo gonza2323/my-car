@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Button, Group, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
@@ -9,6 +9,11 @@ import { DataTable } from "@/components/data-table";
 import { useAuth, useDeleteModelo, useGetModelos } from "@/hooks";
 import { paths } from "@/routes";
 import { client } from "@/api/axios";
+import dayjs from "dayjs";
+import minMax from "dayjs/plugin/minMax";
+import { DateInput, DatePickerInput } from "@mantine/dates";
+import { app } from "@/config";
+dayjs.extend(minMax);
 
 
 export function ModelosTable() {
@@ -23,6 +28,12 @@ export function ModelosTable() {
       column: "marca"
     }
   })
+
+  const [fechaDesde, setFechaDesde] = useState(new Date());
+  const [fechaHasta, setFechaHasta] = useState(dayjs().add(4, "day").toDate());
+
+  const fechaDesdeFormatted = dayjs(fechaDesde).format("YYYY-MM-DD");
+  const fechaHastaFormatted = dayjs(fechaHasta).format("YYYY-MM-DD");
 
   const { data, isLoading } = useGetModelos({
     query: {
@@ -117,6 +128,27 @@ export function ModelosTable() {
     })
   }
 
+  const handleDownloadReport = async (formato) => {
+    try {
+      const response = await client.get(`${app.apiBaseUrl}/reportes/vehiculos/${formato}?fechaInicio=${fechaDesdeFormatted}&fechaFin=${fechaHastaFormatted}`, {
+        responseType: "blob",
+        headers: { Accept: `application/${formato}` },
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `alquileres_autos.${formato}`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(`Error al generar ${formato}:`, error);
+      alert("No se pudo generar el reporte de alquileres");
+    }
+  }
+
 
   return (
     <DataTable.Container>
@@ -125,7 +157,24 @@ export function ModelosTable() {
         description="Lista de modelos"
         actions={
           <Group>
-
+            <Group mb="xl">
+              <DateInput
+                label="Desde"
+                valueFormat="YYYY-MM-DD"
+                value={fechaDesde}
+                onChange={setFechaDesde}
+                maxDate={fechaHasta ?? undefined}
+              />
+              <DateInput
+                label="Hasta"
+                valueFormat="YYYY-MM-DD"
+                value={fechaHasta}
+                onChange={setFechaHasta}
+                minDate={fechaDesde ?? undefined}
+              />
+            </Group>
+            <Button onClick={() => handleDownloadReport('pdf')}>PDF</Button>
+            <Button onClick={() => handleDownloadReport('xlsx')}>Excel</Button>
             <AddButton
               variant="default"
               size="xs"

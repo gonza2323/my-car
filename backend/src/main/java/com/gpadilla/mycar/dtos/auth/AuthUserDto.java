@@ -1,7 +1,10 @@
 package com.gpadilla.mycar.dtos.auth;
 
 import com.gpadilla.mycar.enums.UserRole;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Collection;
@@ -14,4 +17,6 @@ import java.util.Collection;
 public class AuthUserDto {
     Long userId;
     Collection<UserRole> roles;
+    private Boolean hasCompletedProfile;
+    private Boolean mustChangePassword;
 }
