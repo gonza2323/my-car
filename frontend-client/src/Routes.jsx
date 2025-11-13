@@ -34,7 +34,7 @@ export default function AppRoutes() {
                 />
 
                 {/* Complete profile route should be accessible even if profile is incomplete */}
-                <Route path="/complete-profile" element={<CompleteProfilePage />} />
+                <Route path="/complete-profile" element={<AuthGuard><CompleteProfilePage /></AuthGuard>} />
 
                 {/* Catch all */}
                 <Route path="*" element={<ErrorView />} />

@@ -1,5 +1,5 @@
 import "./Product.css";
-import headphones_pink from "@/assets/images/airpods_max_pink.jpg";
+import item_car from "@/assets/images/item_car.png";
 import { FaStar } from "react-icons/fa";
 import { toast } from "react-toastify";
 
@@ -9,7 +9,7 @@ const Product = ({ product }) => {
     <div className="product-container">
       <div className="image">
         <img
-          src={product?.product_image || headphones_pink}
+          src={product?.product_image || item_car}
           alt="Product Image"
           width={"100%"}
         />

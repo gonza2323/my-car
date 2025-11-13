@@ -1,4 +1,4 @@
-import girlHeadphones from "@/assets/images/girl_headphones.png";
+import car from "@/assets/images/car.jpg";
 import "./Banner.css";
 
 const Banner = () => {
@@ -16,7 +16,7 @@ const Banner = () => {
           </span>
         </div>
         <div className="subject">
-          <img src={girlHeadphones} alt="Girl Headphones" width={"100%"} />
+          <img src={car} alt="Girl Headphones" width={"100%"} />
         </div>
       </div>
     </div>

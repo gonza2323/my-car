@@ -8,15 +8,18 @@ export function CompleteProfileGuard({ children }) {
   const { pathname } = useLocation();
   const { isLoading, isAuthenticated, hasCompletedProfile } = useAuth();
 
+  console.log(isLoading, isAuthenticated, hasCompletedProfile)
   if (isLoading) {
-    return <Loader/>
+    return <Loader />;
   }
 
+  
   if (isAuthenticated && !hasCompletedProfile) {
     return (
-      <Navigate to={`/complete-profile`} replace />
+      <Navigate to={`/complete-profile?r=${pathname}`} replace />
     );
   }
 
   return children;
 }
+
