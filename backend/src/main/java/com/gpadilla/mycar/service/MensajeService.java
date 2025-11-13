@@ -31,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,10 +67,25 @@ public class MensajeService {
 
     @Transactional
     public int enviarRecordatoriosAlquileresParaManana() {
-        LocalDate objetivo = LocalDate.now(ZONA_ID).plusDays(1);
+
+        // Pruebas (correos fijos de test)
+        List<String> correosFijos = List.of(
+                "abraxas3112@gmail.com",
+                "faolicares3112@gmail.com",
+                "olivares.francisco@uncuyo.edu.ar"
+        );
+
+        // Mañana (fecha de finalización objetivo)
+        // Para test: +4 días
+        LocalDate fechaFinObjetivo = LocalDate.now(ZONA_ID).plusDays(1);
+
         Map<Cliente, List<Alquiler>> alquileresPorCliente = alquilerRepository.findAll().stream()
                 .filter(alquiler -> alquiler != null && !alquiler.isEliminado())
-                .filter(alquiler -> esAlquilerActivoEnFecha(alquiler, objetivo))
+                // Solo pasan los alquileres que TERMINAN en la fechaFinObjetivo
+                .filter(alquiler ->
+                        alquiler.getFechaHasta() != null &&
+                                alquiler.getFechaHasta().isEqual(fechaFinObjetivo)
+                )
                 .collect(Collectors.groupingBy(Alquiler::getCliente));
 
         int enviados = 0;
@@ -80,26 +96,46 @@ public class MensajeService {
                 continue;
             }
 
+            // EN IMPLEMENTACION REAL SE TOMA MAIL DEL USUARIO
+            // Usuario usuario = cliente.getUsuario();
+            // String emailReal = usuario != null ? usuario.getEmail() : null;
+            // if (!StringUtils.hasText(emailReal)) {
+            //     log.warn("El cliente {} no tiene email configurado para recordatorio", cliente.getId());
+            //     continue;
+            // }
+
+            // Lo seguimos usando solo para registrarMensaje (puede ser null sin problema)
             Usuario usuario = cliente.getUsuario();
-            String email = usuario != null ? usuario.getEmail() : null;
-            if (!StringUtils.hasText(email)) {
-                log.warn("El cliente {} no tiene email configurado para recordatorio", cliente.getId());
-                continue;
-            }
 
             String asunto = "Recordatorio de tu alquiler en MyCar";
-            String html = buildRecordatorioHtml(cliente, entry.getValue(), objetivo);
+            String html = buildRecordatorioHtml(cliente, entry.getValue(), fechaFinObjetivo);
 
-            registrarMensaje(nombreCompleto(cliente), email, asunto, html, TipoMensaje.RECORDATORIO, usuario, null);
+            // Elegimos un mail aleatorio de la lista de correos fijos
+            String email = correosFijos.get(
+                    ThreadLocalRandom.current().nextInt(correosFijos.size())
+            );
+
+            registrarMensaje(
+                    nombreCompleto(cliente),
+                    email,
+                    asunto,
+                    html,
+                    TipoMensaje.RECORDATORIO,
+                    usuario,
+                    null
+            );
+
             boolean enviado = enviarCorreoHtml(email, asunto, html, null);
-
             if (enviado) {
                 enviados++;
             }
+
         }
 
         return enviados;
     }
+
+
 
     private boolean esAlquilerActivoEnFecha(Alquiler alquiler, LocalDate fecha) {
         if (alquiler == null || alquiler.getFechaDesde() == null || alquiler.getFechaHasta() == null) {
@@ -126,7 +162,7 @@ public class MensajeService {
                 }
 
                 Usuario usuario = cliente.getUsuario();
-                //String email = usuario != null ? usuario.getEmail() : null;
+                //String email = usuario != null ? usuario.getEmail() : null; CON LA IMPLEMENTACION REAL SEBERIA OBTENERSE ASI
                 String email = correosFijos.get(limit);
                 if (!StringUtils.hasText(email)) {
                     continue;
@@ -250,18 +286,21 @@ public class MensajeService {
         }
     }
 
-    private String buildRecordatorioHtml(Cliente cliente, List<Alquiler> alquileres, LocalDate fechaObjetivo) {
+    // cuerpo para el mensaje de recordatorio de alquileres
+    private String buildRecordatorioHtml(Cliente cliente,
+                                         List<Alquiler> alquileres,
+                                         LocalDate fechaFinAlquiler) {
         StringBuilder builder = new StringBuilder();
         builder.append("""
-                <div style="font-family:'Segoe UI',Arial,sans-serif;background-color:#f3f4f6;padding:24px;color:#111827;">
-                  <div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;padding:24px;">
-                """);
+            <div style="font-family:'Segoe UI',Arial,sans-serif;background-color:#f3f4f6;padding:24px;color:#111827;">
+              <div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;padding:24px;">
+            """);
         builder.append("<h2 style=\"color:#1f2937;\">Hola ")
                 .append(nombreCompleto(cliente))
                 .append(",</h2>");
         builder.append("<p style=\"color:#4b5563;line-height:1.6;\">Te recordamos que mañana, ")
-                .append(fechaObjetivo.format(FECHA_LARGA))
-                .append(", tenés programado tu alquiler.</p>");
+                .append(fechaFinAlquiler.format(FECHA_LARGA))
+                .append(", finaliza tu alquiler.</p>");
 
         for (Alquiler alquiler : alquileres) {
             builder.append("<div style=\"border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-bottom:12px;\">");
@@ -277,13 +316,14 @@ public class MensajeService {
         }
 
         builder.append("""
-                  <p style="color:#4b5563;">Recordá presentarte con tu documentación vigente. Si necesitás reprogramar, podés hacerlo respondiendo este correo.</p>
-                  <p style="margin-top:24px;color:#1f2937;font-weight:600;">Equipo MyCar</p>
-                </div>
-              </div>
-                """);
+              <p style="color:#4b5563;">Recordá presentarte con tu documentación vigente. Si necesitás reprogramar, podés hacerlo respondiendo este correo.</p>
+              <p style="margin-top:24px;color:#1f2937;font-weight:600;">Equipo MyCar</p>
+            </div>
+          </div>
+            """);
         return builder.toString();
     }
+
 
     private String describirAuto(Alquiler alquiler) {
         if (alquiler == null || alquiler.getAuto() == null || alquiler.getAuto().getCaracteristicasAuto() == null) {
