@@ -12,6 +12,16 @@ import java.util.Optional;
 
 public interface FacturaRepository extends BaseRepository<Factura, Long> {
 
+    @Query("""
+    SELECT f FROM Factura f
+    JOIN FETCH f.detalles d
+    JOIN FETCH d.alquiler a
+    JOIN FETCH a.auto au
+    JOIN FETCH au.caracteristicasAuto ca
+    WHERE f.id = :id
+""")
+    Optional<Factura> findFacturaCompletaPorId(@Param("id") Long id);
+
     Optional<Factura> findByIdAndEliminadoFalse(Long id);
     List<Factura> findAllByEliminadoFalseOrderByFechaFacturaDescNumeroFacturaDesc();
     List<Factura> findAllByEliminadoFalseAndEstado(EstadoFactura estado);

@@ -33,8 +33,9 @@ public class Factura extends BaseEntity<Long> {
     @Enumerated(EnumType.STRING)
     private EstadoFactura estado;
 
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleFactura> detalles = new ArrayList<>();
+
 
     @ManyToOne(cascade = CascadeType.PERSIST, optional = false)
     private FormaDePago formaDePago;

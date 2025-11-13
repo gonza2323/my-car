@@ -50,10 +50,15 @@ public class FacturaService extends BaseService<
         private final byte[] pdfBytes;
     }
 
+    public FacturaDto mapToDto(Factura factura) {
+        return mapper.toDto(factura);
+    }
+
     @Transactional(readOnly = true)
     public byte[] generarFacturaPdfEnMemoria(Long facturaId) {
         // 1️⃣ Buscar la factura en BD
-        Factura factura = repository.findByIdAndEliminadoFalse(facturaId)
+        //Factura factura = repository.findByIdAndEliminadoFalse(facturaId)
+        Factura factura = repository.findFacturaCompletaPorId(facturaId)
                 .orElseThrow(() -> new BusinessException("Factura no encontrada"));
 
         // 2️⃣ Convertir a DTO

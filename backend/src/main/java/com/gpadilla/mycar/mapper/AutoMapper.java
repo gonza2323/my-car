@@ -6,8 +6,7 @@ import com.gpadilla.mycar.dtos.auto.AutoSummaryDto;
 import com.gpadilla.mycar.dtos.auto.AutoUpdateDto;
 import com.gpadilla.mycar.entity.Auto;
 import org.mapstruct.*;
-
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring")
 public interface AutoMapper extends BaseMapper<
         Auto,
         AutoDetailDto,
@@ -29,6 +28,28 @@ public interface AutoMapper extends BaseMapper<
     @Mapping(target = "caracteristicasAuto", ignore = true)
     void updateEntity(AutoUpdateDto dto, @MappingTarget Auto entity);
 
+    // ===============================
+    //    ESTE ES EL IMPORTANTE
+    // ===============================
+    @Override
+    @Named("autoToSummary")
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "patente", source = "patente")
+    @Mapping(target = "estadoAuto", source = "estadoAuto")
+
+    @Mapping(target = "caracteristicaAutoId", source = "caracteristicasAuto.id")
+    @Mapping(target = "marca", source = "caracteristicasAuto.marca")
+    @Mapping(target = "modelo", source = "caracteristicasAuto.modelo")
+    @Mapping(target = "anio", source = "caracteristicasAuto.anio")
+
+    // estos campos NO existen en summary → ignorar
+   // @Mapping(target = "cantidadPuertas", ignore = true)
+//    @Mapping(target = "cantidadAsientos", ignore = true)
+//    @Mapping(target = "cantTotalAutos", ignore = true)
+
+    AutoSummaryDto toSummaryDto(Auto entity);
+
+
     @Override
     @Named("toDto")
     @Mapping(target = "caracteristicaAutoId", source = "caracteristicasAuto.id")
@@ -39,14 +60,6 @@ public interface AutoMapper extends BaseMapper<
     @Mapping(target = "cantidadAsientos", source = "caracteristicasAuto.cantidadAsientos")
     @Mapping(target = "cantTotalAutos", source = "caracteristicasAuto.cantTotalAutos")
     AutoDetailDto toDto(Auto entity);
-
-    @Override
-    @Named("toSummary")
-    @Mapping(target = "caracteristicaAutoId", source = "caracteristicasAuto.id")
-    @Mapping(target = "marca", source = "caracteristicasAuto.marca")
-    @Mapping(target = "modelo", source = "caracteristicasAuto.modelo")
-    @Mapping(target = "anio", source = "caracteristicasAuto.anio")
-    AutoSummaryDto toSummaryDto(Auto entity);
 }
 
 

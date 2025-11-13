@@ -1,6 +1,7 @@
 package com.gpadilla.mycar.facade;
 
 import com.gpadilla.mycar.dtos.alquiler.AlquilerCreateRequestDto;
+import com.gpadilla.mycar.dtos.factura.FacturaDto;
 import com.gpadilla.mycar.entity.*;
 import com.gpadilla.mycar.enums.EstadoFactura;
 import com.gpadilla.mycar.enums.EstadoPagoAlquiler;
@@ -84,6 +85,10 @@ public class AlquilerFacade {
             // Generar PDF en memoria desde la factura creada
             byte[] pdfFactura = facturaService.generarFacturaPdfEnMemoria(factura.getId());
             mensajeService.enviarMensajeFacturaAlquiler(alquiler, pdfFactura);
+
+            FacturaDto dto = facturaService.mapToDto(factura);
+            System.out.println(dto.getDetalles().get(0).getAlquiler().getAuto());
+
         }
 
         // todo configurar recordario por mail y wp
