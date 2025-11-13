@@ -7,7 +7,7 @@ import com.gpadilla.mycar.enums.EstadoFactura;
 import com.gpadilla.mycar.enums.EstadoPagoAlquiler;
 import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.service.AlquilerService;
-import com.gpadilla.mycar.service.pagos.FacturaService;
+import com.gpadilla.mycar.service.FacturaService;
 import com.gpadilla.mycar.service.pagos.MercadoPagoService;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;

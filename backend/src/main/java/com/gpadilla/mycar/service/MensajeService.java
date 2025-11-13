@@ -1,7 +1,6 @@
 package com.gpadilla.mycar.service;
 
 import com.gpadilla.mycar.dtos.mensaje.MensajeDTO;
-import com.gpadilla.mycar.dtos.mensaje.PromocionDTO;
 import com.gpadilla.mycar.dtos.promocion.PromocionCreateDto;
 import com.gpadilla.mycar.entity.Alquiler;
 import com.gpadilla.mycar.entity.Cliente;

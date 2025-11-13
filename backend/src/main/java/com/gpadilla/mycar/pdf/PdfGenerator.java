@@ -30,10 +30,12 @@ public class PdfGenerator {
             PdfWriter.getInstance(document, out);
             document.open();
 
+            // ========================
+            // 🔹 Encabezado principal
+            // ========================
             Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
             Font normalFont = new Font(Font.FontFamily.HELVETICA, 11);
             Font boldFont = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD);
-
 
             Paragraph titulo = new Paragraph("AUTOMOTORA MYCAR", titleFont);
             titulo.setAlignment(Element.ALIGN_LEFT);
@@ -44,18 +46,26 @@ public class PdfGenerator {
             document.add(new Paragraph("Teléfono: +54 261 555-1234", normalFont));
             document.add(Chunk.NEWLINE);
 
-
+            // ========================
+            // 🔹 Cabecera factura
+            // ========================
             PdfPTable cabecera = new PdfPTable(2);
             cabecera.setWidthPercentage(100);
             cabecera.addCell(getCell("Factura Nº: " + factura.getNumeroFactura(), PdfPCell.ALIGN_LEFT, boldFont));
             cabecera.addCell(getCell("Fecha: " + factura.getFechaFactura().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), PdfPCell.ALIGN_RIGHT, normalFont));
 
-            String formaPago = factura.getFormaDePago() != null ? factura.getFormaDePago().getTipoDePago() : "N/A";
+            String formaPago = (factura.getFormaDePago() != null && factura.getFormaDePago().getTipoDePago() != null)
+                    ? factura.getFormaDePago().getTipoDePago()
+                    : "N/A";
+
             cabecera.addCell(getCell("Forma de Pago: " + formaPago, PdfPCell.ALIGN_LEFT, normalFont));
             cabecera.addCell(getCell("Estado: " + factura.getEstado(), PdfPCell.ALIGN_RIGHT, normalFont));
             document.add(cabecera);
             document.add(Chunk.NEWLINE);
 
+            // ========================
+            // 🔹 Datos del cliente
+            // ========================
             if (factura.getDetalles() != null && !factura.getDetalles().isEmpty()) {
                 DetalleFacturaDto detalle = factura.getDetalles().get(0);
                 AlquilerDto alquiler = detalle.getAlquiler();
@@ -75,6 +85,9 @@ public class PdfGenerator {
                 document.add(Chunk.NEWLINE);
             }
 
+            // ========================
+            // 🔹 Tabla de detalles
+            // ========================
             PdfPTable tabla = new PdfPTable(5);
             tabla.setWidthPercentage(100);
             tabla.setWidths(new float[]{3, 2, 2, 2, 2});
@@ -113,6 +126,9 @@ public class PdfGenerator {
             document.add(tabla);
             document.add(Chunk.NEWLINE);
 
+            // ========================
+            // 🔹 Total final
+            // ========================
             Paragraph total = new Paragraph(
                     "Total Pagado: $" + String.format("%.2f", factura.getTotalPagado()),
                     new Font(Font.FontFamily.HELVETICA, 13, Font.BOLD)
@@ -124,7 +140,7 @@ public class PdfGenerator {
             document.add(new Paragraph("¡Gracias por elegir MYCAR!", new Font(Font.FontFamily.HELVETICA, 10, Font.ITALIC)));
 
             document.close();
-            return out.toByteArray();
+            return out.toByteArray(); // ✅ retorna PDF en memoria
 
         } catch (Exception e) {
             log.error("Error generando factura PDF", e);

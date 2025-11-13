@@ -12,7 +12,6 @@ import com.gpadilla.mycar.repository.ContactoRepository;
 import com.gpadilla.mycar.repository.UsuarioRepository;
 import com.gpadilla.mycar.service.ContactoCorreoService;
 import com.gpadilla.mycar.service.ContactoTelefonicoService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

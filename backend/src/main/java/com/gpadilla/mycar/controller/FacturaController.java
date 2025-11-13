@@ -1,15 +1,22 @@
 package com.gpadilla.mycar.controller;
 
+import com.gpadilla.mycar.entity.Factura;
+import com.gpadilla.mycar.entity.FacturaArchivo;
+import com.gpadilla.mycar.error.BusinessException;
 import com.gpadilla.mycar.pdf.PdfGenerator;
-import com.gpadilla.mycar.service.pagos.FacturaService;
+import com.gpadilla.mycar.repository.FacturaArchivoRepository;
+import com.gpadilla.mycar.repository.FacturaRepository;
+import com.gpadilla.mycar.service.FacturaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/facturas")
@@ -17,17 +24,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class FacturaController {
 
     private final FacturaService facturaService;
-    private final PdfGenerator pdfGenerator;
+    private final FacturaRepository facturaRepository;
 
-    @GetMapping("/{id}/pdf")
-    public ResponseEntity<byte[]> generarFacturaPdf(@PathVariable Long id) {
-        var facturaDto = facturaService.buscarFacturaDto(id);
-        byte[] pdfBytes = pdfGenerator.generarFacturaPdf(facturaDto);
+    // 👀 Descargar factura PDF asociada a un alquiler
+    @GetMapping("/alquiler/{alquilerId}/pdf")
+    public ResponseEntity<byte[]> descargarFacturaPorAlquiler(@PathVariable Long alquilerId) {
+        // 1️⃣ Buscar la factura asociada al alquiler
+        Factura factura = facturaRepository.buscarFacturaDeAlquiler(alquilerId)
+                .orElseThrow(() -> new BusinessException("No se encontró factura para este alquiler"));
 
-        String fileName = "factura_" + facturaDto.getNumeroFactura() + ".pdf";
+        // 2️⃣ Generar PDF en memoria
+        byte[] pdfBytes = facturaService.generarFacturaPdfEnMemoria(factura.getId());
 
+        // 3️⃣ Enviar respuesta como PDF
+        String fileName = "factura_" + factura.getNumeroFactura() + ".pdf";
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + fileName)
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdfBytes);
     }

@@ -6,9 +6,8 @@ import com.gpadilla.mycar.enums.EstadoFactura;
 import com.gpadilla.mycar.enums.EstadoPagoAlquiler;
 import com.gpadilla.mycar.enums.TipoDePago;
 import com.gpadilla.mycar.error.BusinessException;
-import com.gpadilla.mycar.pdf.PdfGenerator;
 import com.gpadilla.mycar.service.*;
-import com.gpadilla.mycar.service.pagos.FacturaService;
+import com.gpadilla.mycar.service.FacturaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,8 +74,13 @@ public class AlquilerFacade {
         Factura factura = facturaService.crearFacturaDeAlquiler(alquiler, estadoFactura, request.getFormaDePago(), promocion);
 
         if (estadoFactura == EstadoFactura.PAGADA) {
+
             // todo llamado a factura o pdf service (lo que sea) que devuelva la factura en memoria
             // todo enviar pdf por mail si está pagada, si no, recién cuando la pague por MP
+
+            // Generar PDF en memoria desde la factura creada
+            byte[] pdfFactura = facturaService.generarFacturaPdfEnMemoria(factura.getId());
+
 
             //byte[] pdf = facturaService.generarFacturaPdf ACA VOY A COMPLETAR ESTA PARTE
         }

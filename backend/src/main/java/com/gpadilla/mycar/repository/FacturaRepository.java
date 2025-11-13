@@ -25,4 +25,17 @@ public interface FacturaRepository extends BaseRepository<Factura, Long> {
 
     @Query("SELECT df.factura FROM DetalleFactura df WHERE df.alquiler.id = :alquilerId")
     Optional<Factura> buscarFacturaDeAlquiler(@Param("alquilerId") Long alquilerId);
+
+    @Query("""
+        SELECT DISTINCT f FROM Factura f
+        JOIN FETCH f.detalles d
+        JOIN FETCH d.alquiler a
+        JOIN FETCH a.auto au
+        JOIN FETCH au.caracteristicasAuto c
+        JOIN FETCH a.cliente cl
+        LEFT JOIN FETCH d.promocion p
+        LEFT JOIN FETCH f.formaDePago fp
+        WHERE a.id = :alquilerId
+    """)
+    Optional<Factura> findFacturaCompletaPorAlquiler(@Param("alquilerId") Long alquilerId);
 }
